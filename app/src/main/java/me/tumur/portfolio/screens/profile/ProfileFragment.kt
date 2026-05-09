@@ -11,21 +11,23 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
+import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.screen_profile_about.view.*
+import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.AndroidEntryPoint
 import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.FragmentProfileBinding
 import me.tumur.portfolio.repository.database.model.profile.AboutModel
 import me.tumur.portfolio.screens.MainViewModel
 import me.tumur.portfolio.utils.adapters.listItemAdapters.about.AboutAdapter
 import me.tumur.portfolio.utils.constants.Constants
+import me.tumur.portfolio.utils.extensions.collectFlow
 
 /**
  * An fragment that inflates a profile layout.
  */
+@AndroidEntryPoint
 class ProfileFragment : Fragment() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -45,7 +47,7 @@ class ProfileFragment : Fragment() {
      * this Fragment is attached i.e.,after Fragment.onAttach,
      * and access prior to that will result in IllegalArgumentException.
      * */
-    private val viewModel: ProfileViewModel by navGraphViewModels(R.id.profile_screen)
+    private val viewModel: ProfileViewModel by hiltNavGraphViewModels(R.id.profile_screen)
     private val sharedViewModel: MainViewModel by activityViewModels()
 
     /** Databinding */
@@ -83,7 +85,7 @@ class ProfileFragment : Fragment() {
         val aboutAdapter = AboutAdapter()
         val layoutManagerAbout = LinearLayoutManager(context)
         layoutManagerAbout.orientation = LinearLayoutManager.VERTICAL
-        val aboutList = binding.profileScreen.profile_screen_about_content
+        val aboutList = binding.root.findViewById<RecyclerView>(R.id.profile_screen_about_content)
 
         aboutList.apply {
             this.layoutManager = layoutManagerAbout
@@ -92,7 +94,7 @@ class ProfileFragment : Fragment() {
         }
 
         binding.apply {
-            // Set the lifecycleOwner so DataBinding can observe LiveData
+            // Set the lifecycleOwner so DataBinding can observe Flow
             this.lifecycleOwner = viewLifecycleOwner
             // Set the viewmodel so layout can display data
             this.model = viewModel
@@ -133,23 +135,21 @@ class ProfileFragment : Fragment() {
     private fun setObservers(aboutAdapter: AboutAdapter){
 
         /** Observer for show profile bottom sheet dialog ------------------------------------------------------------*/
-        val showProfileBottomSheetObserver = Observer<Boolean> { data ->
-            data?.let {
-                if(it) {
-                    this.findNavController().navigate(ProfileFragmentDirections.actionToSocial())
-                    viewModel.resetShowProfileBottomsheet()
-                }
+        viewLifecycleOwner.collectFlow(viewModel.profileFlow) {
+            binding.invalidateAll()
+        }
+
+        viewLifecycleOwner.collectFlow(viewModel.showProfileBottomSheetFlow) { data ->
+            if(data) {
+                this.findNavController().navigate(ProfileFragmentDirections.actionToSocial())
+                viewModel.resetShowProfileBottomsheet()
             }
         }
-        viewModel.showProfileBottomSheet.observe(viewLifecycleOwner, showProfileBottomSheetObserver)
 
         /** Observer for about adapter -------------------------------------------------------------------------------*/
-        val aboutAdapterObserver = Observer<List<AboutModel>> { data ->
-            data?.let {
-                aboutAdapter.addHeaderAndSubmitList(it)
-            }
+        viewLifecycleOwner.collectFlow(viewModel.aboutFlow) { data ->
+            aboutAdapter.addHeaderAndSubmitList(data)
         }
-        viewModel.about.observe(viewLifecycleOwner, aboutAdapterObserver)
     }
 
     /** Get a share intent */
@@ -175,10 +175,10 @@ class ProfileFragment : Fragment() {
         url?.let {
             /** Chrome custom tab  */
             val builder = CustomTabsIntent.Builder().apply {
-                this.setToolbarColor(ContextCompat.getColor(context!!, R.color.colorPrimary))
+                this.setToolbarColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
                 this.setShowTitle(true)
             }
-            builder.build().launchUrl(context, (Uri.parse(url)))
+            builder.build().launchUrl(requireContext(), (Uri.parse(url)))
         }
     }
 }

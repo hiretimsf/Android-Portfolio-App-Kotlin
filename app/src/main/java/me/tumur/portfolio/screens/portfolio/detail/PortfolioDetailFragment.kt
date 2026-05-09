@@ -1,6 +1,5 @@
 package me.tumur.portfolio.screens.portfolio.detail
 
-import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.net.Uri
@@ -11,19 +10,17 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.FragmentPortfolioDetailBinding
-import me.tumur.portfolio.repository.database.dao.favorite.FavoriteDao
 import me.tumur.portfolio.repository.database.model.button.ButtonModel
 import me.tumur.portfolio.repository.database.model.category.CategoryModel
 import me.tumur.portfolio.repository.database.model.screenshot.ScreenShotModel
@@ -32,12 +29,13 @@ import me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio.button.Butto
 import me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio.category.CategoryAdapter
 import me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio.screenshot.ScreenShotAdapter
 import me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio.screenshot.ScreenShotClickListener
-import org.koin.android.ext.android.inject
+import me.tumur.portfolio.utils.extensions.collectFlow
 
 
 /**
  * An fragment that inflates a portfolio detail layout.
  */
+@AndroidEntryPoint
 class PortfolioDetailFragment : Fragment() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -64,9 +62,6 @@ class PortfolioDetailFragment : Fragment() {
      */
     private lateinit var binding: FragmentPortfolioDetailBinding
 
-    /** Context */
-    private val ctx: Context by inject()
-
     /** Adapter */
     private lateinit var buttonAdapter: ButtonAdapter
     private lateinit var categoryAdapter: CategoryAdapter
@@ -78,9 +73,6 @@ class PortfolioDetailFragment : Fragment() {
     /** Coroutines */
     private val job = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main.immediate + job)
-
-    /** Repository */
-    private val favoriteDao: FavoriteDao by inject()
 
     /** Portfolio id */
     private lateinit var id: String
@@ -146,7 +138,7 @@ class PortfolioDetailFragment : Fragment() {
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         uiScope.launch {
-            if (viewModel.favorite.value == 1) {
+            if (viewModel.favorite == 1) {
                 menu.findItem(R.id.menu_saved).isVisible = true
                 menu.findItem(R.id.menu_save).isVisible = false
             } else {
@@ -161,7 +153,7 @@ class PortfolioDetailFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_save -> {
-                viewModel.portfolio.value?.let {
+                viewModel.portfolio?.let {
                     viewModel.saveToFavorite(it)
                 }
                 topMenu?.findItem(R.id.menu_saved)?.isVisible = true
@@ -173,7 +165,7 @@ class PortfolioDetailFragment : Fragment() {
                 topMenu?.findItem(R.id.menu_save)?.isVisible = true
             }
             R.id.menu_route -> {
-                viewModel.clickedScreenShot.value?.let { routeToPreview(it.ownerId, it.order) }
+                viewModel.clickedScreenShot?.let { routeToPreview(it.ownerId, it.order) }
             }
             R.id.menu_share -> {
                 getShareIntent()
@@ -230,45 +222,39 @@ class PortfolioDetailFragment : Fragment() {
     private fun setObservers() {
 
         /** Set observer for button */
-        val observerButton = Observer<PagedList<ButtonModel>> { data ->
-            data?.let {
-                buttonAdapter.submitList(it)
-            }
+        viewLifecycleOwner.collectFlow(viewModel.portfolioFlow) {
+            binding.invalidateAll()
         }
-        viewModel.button.observe(viewLifecycleOwner, observerButton)
+
+        viewLifecycleOwner.collectFlow(viewModel.button) { data ->
+            buttonAdapter.submitData(viewLifecycleOwner.lifecycle, data)
+        }
 
         /** Set observer for category */
-        val observerCategory = Observer<PagedList<CategoryModel>> { data ->
-            data?.let {
-                categoryAdapter.submitList(it)
-            }
+        viewLifecycleOwner.collectFlow(viewModel.category) { data ->
+            categoryAdapter.submitData(viewLifecycleOwner.lifecycle, data)
         }
-        viewModel.category.observe(viewLifecycleOwner, observerCategory)
 
         /** Set observer for screenshot */
-        val observerScreenShot = Observer<PagedList<ScreenShotModel>> { data ->
-            data?.let {
-                screenShotAdapter.submitList(it)
-            }
+        viewLifecycleOwner.collectFlow(viewModel.screenshot) { data ->
+            screenShotAdapter.submitData(viewLifecycleOwner.lifecycle, data)
         }
-        viewModel.screenshot.observe(viewLifecycleOwner, observerScreenShot)
 
         /** Set observer for button click listener */
-        val observerButtonUrl = Observer<String> {
+        viewLifecycleOwner.collectFlow(viewModel.buttonUrlFlow) {
             it?.let {
                 // Set chrome custom tab
                 val builder = CustomTabsIntent.Builder()
-                builder.setToolbarColor(ContextCompat.getColor(context!!, R.color.colorPrimary))
+                builder.setToolbarColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
                 builder.setShowTitle(true)
                 val intent = builder.build()
-                intent.launchUrl(context, Uri.parse(it))
+                intent.launchUrl(requireContext(), Uri.parse(it))
                 viewModel.setButtonUrl(null)
             }
         }
-        viewModel.buttonUrl.observe(viewLifecycleOwner, observerButtonUrl)
 
         /** Set observer for screenshot click listener */
-        val observerClickedScreenShot = Observer<ScreenShotModel> {
+        viewLifecycleOwner.collectFlow(viewModel.clickedScreenShotFlow) {
             it?.let {
                 topMenu?.let { menu ->
                     val menuAction = menu.findItem(R.id.menu_route)
@@ -278,36 +264,31 @@ class PortfolioDetailFragment : Fragment() {
                 }
             }
         }
-        viewModel.clickedScreenShot.observe(viewLifecycleOwner, observerClickedScreenShot)
 
         /** Set observer for open video click listener */
-        val observerVideoUrl = Observer<String> {
+        viewLifecycleOwner.collectFlow(viewModel.videoUrlFlow) {
             it?.let {
                 startCustomTab(it)
                 viewModel.setVideoUrl(null)
             }
         }
-        viewModel.videoUrl.observe(viewLifecycleOwner, observerVideoUrl)
 
         /** Set observer for favorite */
-        val observerFavorite = Observer<Int> {
-            it?.let {
-                topMenu?.let { menu ->
-                    val menuSaved = menu.findItem(R.id.menu_saved)
-                    val menuSave = menu.findItem(R.id.menu_save)
-                    val condition1 = it > 0 && menuSave != null && menuSave.isVisible
-                    val condition2 = it == 0 && menuSaved != null && menuSaved.isVisible
-                    if (condition1) {
-                        menuSave.isVisible = false
-                        menuSaved.isVisible = true
-                    } else if (condition2) {
-                        menuSaved.isVisible = false
-                        menuSave.isVisible = true
-                    }
+        viewLifecycleOwner.collectFlow(viewModel.favoriteFlow) {
+            topMenu?.let { menu ->
+                val menuSaved = menu.findItem(R.id.menu_saved)
+                val menuSave = menu.findItem(R.id.menu_save)
+                val condition1 = it > 0 && menuSave != null && menuSave.isVisible
+                val condition2 = it == 0 && menuSaved != null && menuSaved.isVisible
+                if (condition1) {
+                    menuSave.isVisible = false
+                    menuSaved.isVisible = true
+                } else if (condition2) {
+                    menuSaved.isVisible = false
+                    menuSave.isVisible = true
                 }
             }
         }
-        viewModel.favorite.observe(viewLifecycleOwner, observerFavorite)
     }
 
     /**
@@ -319,10 +300,10 @@ class PortfolioDetailFragment : Fragment() {
         url?.let {
             /** Chrome custom tab  */
             val builder = CustomTabsIntent.Builder().apply {
-                this.setToolbarColor(ContextCompat.getColor(context!!, R.color.colorPrimary))
+                this.setToolbarColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
                 this.setShowTitle(true)
             }
-            builder.build().launchUrl(context, (Uri.parse(url)))
+            builder.build().launchUrl(requireContext(), (Uri.parse(url)))
         }
     }
 
@@ -331,9 +312,9 @@ class PortfolioDetailFragment : Fragment() {
         /** Share intent */
         val intent: Intent = Intent().apply {
             action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_SUBJECT, viewModel.portfolio.value?.title)
-            putExtra(Intent.EXTRA_TITLE, viewModel.portfolio.value?.subTitle)
-            putExtra(Intent.EXTRA_TEXT, viewModel.portfolio.value?.linkToShare)
+            putExtra(Intent.EXTRA_SUBJECT, viewModel.portfolio?.title)
+            putExtra(Intent.EXTRA_TITLE, viewModel.portfolio?.subTitle)
+            putExtra(Intent.EXTRA_TEXT, viewModel.portfolio?.linkToShare)
             type = "text/plain"
         }
         startActivity(Intent.createChooser(intent, resources.getText(R.string.app_share_message)))

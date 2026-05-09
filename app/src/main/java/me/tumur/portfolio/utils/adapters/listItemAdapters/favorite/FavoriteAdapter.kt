@@ -1,7 +1,7 @@
 package me.tumur.portfolio.utils.adapters.listItemAdapters.favorite
 
 import android.view.ViewGroup
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import me.tumur.portfolio.repository.database.model.favorite.FavoriteModel
 
@@ -10,7 +10,7 @@ import me.tumur.portfolio.repository.database.model.favorite.FavoriteModel
  * */
 
 class FavoriteAdapter(private val clickListener: FavoriteClickListener) :
-    PagedListAdapter<FavoriteModel, FavoriteViewHolder>(FavoriteDiffCallBack()) {
+    PagingDataAdapter<FavoriteModel, FavoriteViewHolder>(FavoriteDiffCallBack()) {
 
     /**
      * Part of the RecyclerView adapter, called when RecyclerView needs a new [FavoriteViewHolder]

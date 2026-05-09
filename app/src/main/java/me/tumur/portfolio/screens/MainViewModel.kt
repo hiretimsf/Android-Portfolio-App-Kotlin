@@ -2,19 +2,26 @@ package me.tumur.portfolio.screens
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.lifecycle.*
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.tumur.portfolio.repository.database.dao.welcome.WelcomeDao
 import me.tumur.portfolio.repository.network.Failed
+import me.tumur.portfolio.repository.network.Success
 import me.tumur.portfolio.repository.repo.Repository
 import me.tumur.portfolio.utils.constants.Constants
 import me.tumur.portfolio.utils.extensions.isNetworkAvailable
 import me.tumur.portfolio.utils.state.*
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import javax.inject.Inject
 
 
 /**
@@ -23,19 +30,15 @@ import org.koin.core.inject
  * work such as fetching network results can continue through configuration changes and deliver
  * results after the new Fragment or Activity is available.
  */
-class MainViewModel(state : SavedStateHandle): ViewModel(), KoinComponent {
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
+    @param:ApplicationContext private val context: Context,
+    private val repo: Repository,
+    private val welcomeDao: WelcomeDao
+) : ViewModel() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-    /** Saved state */
-    private val context: Context by inject()
-
-    /** Saved state */
-    private val savedStateHandle = state
-
-    /** RepositoryImp */
-    private val repo: Repository by inject()
-    private val welcomeDao: WelcomeDao by inject()
 
     /** Shared preferences */
     private val sharedPref: SharedPreferences = context.getSharedPreferences(Constants.APP, Context.MODE_PRIVATE)
@@ -47,28 +50,32 @@ class MainViewModel(state : SavedStateHandle): ViewModel(), KoinComponent {
     private val network = (isNetworkAvailable(context))
 
     /** Screen state  */
-    private val _screenState = MutableLiveData<ScreenState>()
-    val screenState: LiveData<ScreenState> = _screenState
+    private val _screenState = MutableStateFlow<ScreenState>(SplashScreen)
+    val screenStateFlow: StateFlow<ScreenState> = _screenState.asStateFlow()
+    val screenState: ScreenState get() = _screenState.value
 
     /** Fragment state  */
-    private val _fragmentState = MutableLiveData<String>()
-    val fragmentState: LiveData<String> = _fragmentState
+    private val _fragmentState = MutableStateFlow<String?>(null)
+    val fragmentStateFlow: StateFlow<String?> = _fragmentState.asStateFlow()
+    val fragmentState: String? get() = _fragmentState.value
 
-    private val _fragmentStateHolder = MutableLiveData<String>()
-    private val fragmentStateHolder: LiveData<String> = _fragmentStateHolder
+    private val _fragmentStateHolder = MutableStateFlow<String?>(null)
 
     /** Routed to saved Fragment state */
-    private val _routed = MutableLiveData<Boolean>().apply { value = false }
-    val routed: LiveData<Boolean> = _routed
+    private val _routed = MutableStateFlow(false)
+    val routedFlow: StateFlow<Boolean> = _routed.asStateFlow()
+    val routed: Boolean get() = _routed.value
 
     /** Navigation state  */
     private val _navigation =
-        MutableLiveData<NavigationState>().apply { value = if (isFirstRun) HideNavigation else ShowNavigation }
-    val navigation : LiveData<NavigationState> = _navigation
+        MutableStateFlow<NavigationState>(if (isFirstRun) HideNavigation else ShowNavigation)
+    val navigationFlow: StateFlow<NavigationState> = _navigation.asStateFlow()
+    val navigation: NavigationState get() = _navigation.value
 
     /** Show a toast message */
-    private val _showToast = MutableLiveData<ToastState>().apply { value = ToastEmpty }
-    val showToast: LiveData<ToastState> = _showToast
+    private val _showToast = MutableStateFlow<ToastState>(ToastEmpty)
+    val showToastFlow: StateFlow<ToastState> = _showToast.asStateFlow()
+    val showToast: ToastState get() = _showToast.value
 
     /** INITIALIZATION  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -79,21 +86,18 @@ class MainViewModel(state : SavedStateHandle): ViewModel(), KoinComponent {
         /** Check first run */
         if (isFirstRun) {
             setScreenState(SplashScreen)
-            val job = populateDb()
-            job.isCompleted.let {
-                if (network) fetch(WelcomeScreen)
-                else viewModelScope.launch {
-                    setScreenStateWithDelay(WelcomeScreen)
-                    setShowToast(ToastShow)
-                }
+            viewModelScope.launch {
+                populateDb()
+                setScreenStateWithDelay(WelcomeScreen)
+                if (network) refreshData() else setShowToast(ToastShow)
             }
         } else {
             when (val savedState = getSavedStateHandle()) {
                 Constants.FRAGMENT_EMPTY -> {
                     setScreenState(SplashScreen)
-                    if (network) fetch(MainScreen) else viewModelScope.launch {
+                    viewModelScope.launch {
                         setScreenStateWithDelay(MainScreen)
-                        setShowToast(ToastShow)
+                        if (network) refreshData() else setShowToast(ToastShow)
                     }
                 }
                 else -> {
@@ -114,7 +118,7 @@ class MainViewModel(state : SavedStateHandle): ViewModel(), KoinComponent {
     /** Set saved state handle */
     private fun setSavedStateHandle() {
         // Sets a new value for the object associated to the key.
-        fragmentStateHolder.value?.let { state ->
+        _fragmentStateHolder.value?.let { state ->
             savedStateHandle.set(Constants.FRAGMENT_STATE, state)
         }
     }
@@ -126,18 +130,16 @@ class MainViewModel(state : SavedStateHandle): ViewModel(), KoinComponent {
     }
 
     /** Database population at very first run */
-    private fun populateDb() = viewModelScope.launch{
-
+    private suspend fun populateDb() {
         /** Fake dao is required to create and populate database from local resource  */
         withContext(Dispatchers.IO) { welcomeDao.check() }
     }
 
-    /** Fetch network data, update the database, set screen state */
-    private fun fetch(screen: ScreenState?) = viewModelScope.launch{
+    private suspend fun refreshData() {
         when(withContext(Dispatchers.IO) { repo.fetchAll() }){
             is Failed -> setShowToast(ToastShow)
+            is Success -> Unit
         }
-        screen?.let { setScreenStateWithDelay(screen) }
     }
 
     /** Set navigation state */
@@ -160,6 +162,10 @@ class MainViewModel(state : SavedStateHandle): ViewModel(), KoinComponent {
     private fun setFragmentState(state: String) {
         // Sets a new value for the object associated to the key.
         _fragmentState.value = state
+    }
+
+    fun clearFragmentState() {
+        _fragmentState.value = null
     }
 
     /** Set saved state handle for fragment state holder */

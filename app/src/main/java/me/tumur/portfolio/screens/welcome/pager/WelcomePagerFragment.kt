@@ -7,16 +7,18 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import dagger.hilt.android.AndroidEntryPoint
 import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.PagerItemWelcomeScreenBinding
 import me.tumur.portfolio.repository.database.model.welcome.WelcomeModel
 import me.tumur.portfolio.screens.welcome.WelcomeViewModel
 import me.tumur.portfolio.utils.constants.Constants
+import me.tumur.portfolio.utils.extensions.collectFlow
 
 /**
  * An fragment that inflates a welcome layout.
  */
+@AndroidEntryPoint
 class WelcomePagerFragment : Fragment() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -68,15 +70,14 @@ class WelcomePagerFragment : Fragment() {
         /** Set data for ViewPager adapter */
         arguments?.takeIf { it.containsKey(Constants.POSITION) }?.apply {
             viewModel.setPosition(this.getInt(Constants.POSITION))
+            binding.invalidateAll()
         }
 
         /** Observer for welcome screen's data -----------------------------------------------------------------------*/
-        val screenWelcomeDataObserver = Observer<List<WelcomeModel>> { data ->
-            data?.let {
-                sharedViewModel.getWelcomeScreenData(viewModel.position.value!!)?.let { model -> viewModel.setData(model) }
-            }
+        viewLifecycleOwner.collectFlow(sharedViewModel.welcomeScreenFlow) {
+            sharedViewModel.getWelcomeScreenData(viewModel.position)?.let { model -> viewModel.setData(model) }
+            binding.invalidateAll()
         }
-        sharedViewModel.welcomeScreen.observe(viewLifecycleOwner, screenWelcomeDataObserver)
 
         return binding.root
     }

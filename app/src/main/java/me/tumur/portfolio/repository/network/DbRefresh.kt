@@ -1,8 +1,11 @@
 package me.tumur.portfolio.repository.network
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import me.tumur.portfolio.repository.database.dao.button.ButtonDao
 import me.tumur.portfolio.repository.database.dao.category.CategoryDao
 import me.tumur.portfolio.repository.database.dao.experience.ExperienceDao
@@ -16,31 +19,29 @@ import me.tumur.portfolio.repository.database.dao.screenshot.ScreenShotDao
 import me.tumur.portfolio.repository.database.dao.settings.AppDao
 import me.tumur.portfolio.repository.database.dao.task.TaskDao
 import me.tumur.portfolio.repository.database.dao.welcome.WelcomeDao
-import org.koin.core.KoinComponent
-import org.koin.core.inject
 import retrofit2.HttpException
 
-class DbRefresh(context: Context, params: WorkerParameters): CoroutineWorker(context, params), KoinComponent{
+@HiltWorker
+class DbRefresh @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val welcomeDao: WelcomeDao,
+    private val profileDao: ProfileDao,
+    private val socialDao: SocialDao,
+    private val aboutDao: AboutDao,
+    private val appDao: AppDao,
+    private val portfolioDao: PortfolioDao,
+    private val experienceDao: ExperienceDao,
+    private val buttonDao: ButtonDao,
+    private val taskDao: TaskDao,
+    private val categoryDao: CategoryDao,
+    private val screenShotDao: ScreenShotDao,
+    private val locationDao: LocationDao,
+    private val resourceDao: ResourceDao,
+    private val api: RestApi
+) : CoroutineWorker(context, params) {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-    /** DATABASE API ------------------------------------------------------------------------------------------------ */
-    private val welcomeDao: WelcomeDao by inject()
-    private val profileDao: ProfileDao by inject()
-    private val socialDao: SocialDao by inject()
-    private val aboutDao: AboutDao by inject()
-    private val appDao: AppDao by inject()
-    private val portfolioDao: PortfolioDao by inject()
-    private val experienceDao: ExperienceDao by inject()
-    private val buttonDao: ButtonDao by inject()
-    private val taskDao: TaskDao by inject()
-    private val categoryDao: CategoryDao by inject()
-    private val screenShotDao: ScreenShotDao by inject()
-    private val locationDao: LocationDao by inject()
-    private val resourceDao: ResourceDao by inject()
-
-    /** NETWORK API ------------------------------------------------------------------------------------------------- */
-    private val api: RestApi by inject()
 
     override suspend fun doWork(): Result {
         return try {

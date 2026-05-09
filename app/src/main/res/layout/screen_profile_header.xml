@@ -57,14 +57,15 @@
                 android:text="@{model.profile.greeting}"/>
 
         <!-- Avatar -->
-        <de.hdodenhof.circleimageview.CircleImageView
+        <com.google.android.material.imageview.ShapeableImageView
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Portfolio.Circle"
                 android:id="@+id/profile_screen_header_avatar"
                 android:layout_width="@dimen/_80sdp"
                 android:layout_height="@dimen/_80sdp"
                 app:imageLoad="@{model.profile.image}"
                 android:contentDescription="@{model.profile.imageDescription}"
-                app:civ_border_width="@dimen/_1sdp"
-                app:civ_border_color="?attr/colorOnPrimary"/>
+                app:strokeWidth="@dimen/_1sdp"
+                app:strokeColor="?attr/colorOnPrimary"/>
 
         <!-- Name-->
         <androidx.appcompat.widget.AppCompatTextView

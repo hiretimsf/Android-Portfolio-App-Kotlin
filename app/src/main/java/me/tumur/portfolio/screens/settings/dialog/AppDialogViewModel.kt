@@ -1,26 +1,31 @@
 package me.tumur.portfolio.screens.settings.dialog
 
-import androidx.lifecycle.*
-import kotlinx.coroutines.Dispatchers
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import me.tumur.portfolio.repository.database.dao.settings.AppDao
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import me.tumur.portfolio.repository.database.model.settings.AppModel
+import javax.inject.Inject
 
-class AppDialogViewModel: ViewModel(), KoinComponent{
+@HiltViewModel
+class AppDialogViewModel @Inject constructor(
+    private val appDao: AppDao
+) : ViewModel() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-    /** RepositoryImp */
-    private val appDao: AppDao by inject()
-
     /** Profile data */
-    val appInfo = liveData(context = viewModelScope.coroutineContext + Dispatchers.IO){
-        emitSource(appDao.getListItems())
-    }
+    val appInfo: StateFlow<List<AppModel>> = appDao.getListItems()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     /** Close button on click */
-    private val _closeButtonOnClick = MutableLiveData<Boolean>().apply { value = false }
-    val closeButtonOnClick: LiveData<Boolean> = _closeButtonOnClick
+    private val _closeButtonOnClick = MutableStateFlow(false)
+    val closeButtonOnClick: StateFlow<Boolean> = _closeButtonOnClick.asStateFlow()
 
     /** FUNCTIONS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -28,6 +33,6 @@ class AppDialogViewModel: ViewModel(), KoinComponent{
      * Set close button onClick event
      * */
     fun setCloseButtonOnClick(status: Boolean){
-        _closeButtonOnClick.apply { value = status }
+        _closeButtonOnClick.value = status
     }
 }

@@ -26,7 +26,8 @@
                 app:srcCompat="@drawable/ic_header_bg"/>
 
         <!-- Avatar -->
-        <de.hdodenhof.circleimageview.CircleImageView
+        <com.google.android.material.imageview.ShapeableImageView
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Portfolio.Circle"
                 android:id="@+id/header_avatar"
                 android:layout_width="@dimen/_60sdp"
                 android:layout_height="@dimen/_60sdp"
@@ -34,8 +35,8 @@
                 android:contentDescription="@string/cd_avatar"
                 android:scaleType="centerCrop"
                 android:src="@drawable/profile"
-                app:civ_border_color="?attr/colorOnSecondary"
-                app:civ_border_width="@dimen/_1sdp"
+                app:strokeColor="?attr/colorOnSecondary"
+                app:strokeWidth="@dimen/_1sdp"
                 app:layout_constraintBottom_toTopOf="@+id/header_name"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

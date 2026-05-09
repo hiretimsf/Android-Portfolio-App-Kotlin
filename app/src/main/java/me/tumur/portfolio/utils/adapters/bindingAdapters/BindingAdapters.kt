@@ -1,23 +1,39 @@
 package me.tumur.portfolio.utils.adapters.bindingAdapters
 
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.Paint
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.IdRes
 import androidx.databinding.BindingAdapter
-import coil.api.load
-import coil.transform.GrayscaleTransformation
+import coil.load
 import coil.transform.RoundedCornersTransformation
+import coil.transform.Transformation
+import coil.size.Size
 import com.google.android.material.button.MaterialButton
 import me.tumur.portfolio.R
 import me.tumur.portfolio.utils.constants.BsConstants
 import me.tumur.portfolio.utils.constants.Constants
-import org.threeten.bp.LocalDate
-import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.temporal.ChronoUnit
 import java.text.SimpleDateFormat
 import java.util.*
 
+private class GrayscaleTransformation : Transformation {
+    override val cacheKey = "me.tumur.portfolio.GrayscaleTransformation"
+
+    override suspend fun transform(input: Bitmap, size: Size): Bitmap {
+        val output = input.copy(input.config ?: Bitmap.Config.ARGB_8888, true)
+        val canvas = Canvas(output)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+        }
+        canvas.drawBitmap(input, 0f, 0f, paint)
+        return output
+    }
+}
 
 /** Load image from the network or cache with placeholder and error images */
 @BindingAdapter("imageLoad")
@@ -72,23 +88,16 @@ fun TextView.setDateFromTo(dateFrom: Date?, dateTo: Date?) {
             val a = outputFormat.format(dateFrom)
             val b = outputFormat.format(dateTo)
 
-            val outputFormatC = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-            val ac = outputFormatC.format(dateFrom)
-            val bc = outputFormatC.format(dateTo)
+            val start = Calendar.getInstance().apply { time = dateFrom }
+            val end = Calendar.getInstance().apply { time = dateTo }
+            val diff = (end.get(Calendar.YEAR) - start.get(Calendar.YEAR)) * 12L +
+                (end.get(Calendar.MONTH) - start.get(Calendar.MONTH))
+            val diffYear = diff / 12
+            val diffMonth = diff % 12
+            val d = if (diffYear > 0) "$diffYear.$diffMonth year(s)" else "$diffMonth month(s)"
 
-            val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-            val start = LocalDate.parse(ac, dateFormatter)
-            val end = LocalDate.parse(bc, dateFormatter)
-
-            if (start != null && end != null) {
-                val diff: Long = ChronoUnit.MONTHS.between(start, end)
-                val diffYear = diff / 12
-                val diffMonth = diff % 12
-                val d = if (diffYear > 0) "$diffYear.$diffMonth year(s)" else "$diffMonth month(s)"
-
-                val result = "$a - $b | $d"
-                text = result
-            }
+            val result = "$a - $b | $d"
+            text = result
         }
     }
 }

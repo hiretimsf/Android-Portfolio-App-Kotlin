@@ -1,6 +1,6 @@
 package me.tumur.portfolio.repository.database.dao.profile
 
-import androidx.lifecycle.LiveData
+import kotlinx.coroutines.flow.Flow
 import androidx.room.*
 import me.tumur.portfolio.repository.database.model.profile.SocialModel
 import me.tumur.portfolio.utils.constants.DbConstants
@@ -25,5 +25,5 @@ abstract class SocialDao {
 
     /** Get list items */
     @Query(DbConstants.SOCIAL_GET_LIST_ITEMS)
-    abstract fun getListItems(id: String): LiveData<List<SocialModel>>
+    abstract fun getListItems(id: String): Flow<List<SocialModel>>
 }

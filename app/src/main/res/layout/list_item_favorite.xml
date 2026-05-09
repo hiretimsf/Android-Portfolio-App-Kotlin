@@ -70,7 +70,8 @@
                         app:layout_constraintTop_toTopOf="parent">
 
                     <!-- Favorite logo -->
-                    <de.hdodenhof.circleimageview.CircleImageView
+                    <com.google.android.material.imageview.ShapeableImageView
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Portfolio.Circle"
                             android:id="@+id/list_item_favorite_logo"
                             android:layout_width="@dimen/_15sdp"
                             android:layout_height="@dimen/_15sdp"

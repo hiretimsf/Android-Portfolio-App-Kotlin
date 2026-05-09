@@ -117,7 +117,8 @@
                                 app:layout_constraintTop_toTopOf="parent">
 
                             <!-- Job title icon -->
-                            <de.hdodenhof.circleimageview.CircleImageView
+                            <com.google.android.material.imageview.ShapeableImageView
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Portfolio.Circle"
                                     android:id="@+id/experience_item_detail_job_title_icon"
                                     android:layout_width="@dimen/_15sdp"
                                     android:layout_height="@dimen/_15sdp"

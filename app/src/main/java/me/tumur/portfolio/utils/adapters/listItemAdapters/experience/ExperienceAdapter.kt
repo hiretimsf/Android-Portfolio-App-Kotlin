@@ -1,7 +1,7 @@
 package me.tumur.portfolio.utils.adapters.listItemAdapters.experience
 
 import android.view.ViewGroup
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import me.tumur.portfolio.repository.database.model.experience.ExperienceModel
 
@@ -10,7 +10,7 @@ import me.tumur.portfolio.repository.database.model.experience.ExperienceModel
  * */
 
 class ExperienceAdapter(private val clickListener: ExperienceClickListener) :
-    PagedListAdapter<ExperienceModel, ExperienceViewHolder>(
+    PagingDataAdapter<ExperienceModel, ExperienceViewHolder>(
         ExperienceDiffCallBack()
     ) {
 

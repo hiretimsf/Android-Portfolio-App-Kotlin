@@ -1,36 +1,38 @@
 package me.tumur.portfolio.screens.experience
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.paging.PagedList
-import androidx.paging.toLiveData
+import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import me.tumur.portfolio.repository.database.dao.experience.ExperienceDao
 import me.tumur.portfolio.repository.database.model.experience.ExperienceModel
 import me.tumur.portfolio.utils.constants.DbConstants
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import javax.inject.Inject
 
-class ExperienceViewModel : ViewModel(), KoinComponent {
+@HiltViewModel
+class ExperienceViewModel @Inject constructor(
+    private val experienceDao: ExperienceDao
+) : ViewModel() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-    /** Repository */
-    private val experienceDao: ExperienceDao by inject()
-
     /** Selected item id */
-    private val _selectedItem = MutableLiveData<ExperienceModel>()
-    val selectedItem: LiveData<ExperienceModel> = _selectedItem
+    private val _selectedItem = MutableStateFlow<ExperienceModel?>(null)
+    val selectedItemFlow: StateFlow<ExperienceModel?> = _selectedItem.asStateFlow()
 
     /** Portfolio pager data */
-    private val config = PagedList.Config.Builder()
-        .setPageSize(10)
-        .setEnablePlaceholders(true)
-        .setInitialLoadSizeHint(5)
-        .build()
+    private val config = PagingConfig(pageSize = 10, enablePlaceholders = true, initialLoadSize = 5)
 
-    val data: LiveData<PagedList<ExperienceModel>> =
-        experienceDao.getListItems(DbConstants.PERSON_ID).toLiveData(config)
+    val data: Flow<PagingData<ExperienceModel>> = Pager(config) {
+        experienceDao.getListItems(DbConstants.PERSON_ID)
+    }.flow.cachedIn(viewModelScope)
 
     /** FUNCTIONS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 

@@ -1,6 +1,6 @@
 package me.tumur.portfolio.repository.database.dao.button
 
-import androidx.paging.DataSource
+import androidx.paging.PagingSource
 import androidx.room.*
 import me.tumur.portfolio.repository.database.model.button.ButtonModel
 import me.tumur.portfolio.utils.constants.DbConstants
@@ -25,5 +25,5 @@ abstract class ButtonDao {
 
     /** Get list items */
     @Query(DbConstants.BUTTON_GET_LIST_ITEMS)
-    abstract fun getListItems(id: String): DataSource.Factory<Int, ButtonModel>
+    abstract fun getListItems(id: String): PagingSource<Int, ButtonModel>
 }

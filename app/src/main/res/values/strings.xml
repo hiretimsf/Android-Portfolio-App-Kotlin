@@ -22,6 +22,8 @@
 	<string name="dialog_app_info">App Info</string>
 	<string name="button_skip">Skip</string>
 	<string name="button_get_started">Get started</string>
+	<string name="button_next">Next</string>
+	<string name="button_finish">Finish</string>
 	<string name="person_name">Tumur.B(Alex)</string>
 	<string name="person_title">Android Developer</string>
 	<string name="button_refresh">Refresh</string>

@@ -57,7 +57,7 @@ I've published two Kotlin Android apps and up to date with the latest technologi
 | **MVVM architecture**                           | Using the lifecycle aware viewmodels, the view observes changes in the model / repository.|
 | **Android Architecture Components**             | Lifecycle awareness has been achieved using a combination of LiveData, ViewModels and Room.|
 | **Backend**                                    | Used Google Cloud Functions and Firebase Firestore for backend and REST API|
-| **Dependency Injection**                        | Common elements like context, networking interface are injected using Koin.|
+| **Dependency Injection**                        | Common elements like context, networking interface and persistence are injected using Hilt.|
 | **Offline first architecture**                  | All the data is loaded from the Room database and it's updated from the network. This ensures that the app is usable even in an offline mode.|
 | **Effective Networking**                        | Using a combination of Retrofit, Room, LiveData, Coroutines to handle networking in the most effective way.|
 | **Intelligent sync**                            | Intelligent hybrid syncing logic makes sure your Android app does not make repeated calls to the same back-end API for the same data in a particular time period.|
@@ -66,13 +66,13 @@ I've published two Kotlin Android apps and up to date with the latest technologi
 ## 📦 THIRD PARTY LIBRARIES
 | Third party libraries | Firebase | Design tools | Gradle | 
 |:-------------------|:------------------------|:------------------------|:------------------------|
-|[Koin](https://bit.ly/2GIqyDE)|[Cloud Firestore](https://bit.ly/2U1Z9iZ)|[Sketch](https://bit.ly/23L9Cj0)| [Gradle Kotlin DSL](http://bit.ly/2Njua1r)|
+|[Hilt](https://developer.android.com/training/dependency-injection/hilt-android)|[Cloud Firestore](https://bit.ly/2U1Z9iZ)|[Sketch](https://bit.ly/23L9Cj0)| [Gradle Kotlin DSL](http://bit.ly/2Njua1r)|
 |[Kotlin Coroutines](https://bit.ly/2wTru3E)|[Cloud Functions](https://bit.ly/2TfAkTE)|[Shape Shifter](https://bit.ly/2IuQzrQ)|[Ktlint](http://bit.ly/2Z9rGJB)|
 |[Retrofit](https://bit.ly/2pSxHbb)|[Hosting](https://bit.ly/2H5qbSW)|[Adobe Photoshop](https://adobe.ly/1Z5LVOp)|[Detekt](http://bit.ly/31T7r0l)|
 |[OkHttp](https://bit.ly/2fVF6OA)|[Cloud Storage](https://bit.ly/2EuLtb6)|[Adobe Illustrator](https://adobe.ly/1G6wY8i)|[Versions](http://bit.ly/31P7Xwj)|
 |[Glide](https://bit.ly/1RIHiKz)|[Crashlytics](https://bit.ly/2GIM9fq)|[Adobe After Effects](https://adobe.ly/1B8kNrh)|[SafeArgs](http://bit.ly/2KSkf04)|
-|[Leak Canary](https://bit.ly/1Mz1RV4)|[Performance Monitoring](https://bit.ly/2Es0b2s)|||
-|[Timber](https://bit.ly/1zQNWqd)|[Test Lab](https://bit.ly/2C1h3Mb)|||
+|[Timber](https://bit.ly/1zQNWqd)|[Performance Monitoring](https://bit.ly/2Es0b2s)|||
+||[Test Lab](https://bit.ly/2C1h3Mb)|||
 |[ThreenTenABP](https://bit.ly/2GIykxt)|[App Indexing](https://bit.ly/2Tcy9jP)|||
 |[Stetho](https://bit.ly/2eZ3YI7)||||
 |[Chrome Custom Tab](http://bit.ly/2XQsjYy)||||
@@ -218,10 +218,9 @@ the option to use the gradle wrapper
 16. <a href="http://bit.ly/2Y19ZaR" target="_blank">ConstraintLayout 2.0</a>
 17. <a href="http://bit.ly/2VIjChe" target="_blank">ConstraintLayout 2.0.0 alpha 5</a>
 
-### Koin
-1. <a href="https://bit.ly/2Vsvlwe" target="_blank">Course: Koin(Caster.io)</a> 🔥🔥🔥
-2. <a href="https://bit.ly/2E7w3YP" target="_blank">Painless Android testing with Room & Koin</a>
-3. <a href="https://bit.ly/2Nrr1e7" target="_blank">Unlock your Android ViewModel power with Koin</a>
+### Hilt
+1. <a href="https://developer.android.com/training/dependency-injection/hilt-android" target="_blank">Dependency injection with Hilt</a> 🔥🔥🔥
+2. <a href="https://developer.android.com/training/dependency-injection/hilt-jetpack" target="_blank">Hilt and Jetpack integrations</a>
 
 ### Kotlin Coroutines
 1. <a href="http://bit.ly/2Lec0yT" target="_blank">Coroutines on Android (part I): Getting the background</a> 🔥🔥🔥
@@ -261,7 +260,7 @@ the option to use the gradle wrapper
 1. <a href="https://bit.ly/2ElLa17" target="_blank">Android Jetpack: manage infinite lists with RecyclerView and Paging (Google I/O '18)</a> 🔥
 2. <a href="http://bit.ly/2T2SU22" target="_blank">First Java MVVM project that includes: Paging library, ViewModel, LiveData, Room and Retrofit</a> 🔥
 3. <a href="http://bit.ly/2JFSJTY" target="_blank">Paging Library for Android With Kotlin: Creating Infinite Lists</a> 🔥
-4. <a href="https://bit.ly/2ThdlHV" target="_blank">Playing with Paging Library, Retrofit, Coroutines, Koin & Testing.</a>
+4. <a href="https://bit.ly/2ThdlHV" target="_blank">Playing with Paging Library, Retrofit, Coroutines & Testing.</a>
 5. <a href="http://bit.ly/2NylGBG" target="_blank">7 steps to implement Paging library in Android</a> 
 6. <a href="http://bit.ly/2tEZ0qq" target="_blank">Simple intro for Rest-Api loading of json data into recyclerview using Kotlin</a>
 7. <a href="http://bit.ly/2IIxaUC" target="_blank">The Movie Datbase</a>
@@ -390,4 +389,3 @@ Android Developer
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-

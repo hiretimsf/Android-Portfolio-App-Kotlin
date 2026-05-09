@@ -7,14 +7,15 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
 import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.FragmentDialogAppInfoBinding
 import me.tumur.portfolio.repository.database.model.settings.AppModel
 import me.tumur.portfolio.utils.adapters.listItemAdapters.app.AppAdapter
-import timber.log.Timber
+import me.tumur.portfolio.utils.extensions.collectFlow
 
+@AndroidEntryPoint
 class AppDialogFragment : DialogFragment() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -79,30 +80,24 @@ class AppDialogFragment : DialogFragment() {
         }
 
         binding.apply {
-            // Set the lifecycleOwner so DataBinding can observe LiveData
+            // Set the lifecycleOwner so DataBinding can observe Flow
             this.lifecycleOwner = viewLifecycleOwner
             // Set the viewmodel so layout can display data
             this.model = viewModel
         }
 
         /** Observer for social adapter */
-        val appInfoAdapterObserver = Observer<List<AppModel>> { data ->
-            Timber.tag("AppInfo").d(data.toString())
-            data?.let {
-                appInfoAdapter.submitList(data)
-            }
+        viewLifecycleOwner.collectFlow(viewModel.appInfo) { data ->
+            appInfoAdapter.submitList(data)
         }
-        viewModel.appInfo.observe(viewLifecycleOwner, appInfoAdapterObserver)
 
         /** Observer for close button */
-        val closeButtonObserver = Observer<Boolean> { status ->
-
+        viewLifecycleOwner.collectFlow(viewModel.closeButtonOnClick) { status ->
             if(status)
             {
                 this.dismiss()
             }
         }
-        viewModel.closeButtonOnClick.observe(viewLifecycleOwner, closeButtonObserver)
 
         return binding.root
     }

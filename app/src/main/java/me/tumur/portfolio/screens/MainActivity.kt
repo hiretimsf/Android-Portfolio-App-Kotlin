@@ -3,19 +3,20 @@ package me.tumur.portfolio.screens
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+import dagger.hilt.android.AndroidEntryPoint
 import es.dmoral.toasty.Toasty
-import kotlinx.android.synthetic.main.screen_main.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,6 +24,7 @@ import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.ActivityMainBinding
 import me.tumur.portfolio.utils.constants.Constants
 import me.tumur.portfolio.utils.extensions.activityBinding
+import me.tumur.portfolio.utils.extensions.collectFlow
 import me.tumur.portfolio.utils.state.*
 
 
@@ -31,6 +33,7 @@ import me.tumur.portfolio.utils.state.*
  * This is a single activity application that uses the Navigation library.
  * Content is displayed by Fragments.
  */
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -66,7 +69,7 @@ class MainActivity : AppCompatActivity() {
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             when (key) {
                 Constants.FIRST -> {
-                    if(!prefs.getBoolean(Constants.FIRST, true) && viewModel.navigation.value == HideNavigation)
+                    if(!prefs.getBoolean(Constants.FIRST, true) && viewModel.navigation == HideNavigation)
                         viewModel.setNavigationState(ShowNavigation)
                 }
             }
@@ -79,7 +82,9 @@ class MainActivity : AppCompatActivity() {
      * This is where most initialization should go.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+        splashScreen.setKeepOnScreenCondition { viewModel.screenState is SplashScreen }
 
         /** Binding lifecycle and viewmodel to layout */
         binding.apply {
@@ -91,7 +96,7 @@ class MainActivity : AppCompatActivity() {
         navController = findNavController(R.id.main_screen_host_fragment)
 
         /** Set action bar */
-        setSupportActionBar(binding.main.main_screen_toolbar)
+        setSupportActionBar(binding.root.findViewById(R.id.main_screen_toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         /** Delayed initialization */
@@ -135,32 +140,36 @@ class MainActivity : AppCompatActivity() {
     private fun setObservers() {
 
         /** Setup welcome screen observer  */
-        val screenWelcomeObserver = Observer<ScreenState> { state ->
+        collectFlow(viewModel.screenStateFlow) { state ->
+            binding.invalidateAll()
             if (state is WelcomeScreen && prefs.getBoolean(Constants.FIRST, true)) {
                 navController.navigate(R.id.action_global_to_welcome_screen)
             }
         }
-        viewModel.screenState.observe(this, screenWelcomeObserver)
 
         /** Setup fragment state observer  */
-        val fragmentStateObserver = Observer<String> { state ->
-                when(state){
-                    Constants.FRAGMENT_PROFILE -> navController.navigate(R.id.profile_screen)
-                    Constants.FRAGMENT_PORTFOLIO -> navController.navigate(R.id.portfolio_screen)
-                    Constants.FRAGMENT_EXPERIENCE -> navController.navigate(R.id.experience_screen)
-                    Constants.FRAGMENT_SETTINGS -> navController.navigate(R.id.settings_screen)
-                    Constants.FRAGMENT_FAVORITE -> navController.navigate(R.id.favorite_screen)
-                }
+        collectFlow(viewModel.fragmentStateFlow) { state ->
+            when(state){
+                Constants.FRAGMENT_PROFILE -> navController.navigate(R.id.profile_screen)
+                Constants.FRAGMENT_PORTFOLIO -> navController.navigate(R.id.portfolio_screen)
+                Constants.FRAGMENT_EXPERIENCE -> navController.navigate(R.id.experience_screen)
+                Constants.FRAGMENT_SETTINGS -> navController.navigate(R.id.settings_screen)
+                Constants.FRAGMENT_FAVORITE -> navController.navigate(R.id.favorite_screen)
+            }
+            if (state != null) viewModel.clearFragmentState()
         }
-        viewModel.fragmentState.observe(this, fragmentStateObserver)
+
+        collectFlow(viewModel.navigationFlow) {
+            binding.invalidateAll()
+        }
 
         /** Set observer for a toast message */
-        val observerShowToast = Observer<ToastState> {
+        collectFlow(viewModel.showToastFlow) {
             when (it) {
                 ToastShow -> showToastMessage()
+                else -> Unit
             }
         }
-        viewModel.showToast.observe(this, observerShowToast)
     }
 
     /** Setup bottom menu */
@@ -171,13 +180,14 @@ class MainActivity : AppCompatActivity() {
         // Application bar configuration for navigationController
         val appBarConfiguration = AppBarConfiguration(navigationGraphTopLevel)
         // Setup bottom menu
-        binding.main.main_screen_bottom_menu?.apply {
+        binding.root.findViewById<BottomNavigationView>(R.id.main_screen_bottom_menu)?.apply {
             // Show the true colors of menu icons
             this.itemIconTintList = null
             // Setup navController with bottom menu and toolbar
             this.setupWithNavController(navController)
         }
-        binding.main.main_screen_toolbar?.setupWithNavController(navController, appBarConfiguration)
+        binding.root.findViewById<MaterialToolbar>(R.id.main_screen_toolbar)
+            ?.setupWithNavController(navController, appBarConfiguration)
     }
 
     /** Setup side menu */
@@ -189,13 +199,14 @@ class MainActivity : AppCompatActivity() {
         // Application bar configuration for navigationController
         val appBarConfiguration = AppBarConfiguration(navigationGraphTopLevel, drawerLayout)
         // Setup side menu
-        binding.main.main_screen_side_menu?.apply {
+        binding.root.findViewById<NavigationView>(R.id.main_screen_side_menu)?.apply {
             // Show the true colors of menu icons
             this.itemIconTintList = null
             // Setup navController with side menu with drawerlayout and toolbar
             this.setupWithNavController(navController)
         }
-        binding.main.main_screen_toolbar?.setupWithNavController(navController, appBarConfiguration)
+        binding.root.findViewById<MaterialToolbar>(R.id.main_screen_toolbar)
+            ?.setupWithNavController(navController, appBarConfiguration)
     }
 
     /** Show toast message */

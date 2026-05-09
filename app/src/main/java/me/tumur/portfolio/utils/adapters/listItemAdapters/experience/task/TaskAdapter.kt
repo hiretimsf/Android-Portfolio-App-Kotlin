@@ -1,7 +1,7 @@
 package me.tumur.portfolio.utils.adapters.listItemAdapters.experience.task
 
 import android.view.ViewGroup
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import me.tumur.portfolio.repository.database.model.task.TaskModel
 
@@ -9,7 +9,7 @@ import me.tumur.portfolio.repository.database.model.task.TaskModel
  * An adapter that provides a list of [TaskModel] to a [RecyclerView]
  * */
 
-class TaskAdapter : PagedListAdapter<TaskModel, TaskViewHolder>(TaskDiffCallBack()) {
+class TaskAdapter : PagingDataAdapter<TaskModel, TaskViewHolder>(TaskDiffCallBack()) {
 
     /**
      * Part of the RecyclerView adapter, called when RecyclerView needs a new [TaskViewHolder]

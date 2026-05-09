@@ -1,94 +1,96 @@
 package me.tumur.portfolio.screens.experience.detail
 
-import androidx.lifecycle.*
-import androidx.paging.PagedList
-import androidx.paging.toLiveData
-import kotlinx.coroutines.Dispatchers
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import me.tumur.portfolio.repository.database.dao.button.ButtonDao
 import me.tumur.portfolio.repository.database.dao.experience.ExperienceDao
 import me.tumur.portfolio.repository.database.dao.location.LocationDao
 import me.tumur.portfolio.repository.database.dao.resource.ResourceDao
 import me.tumur.portfolio.repository.database.dao.task.TaskDao
+import me.tumur.portfolio.repository.database.model.LocationModel
 import me.tumur.portfolio.repository.database.model.button.ButtonModel
+import me.tumur.portfolio.repository.database.model.experience.ExperienceModel
 import me.tumur.portfolio.repository.database.model.resource.ResourceModel
 import me.tumur.portfolio.repository.database.model.task.TaskModel
 import me.tumur.portfolio.utils.state.FavoriteState
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import javax.inject.Inject
 
-class ExperienceDetailFragmentViewModel : ViewModel(), KoinComponent {
+@HiltViewModel
+@OptIn(ExperimentalCoroutinesApi::class)
+class ExperienceDetailFragmentViewModel @Inject constructor(
+    private val experienceDao: ExperienceDao,
+    private val buttonDao: ButtonDao,
+    private val taskDao: TaskDao,
+    private val locationDao: LocationDao,
+    private val resourceDao: ResourceDao
+) : ViewModel() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-    /** Repository */
-    private val experienceDao: ExperienceDao by inject()
-    private val buttonDao: ButtonDao by inject()
-    private val taskDao: TaskDao by inject()
-    private val locationDao: LocationDao by inject()
-    private val resourceDao: ResourceDao by inject()
-
     /** Experience item id */
-    private val _id = MutableLiveData<String>()
-    val id: LiveData<String> = _id
+    private val _id = MutableStateFlow<String?>(null)
+    val idFlow: StateFlow<String?> = _id.asStateFlow()
+    val id: String? get() = _id.value
 
     /** Experience item data */
-    val data = id.switchMap { id ->
-        liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
-            emitSource(experienceDao.getSingleItem(id))
-        }
-    }
+    val dataFlow: StateFlow<ExperienceModel?> = idFlow.filterNotNull()
+        .flatMapLatest { id -> experienceDao.getSingleItem(id) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    val data: ExperienceModel? get() = dataFlow.value
 
     /** Button data */
-    private val configButton = PagedList.Config.Builder()
-        .setPageSize(3)
-        .setEnablePlaceholders(true)
-        .setInitialLoadSizeHint(3)
-        .build()
+    private val configButton = PagingConfig(pageSize = 3, enablePlaceholders = true, initialLoadSize = 3)
 
-    val button: LiveData<PagedList<ButtonModel>> =
-        id.switchMap { id -> buttonDao.getListItems(id).toLiveData(configButton) }
+    val button: Flow<PagingData<ButtonModel>> = idFlow.filterNotNull()
+        .flatMapLatest { id -> Pager(configButton) { buttonDao.getListItems(id) }.flow }
+        .cachedIn(viewModelScope)
 
     /** Task data */
-    private val configTask = PagedList.Config.Builder()
-        .setPageSize(10)
-        .setEnablePlaceholders(true)
-        .setInitialLoadSizeHint(10)
-        .build()
+    private val configTask = PagingConfig(pageSize = 10, enablePlaceholders = true, initialLoadSize = 10)
 
-    val task: LiveData<PagedList<TaskModel>> =
-        id.switchMap { id -> taskDao.getListItems(id).toLiveData(configTask) }
+    val task: Flow<PagingData<TaskModel>> = idFlow.filterNotNull()
+        .flatMapLatest { id -> Pager(configTask) { taskDao.getListItems(id) }.flow }
+        .cachedIn(viewModelScope)
 
     /** Resource data */
-    private val configResource = PagedList.Config.Builder()
-        .setPageSize(5)
-        .setEnablePlaceholders(true)
-        .setInitialLoadSizeHint(5)
-        .build()
+    private val configResource = PagingConfig(pageSize = 5, enablePlaceholders = true, initialLoadSize = 5)
 
-    val resource: LiveData<PagedList<ResourceModel>> =
-        id.switchMap { id -> resourceDao.getListItems(id).toLiveData(configTask) }
+    val resource: Flow<PagingData<ResourceModel>> = idFlow.filterNotNull()
+        .flatMapLatest { id -> Pager(configResource) { resourceDao.getListItems(id) }.flow }
+        .cachedIn(viewModelScope)
 
     /** Resource state */
-    private val _resourceState = MutableLiveData<FavoriteState>()
-    val resourceState: LiveData<FavoriteState> = _resourceState
+    private val _resourceState = MutableStateFlow<FavoriteState?>(null)
+    val resourceStateFlow: StateFlow<FavoriteState?> = _resourceState.asStateFlow()
+    val resourceState: FavoriteState? get() = _resourceState.value
 
     /** Experience item data */
-    val checkResourceTable = id.switchMap { id ->
-        liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
-            emitSource(resourceDao.check(id))
-        }
-    }
+    val checkResourceTable: StateFlow<Int> = idFlow.filterNotNull()
+        .flatMapLatest { id -> resourceDao.check(id) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
 
     /** Location data */
-    val location = id.switchMap { id ->
-        liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
-            emitSource(locationDao.getSingleItem(id))
-        }
-    }
+    val locationFlow: StateFlow<LocationModel?> = idFlow.filterNotNull()
+        .flatMapLatest { id -> locationDao.getSingleItem(id) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     /** Url -> clicked */
-    private val _url = MutableLiveData<String>()
-    val url: LiveData<String> = _url
+    private val _url = MutableStateFlow<String?>(null)
+    val urlFlow: StateFlow<String?> = _url.asStateFlow()
 
     /** FUNCTIONS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -102,7 +104,7 @@ class ExperienceDetailFragmentViewModel : ViewModel(), KoinComponent {
     /**
      * Set clicked url
      * */
-    fun setUrl(url: String) {
+    fun setUrl(url: String?) {
         _url.value = url
     }
 

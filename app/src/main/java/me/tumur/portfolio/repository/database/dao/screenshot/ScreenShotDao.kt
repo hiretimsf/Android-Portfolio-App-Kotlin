@@ -1,7 +1,7 @@
 package me.tumur.portfolio.repository.database.dao.screenshot
 
-import androidx.lifecycle.LiveData
-import androidx.paging.DataSource
+import kotlinx.coroutines.flow.Flow
+import androidx.paging.PagingSource
 import androidx.room.*
 import me.tumur.portfolio.repository.database.model.screenshot.ScreenShotModel
 import me.tumur.portfolio.utils.constants.DbConstants
@@ -26,9 +26,9 @@ abstract class ScreenShotDao {
 
     /** Get paged list items */
     @Query(DbConstants.SCREENSHOT_GET_LIST_ITEMS)
-    abstract fun getPagedListItems(id: String): DataSource.Factory<Int, ScreenShotModel>
+    abstract fun getPagedItems(id: String): PagingSource<Int, ScreenShotModel>
 
     /** Get list items */
     @Query(DbConstants.SCREENSHOT_GET_LIST_ITEMS)
-    abstract fun getListItems(id: String): LiveData<List<ScreenShotModel>>
+    abstract fun getListItems(id: String): Flow<List<ScreenShotModel>>
 }

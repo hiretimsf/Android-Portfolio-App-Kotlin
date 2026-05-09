@@ -7,17 +7,19 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import dagger.hilt.android.AndroidEntryPoint
 import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.PagerItemPreviewScreenBinding
 import me.tumur.portfolio.repository.database.model.screenshot.ScreenShotModel
 import me.tumur.portfolio.screens.portfolio.detail.preview.PreviewFragmentViewModel
 import me.tumur.portfolio.utils.constants.Constants
+import me.tumur.portfolio.utils.extensions.collectFlow
 import me.tumur.portfolio.utils.state.PreviewImage
 
 /**
  * An fragment that inflates a preview layout.
  */
+@AndroidEntryPoint
 class PreviewPagerFragment : Fragment() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -84,13 +86,13 @@ class PreviewPagerFragment : Fragment() {
     /** Set observers */
     private fun setObservers() {
         /** Observer for view pager's position -----------------------------------------------------------------------*/
-        val observerData = Observer<List<ScreenShotModel>> { list ->
-            list?.let {
-                val screenshot = it[position]
+        viewLifecycleOwner.collectFlow(sharedViewModel.dataFlow) { list ->
+            list.getOrNull(position)?.let {
+                val screenshot = it
                 viewModel.setData(screenshot)
                 viewModel.setState(PreviewImage)
+                binding.invalidateAll()
             }
         }
-        sharedViewModel.data.observe(viewLifecycleOwner, observerData)
     }
 }

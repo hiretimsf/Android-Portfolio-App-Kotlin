@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="tag_welcome_page_listener" type="id" />
+    <item name="tag_preview_page_listener" type="id" />
+</resources>

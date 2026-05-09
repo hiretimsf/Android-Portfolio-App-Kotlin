@@ -1,51 +1,58 @@
 package me.tumur.portfolio.screens.profile
 
-import androidx.lifecycle.*
-import kotlinx.coroutines.Dispatchers
+import dagger.hilt.android.lifecycle.HiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import me.tumur.portfolio.repository.database.dao.profile.AboutDao
 import me.tumur.portfolio.repository.database.dao.profile.ProfileDao
 import me.tumur.portfolio.repository.database.dao.profile.SocialDao
+import me.tumur.portfolio.repository.database.model.profile.AboutModel
+import me.tumur.portfolio.repository.database.model.profile.ProfileModel
 import me.tumur.portfolio.repository.database.model.profile.SocialModel
 import me.tumur.portfolio.utils.constants.DbConstants
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import javax.inject.Inject
 
-class ProfileViewModel: ViewModel(), KoinComponent{
+@HiltViewModel
+class ProfileViewModel @Inject constructor(
+    private val profileDao: ProfileDao,
+    private val aboutDao: AboutDao,
+    private val socialDao: SocialDao
+) : ViewModel() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-    /** Repository */
-    private val profileDao: ProfileDao by inject()
-    private val aboutDao: AboutDao by inject()
-    private val socialDao: SocialDao by inject()
-
     /** Profile */
-    val profile = liveData(context = viewModelScope.coroutineContext + Dispatchers.IO){
-        emitSource(profileDao.getSingleItem(DbConstants.PERSON_ID))
-    }
+    val profileFlow: StateFlow<ProfileModel?> = profileDao.getSingleItem(DbConstants.PERSON_ID)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    val profile: ProfileModel? get() = profileFlow.value
 
     /** About */
-    val about = liveData(context = viewModelScope.coroutineContext + Dispatchers.IO){
-        emitSource(aboutDao.getListItems(DbConstants.PERSON_ID))
-    }
+    val aboutFlow: StateFlow<List<AboutModel>> = aboutDao.getListItems(DbConstants.PERSON_ID)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    val about: List<AboutModel> get() = aboutFlow.value
 
     /** Social*/
-    val social = liveData(context = viewModelScope.coroutineContext + Dispatchers.IO){
-        emitSource(socialDao.getListItems(DbConstants.PERSON_ID))
-    }
+    val socialFlow: StateFlow<List<SocialModel>> = socialDao.getListItems(DbConstants.PERSON_ID)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    val social: List<SocialModel> get() = socialFlow.value
 
 
     /** Profile bottom sheet dialog */
-    private val _showProfileBottomSheet = MutableLiveData<Boolean>().apply { value = false }
-    val showProfileBottomSheet: LiveData<Boolean> = _showProfileBottomSheet
+    private val _showProfileBottomSheet = MutableStateFlow(false)
+    val showProfileBottomSheetFlow: StateFlow<Boolean> = _showProfileBottomSheet.asStateFlow()
 
     /** Social item on click */
-    private val _socialItemOnClick = MutableLiveData<SocialModel>()
-    val socialItemOnClick: LiveData<SocialModel> = _socialItemOnClick
+    private val _socialItemOnClick = MutableStateFlow<SocialModel?>(null)
+    val socialItemOnClickFlow: StateFlow<SocialModel?> = _socialItemOnClick.asStateFlow()
 
     /** Email item on click */
-    private val _emailItemOnClick = MutableLiveData<Boolean>().apply { value = false }
-    val emailItemOnClick: LiveData<Boolean> = _emailItemOnClick
+    private val _emailItemOnClick = MutableStateFlow(false)
+    val emailItemOnClickFlow: StateFlow<Boolean> = _emailItemOnClick.asStateFlow()
 
     /** FUNCTIONS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -53,32 +60,32 @@ class ProfileViewModel: ViewModel(), KoinComponent{
      * Set show profile bottom sheet
      * */
     fun setShowProfileBottomsheet(status: Boolean){
-        _showProfileBottomSheet.apply { value = status }
+        _showProfileBottomSheet.value = status
     }
     // Set back to @false after it showed
     fun resetShowProfileBottomsheet(){
-        _showProfileBottomSheet.apply { value = false }
+        _showProfileBottomSheet.value = false
     }
 
     /**
      * Set social item onClick event
      * */
     fun socialItemOnClick(item: SocialModel){
-        _socialItemOnClick.apply { value = item }
+        _socialItemOnClick.value = item
     }
     // Set back to @null after it navigated
     fun socialItemClicked(){
-        _socialItemOnClick.apply { value = null }
+        _socialItemOnClick.value = null
     }
 
     /**
      * Set email item onClick event
      * */
     fun emailItemOnClick(status: Boolean){
-        _emailItemOnClick.apply { value = status }
+        _emailItemOnClick.value = status
     }
     // Set back to @null after it navigated
     fun emailItemClicked(){
-        _emailItemOnClick.apply { value = false }
+        _emailItemOnClick.value = false
     }
 }

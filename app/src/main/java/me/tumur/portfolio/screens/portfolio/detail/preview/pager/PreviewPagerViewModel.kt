@@ -1,28 +1,31 @@
 package me.tumur.portfolio.screens.portfolio.detail.preview.pager
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import me.tumur.portfolio.repository.database.model.screenshot.ScreenShotModel
 import me.tumur.portfolio.utils.state.PreviewState
 import me.tumur.portfolio.utils.state.ProgressBar
-import org.koin.core.KoinComponent
 
-class PreviewPagerViewModel : ViewModel(), KoinComponent {
+class PreviewPagerViewModel : ViewModel() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /** Position */
-    private val _position = MutableLiveData<Int>()
-    val position: LiveData<Int> = _position
+    private val _position = MutableStateFlow(0)
+    val positionFlow: StateFlow<Int> = _position.asStateFlow()
+    val position: Int get() = _position.value
 
     /** Screenshot */
-    private val _data = MutableLiveData<ScreenShotModel>()
-    val data: LiveData<ScreenShotModel> = _data
+    private val _data = MutableStateFlow<ScreenShotModel?>(null)
+    val dataFlow: StateFlow<ScreenShotModel?> = _data.asStateFlow()
+    val data: ScreenShotModel? get() = _data.value
 
     /** State */
-    private val _state = MutableLiveData<PreviewState>().apply { value = ProgressBar }
-    val state: LiveData<PreviewState> = _state
+    private val _state = MutableStateFlow<PreviewState>(ProgressBar)
+    val stateFlow: StateFlow<PreviewState> = _state.asStateFlow()
+    val state: PreviewState get() = _state.value
 
     /** FUNCTIONS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 

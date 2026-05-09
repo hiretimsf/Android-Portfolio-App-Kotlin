@@ -43,11 +43,11 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/welcome_screen_view_pager"
                 app:layout_constraintBottom_toTopOf="@+id/welcome_screen_btn"
-                app:ipi_dotDiameter="@dimen/_8sdp"
-                app:ipi_dotGap="@dimen/_4sdp"
-                app:ipi_animationDuration="320"
-                app:ipi_pageIndicatorColor="@color/colorPageIndicatorBackground"
-                app:ipi_currentPageIndicatorColor="@color/colorPageIndicatorActive"/>
+                app:dotDiameter="@dimen/_8sdp"
+                app:dotGap="@dimen/_4sdp"
+                app:animationDuration="320"
+                app:pageIndicatorColor="@color/colorPageIndicatorBackground"
+                app:currentPageIndicatorColor="@color/colorPageIndicatorActive"/>
 
         <!-- Button -->
         <com.google.android.material.button.MaterialButton
@@ -71,7 +71,8 @@
                 android:textAlignment="center"
                 android:textAllCaps="true"
                 android:textColor="?attr/colorOnPrimary"
-                android:background="?attr/selectableItemBackground"
+                app:backgroundTint="?attr/colorPrimary"
+                app:cornerRadius="@dimen/_4sdp"
                 android:text="@{model.buttonText}"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

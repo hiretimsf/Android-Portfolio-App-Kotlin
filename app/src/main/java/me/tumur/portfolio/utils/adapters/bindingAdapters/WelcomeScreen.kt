@@ -2,7 +2,6 @@ package me.tumur.portfolio.utils.adapters.bindingAdapters
 
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
-import androidx.lifecycle.LiveData
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
 import androidx.viewpager.widget.ViewPager
 import me.tumur.portfolio.R
@@ -30,6 +29,8 @@ fun setPagerIcon(view: ImageView, order: Int, scrolledPagerItem: Int, pagerPosit
 /** OnPage listener */
 @BindingAdapter("onPageScrolled")
 fun setViewPagerPageChangeListener(viewPager: ViewPager, viewModel: WelcomeViewModel) {
+    if (viewPager.getTag(R.id.tag_welcome_page_listener) == viewModel) return
+    viewPager.setTag(R.id.tag_welcome_page_listener, viewModel)
     viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
             viewModel.setCurrentItem(position)
@@ -41,6 +42,6 @@ fun setViewPagerPageChangeListener(viewPager: ViewPager, viewModel: WelcomeViewM
 
 /** Current item */
 @BindingAdapter("scrollToItem", "smoothScroll", requireAll = false)
-fun setViewPagerCurrentItem(viewPager: ViewPager, scrollToItem: LiveData<Int>?, smoothScroll: Boolean = false) {
-    scrollToItem?.value?.let {  viewPager.setCurrentItem(it, smoothScroll)}
+fun setViewPagerCurrentItem(viewPager: ViewPager, scrollToItem: Int?, smoothScroll: Boolean = false) {
+    scrollToItem?.let { viewPager.setCurrentItem(it, smoothScroll)}
 }

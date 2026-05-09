@@ -1,6 +1,6 @@
 package me.tumur.portfolio.repository.database.dao.settings
 
-import androidx.lifecycle.LiveData
+import kotlinx.coroutines.flow.Flow
 import androidx.room.*
 import me.tumur.portfolio.repository.database.model.settings.AppModel
 import me.tumur.portfolio.utils.constants.DbConstants
@@ -25,5 +25,5 @@ abstract class AppDao {
 
     /** Get list items */
     @Query(DbConstants.APP_GET_LIST_ITEMS)
-    abstract fun getListItems(): LiveData<List<AppModel>>
+    abstract fun getListItems(): Flow<List<AppModel>>
 }

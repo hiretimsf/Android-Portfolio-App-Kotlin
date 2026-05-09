@@ -1,9 +1,22 @@
 package me.tumur.portfolio.screens.portfolio.detail
 
-import androidx.lifecycle.*
-import androidx.paging.PagedList
-import androidx.paging.toLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import me.tumur.portfolio.repository.database.dao.button.ButtonDao
 import me.tumur.portfolio.repository.database.dao.category.CategoryDao
@@ -15,74 +28,71 @@ import me.tumur.portfolio.repository.database.model.category.CategoryModel
 import me.tumur.portfolio.repository.database.model.favorite.FavoriteModel
 import me.tumur.portfolio.repository.database.model.portfolio.PortfolioModel
 import me.tumur.portfolio.repository.database.model.screenshot.ScreenShotModel
-import org.koin.core.KoinComponent
-import org.koin.core.inject
 import java.util.*
+import javax.inject.Inject
 
-class PortfolioDetailFragmentViewModel : ViewModel(), KoinComponent {
+@HiltViewModel
+@OptIn(ExperimentalCoroutinesApi::class)
+class PortfolioDetailFragmentViewModel @Inject constructor(
+    private val portfolioDao: PortfolioDao,
+    private val buttonDao: ButtonDao,
+    private val categoryDao: CategoryDao,
+    private val screenshotDao: ScreenShotDao,
+    private val favoriteDao: FavoriteDao
+) : ViewModel() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-    /** Repository */
-    private val portfolioDao: PortfolioDao by inject()
-    private val buttonDao: ButtonDao by inject()
-    private val categoryDao: CategoryDao by inject()
-    private val screenshotDao: ScreenShotDao by inject()
-    private val favoriteDao: FavoriteDao by inject()
-
     /** Portfolio id */
-    private val _id = MutableLiveData<String>()
-    val id: LiveData<String> = _id
+    private val _id = MutableStateFlow<String?>(null)
+    val idFlow: StateFlow<String?> = _id.asStateFlow()
+    val id: String? get() = _id.value
 
     /** Button -> clicked */
-    private val _buttonUrl = MutableLiveData<String>()
-    val buttonUrl: LiveData<String> = _buttonUrl
+    private val _buttonUrl = MutableStateFlow<String?>(null)
+    val buttonUrlFlow: StateFlow<String?> = _buttonUrl.asStateFlow()
+    val buttonUrl: String? get() = _buttonUrl.value
 
     /** Screenshot -> clicked */
-    private val _clickedScreenShot = MutableLiveData<ScreenShotModel>()
-    val clickedScreenShot: LiveData<ScreenShotModel> = _clickedScreenShot
+    private val _clickedScreenShot = MutableStateFlow<ScreenShotModel?>(null)
+    val clickedScreenShotFlow: StateFlow<ScreenShotModel?> = _clickedScreenShot.asStateFlow()
+    val clickedScreenShot: ScreenShotModel? get() = _clickedScreenShot.value
 
     /** Video Url */
-    private val _videoUrl = MutableLiveData<String>()
-    val videoUrl: LiveData<String> = _videoUrl
+    private val _videoUrl = MutableStateFlow<String?>(null)
+    val videoUrlFlow: StateFlow<String?> = _videoUrl.asStateFlow()
+    val videoUrl: String? get() = _videoUrl.value
 
     /** Portfolio item data */
-    val portfolio = id.switchMap { id ->
-        liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
-            emitSource(portfolioDao.getSingleItem(id))
-        }
-    }
+    val portfolioFlow: StateFlow<PortfolioModel?> = idFlow.filterNotNull()
+        .flatMapLatest { id -> portfolioDao.getSingleItem(id) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    val portfolio: PortfolioModel? get() = portfolioFlow.value
 
     /** Is it favorite? */
-    val favorite = id.switchMap { id ->
-        liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
-            emitSource(favoriteDao.existSingleItem(id))
-        }
-    }
+    val favoriteFlow: StateFlow<Int> = idFlow.filterNotNull()
+        .flatMapLatest { id -> favoriteDao.existSingleItem(id) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
+    val favorite: Int get() = favoriteFlow.value
 
     /** Button data */
-    private val configButton = PagedList.Config.Builder()
-        .setPageSize(3)
-        .setEnablePlaceholders(true)
-        .setInitialLoadSizeHint(3)
-        .build()
+    private val configButton = PagingConfig(pageSize = 3, enablePlaceholders = true, initialLoadSize = 3)
 
-    val button: LiveData<PagedList<ButtonModel>> =
-        id.switchMap { id -> buttonDao.getListItems(id).toLiveData(configButton) }
+    val button: Flow<PagingData<ButtonModel>> = idFlow.filterNotNull()
+        .flatMapLatest { id -> Pager(configButton) { buttonDao.getListItems(id) }.flow }
+        .cachedIn(viewModelScope)
 
     /** Category data */
-    val category: LiveData<PagedList<CategoryModel>> =
-        portfolio.switchMap { portfolio -> categoryDao.getListItems(portfolio.categoryType).toLiveData(configButton) }
+    val category: Flow<PagingData<CategoryModel>> = portfolioFlow.filterNotNull()
+        .flatMapLatest { portfolio -> Pager(configButton) { categoryDao.getListItems(portfolio.categoryType) }.flow }
+        .cachedIn(viewModelScope)
 
     /** Screenshot data */
-    private val configScreenShot = PagedList.Config.Builder()
-        .setPageSize(5)
-        .setEnablePlaceholders(true)
-        .setInitialLoadSizeHint(5)
-        .build()
+    private val configScreenShot = PagingConfig(pageSize = 5, enablePlaceholders = true, initialLoadSize = 5)
 
-    val screenshot: LiveData<PagedList<ScreenShotModel>> =
-        id.switchMap { id -> screenshotDao.getPagedListItems(id).toLiveData(configScreenShot) }
+    val screenshot: Flow<PagingData<ScreenShotModel>> = idFlow.filterNotNull()
+        .flatMapLatest { id -> Pager(configScreenShot) { screenshotDao.getPagedItems(id) }.flow }
+        .cachedIn(viewModelScope)
 
     /** FUNCTIONS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -104,9 +114,7 @@ class PortfolioDetailFragmentViewModel : ViewModel(), KoinComponent {
      * Set clicked screenshot
      * */
     fun setClickedScreenShot(model: ScreenShotModel?) {
-        model?.let {
-            _clickedScreenShot.value = model
-        }
+        _clickedScreenShot.value = model
     }
 
     /**

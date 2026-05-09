@@ -7,10 +7,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
 import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.FragmentFavoriteBinding
 import me.tumur.portfolio.repository.database.model.favorite.FavoriteModel
@@ -18,12 +17,14 @@ import me.tumur.portfolio.screens.MainViewModel
 import me.tumur.portfolio.utils.adapters.listItemAdapters.favorite.FavoriteAdapter
 import me.tumur.portfolio.utils.adapters.listItemAdapters.favorite.FavoriteClickListener
 import me.tumur.portfolio.utils.constants.Constants
+import me.tumur.portfolio.utils.extensions.collectFlow
 import me.tumur.portfolio.utils.state.Empty
 import me.tumur.portfolio.utils.state.NotEmpty
 
 /**
  * An fragment that inflates a portfolio layout.
  */
+@AndroidEntryPoint
 class FavoriteFragment : Fragment() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -124,7 +125,7 @@ class FavoriteFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_delete_all -> {
-                val favoriteItem = viewModel.selectedItem.value
+                val favoriteItem = viewModel.selectedItem
                 if (favoriteItem != null) {
                     val action =
                         FavoriteFragmentDirections.actionToPortfolioDetailScreen(favoriteItem.id, favoriteItem.title)
@@ -144,17 +145,14 @@ class FavoriteFragment : Fragment() {
         /**
          * Observer for favorite list items data
          * */
-        val observer = Observer<PagedList<FavoriteModel>> { data ->
-            data?.let {
-                favoriteAdapter.submitList(it)
-            }
+        viewLifecycleOwner.collectFlow(viewModel.data) { data ->
+            favoriteAdapter.submitData(viewLifecycleOwner.lifecycle, data)
         }
-        viewModel.data.observe(viewLifecycleOwner, observer)
 
         /**
          * Observer for click listener
          * */
-        val observerClickListener = Observer<FavoriteModel> {
+        viewLifecycleOwner.collectFlow(viewModel.selectedItemFlow) {
             it?.let {
                 favoriteMenu?.let { menu ->
                     val menuAction = menu.findItem(R.id.menu_delete_all)
@@ -166,27 +164,22 @@ class FavoriteFragment : Fragment() {
 
             }
         }
-        viewModel.selectedItem.observe(viewLifecycleOwner, observerClickListener)
 
         /**
          * Observer for table
          * */
-        val observerTable = Observer<Int> {
-            it?.let {
-                if (it > 0) viewModel.setState(NotEmpty) else viewModel.setState(Empty)
-            }
+        viewLifecycleOwner.collectFlow(viewModel.table) {
+            if (it > 0) viewModel.setState(NotEmpty) else viewModel.setState(Empty)
         }
-        viewModel.table.observe(viewLifecycleOwner, observerTable)
 
         /**
          * Observer for delete item id
          * */
-        val observerDeleteItemId = Observer<String> {
+        viewLifecycleOwner.collectFlow(viewModel.deleteItemIdFlow) {
             it?.let {
                 viewModel.deleteSingleItem(it)
                 viewModel.setDeleteItemId(null)
             }
         }
-        viewModel.deleteItemId.observe(viewLifecycleOwner, observerDeleteItemId)
     }
 }

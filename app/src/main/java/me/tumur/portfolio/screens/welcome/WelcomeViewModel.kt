@@ -3,14 +3,20 @@ package me.tumur.portfolio.screens.welcome
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import androidx.lifecycle.*
-import kotlinx.coroutines.Dispatchers
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import me.tumur.portfolio.R
 import me.tumur.portfolio.repository.database.dao.welcome.WelcomeDao
 import me.tumur.portfolio.repository.database.model.welcome.WelcomeModel
 import me.tumur.portfolio.utils.constants.Constants
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import javax.inject.Inject
 
 /**
  * WelcomeViewModel designed to store and manage UI-related data in a lifecycle conscious way. This
@@ -19,37 +25,40 @@ import org.koin.core.inject
  * results after the new Fragment or Activity is available.
  */
 
-class WelcomeViewModel: ViewModel(), KoinComponent{
+@HiltViewModel
+class WelcomeViewModel @Inject constructor(
+    private val welcomeDao: WelcomeDao,
+    @param:ApplicationContext private val context: Context
+) : ViewModel() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-    /** Repository */
-    private val welcomeDao: WelcomeDao by inject()
-    private val context: Context by inject()
 
     /** Shared preferences */
     private val sharedPref: SharedPreferences = context.getSharedPreferences(Constants.APP, Context.MODE_PRIVATE)
 
     /** Welcome data */
-    val welcomeScreen = liveData(context = viewModelScope.coroutineContext + Dispatchers.IO){
-        emitSource(welcomeDao.getListItems())
-    }
+    val welcomeScreenFlow: StateFlow<List<WelcomeModel>> = welcomeDao.getListItems()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    val welcomeScreen: List<WelcomeModel> get() = welcomeScreenFlow.value
 
     /** Current item of view pager  */
-    private val _currentItem = MutableLiveData<Int>()
-    val currentItem : LiveData<Int> = _currentItem
+    private val _currentItem = MutableStateFlow(0)
+    val currentItemFlow: StateFlow<Int> = _currentItem.asStateFlow()
+    val currentItem: Int get() = _currentItem.value
 
     /** ScrollTo item of view pager  */
-    private val _scrollToItem = MutableLiveData<Int>()
-    val scrollToItem : LiveData<Int> = _scrollToItem
+    private val _scrollToItem = MutableStateFlow<Int?>(null)
+    val scrollToItemFlow: StateFlow<Int?> = _scrollToItem.asStateFlow()
+    val scrollToItem: Int? get() = _scrollToItem.value
 
     /** Skip and next button clicked  */
-    private val _onClicked = MutableLiveData<Boolean>().apply { value = false }
-    val onClicked : LiveData<Boolean> = _onClicked
+    private val _onClicked = MutableStateFlow(false)
+    val onClickedFlow: StateFlow<Boolean> = _onClicked.asStateFlow()
 
     /** Skip and get started button text  */
-    private val _buttonText = MutableLiveData<String>().apply { value = context.getString(R.string.button_skip) }
-    val buttonText: LiveData<String> = _buttonText
+    private val _buttonText = MutableStateFlow(context.getString(R.string.button_next))
+    val buttonTextFlow: StateFlow<String> = _buttonText.asStateFlow()
+    val buttonText: String get() = _buttonText.value
 
     /** FUNCTIONS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -67,7 +76,7 @@ class WelcomeViewModel: ViewModel(), KoinComponent{
      * Get welcome screen data
      * */
     fun getWelcomeScreenData(position: Int): WelcomeModel?{
-        return welcomeScreen.value?.get(position)
+        return welcomeScreen.getOrNull(position)
     }
 
     /**
@@ -88,13 +97,13 @@ class WelcomeViewModel: ViewModel(), KoinComponent{
      * Set viewpager's scroll to item
      */
     fun setOnClicked(status: Boolean) {
-        _onClicked.apply { value = status }
+        _onClicked.value = status
     }
 
     /**
      * Set skip and get started button text
      */
     fun setButtonText(text: String) {
-        _buttonText.apply { value = text }
+        _buttonText.value = text
     }
 }

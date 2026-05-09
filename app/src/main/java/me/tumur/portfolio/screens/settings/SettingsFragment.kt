@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.Preference.OnPreferenceChangeListener
 import androidx.preference.PreferenceFragmentCompat
+import dagger.hilt.android.AndroidEntryPoint
 import me.tumur.portfolio.R
 import me.tumur.portfolio.R.string
 import me.tumur.portfolio.R.xml
@@ -22,6 +23,7 @@ import me.tumur.portfolio.utils.theme.ThemeHelper
  * An fragment that inflates a settings preferences xml.
  */
 
+@AndroidEntryPoint
 class SettingsFragment : PreferenceFragmentCompat() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -63,7 +65,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
      * at this PreferenceScreen has been clicked.
      * */
 
-    override fun onPreferenceTreeClick(preference: Preference?): Boolean {
+    override fun onPreferenceTreeClick(preference: Preference): Boolean {
 
         /** Preference keys */
         val appInfo = resources.getString(string.preference_key_app_version)
@@ -72,7 +74,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val twitter = resources.getString(string.preference_key_tumur)
 
         /** OnClick handler */
-        when(preference?.key){
+        when(preference.key){
             sourceCode -> startCustomTab(Constants.SOURCE_CODE_URL)
             privacy -> startCustomTab(Constants.PRIVACY_URL)
             twitter -> startCustomTab(Constants.TWITTER_URL)
@@ -100,8 +102,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val pref = preferenceManager.preferenceScreen
 
         /** Custom summary and intent data */
-        val version = context?.packageManager?.getPackageInfo(context?.packageName, 0)?.versionName
-        val uri = Uri.parse("market://details?id=" + context?.packageName)
+        val version = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0).versionName
+        val uri = Uri.parse("market://details?id=" + requireContext().packageName)
         // App version
         pref.findPreference<Preference>(appVersion)?.summary = version
         // Rate this app
@@ -126,10 +128,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
         url?.let {
             /** Chrome custom tab  */
             val builder = CustomTabsIntent.Builder().apply {
-                this.setToolbarColor(ContextCompat.getColor(context!!, R.color.colorPrimary))
+                this.setToolbarColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
                 this.setShowTitle(true)
             }
-            builder.build().launchUrl(context, (Uri.parse(url)))
+            builder.build().launchUrl(requireContext(), (Uri.parse(url)))
         }
     }
 }

@@ -1,6 +1,6 @@
 package me.tumur.portfolio.repository.database.dao.location
 
-import androidx.lifecycle.LiveData
+import kotlinx.coroutines.flow.Flow
 import androidx.room.*
 import me.tumur.portfolio.repository.database.model.LocationModel
 import me.tumur.portfolio.utils.constants.DbConstants
@@ -26,6 +26,6 @@ abstract class LocationDao {
 
     /** Get single item */
     @Query(DbConstants.LOCATION_GET_SINGLE_ITEM)
-    abstract fun getSingleItem(id: String): LiveData<LocationModel>
+    abstract fun getSingleItem(id: String): Flow<LocationModel>
 
 }

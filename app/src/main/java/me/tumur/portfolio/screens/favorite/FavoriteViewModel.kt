@@ -1,49 +1,57 @@
 package me.tumur.portfolio.screens.favorite
 
-import androidx.lifecycle.*
-import androidx.paging.PagedList
-import androidx.paging.toLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.tumur.portfolio.repository.database.dao.favorite.FavoriteDao
 import me.tumur.portfolio.repository.database.model.favorite.FavoriteModel
 import me.tumur.portfolio.utils.state.FavoriteState
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import javax.inject.Inject
 
-class FavoriteViewModel : ViewModel(), KoinComponent {
+@HiltViewModel
+class FavoriteViewModel @Inject constructor(
+    private val favoriteDao: FavoriteDao
+) : ViewModel() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-    /** Repository */
-    private val favoriteDao: FavoriteDao by inject()
-
     /** State */
-    private val _state = MutableLiveData<FavoriteState>()
-    val state: LiveData<FavoriteState> = _state
+    private val _state = MutableStateFlow<FavoriteState?>(null)
+    val stateFlow: StateFlow<FavoriteState?> = _state.asStateFlow()
+    val state: FavoriteState? get() = _state.value
 
     /** Selected item id */
-    private val _selectedItem = MutableLiveData<FavoriteModel>()
-    val selectedItem: LiveData<FavoriteModel> = _selectedItem
+    private val _selectedItem = MutableStateFlow<FavoriteModel?>(null)
+    val selectedItemFlow: StateFlow<FavoriteModel?> = _selectedItem.asStateFlow()
+    val selectedItem: FavoriteModel? get() = _selectedItem.value
 
     /** Delete item id */
-    private val _deleteItemId = MutableLiveData<String>()
-    val deleteItemId: LiveData<String> = _deleteItemId
+    private val _deleteItemId = MutableStateFlow<String?>(null)
+    val deleteItemIdFlow: StateFlow<String?> = _deleteItemId.asStateFlow()
 
     /** Favorite pager data */
-    private val config = PagedList.Config.Builder()
-        .setPageSize(10)
-        .setEnablePlaceholders(true)
-        .setInitialLoadSizeHint(5)
-        .build()
+    private val config = PagingConfig(pageSize = 10, enablePlaceholders = true, initialLoadSize = 5)
 
-    val data: LiveData<PagedList<FavoriteModel>> = favoriteDao.getListItems().toLiveData(config)
+    val data: Flow<PagingData<FavoriteModel>> = Pager(config) {
+        favoriteDao.getListItems()
+    }.flow.cachedIn(viewModelScope)
 
     /** Check table */
-    val table = liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
-        emitSource(favoriteDao.check())
-    }
+    val table: StateFlow<Int> = favoriteDao.check()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
 
     /** FUNCTIONS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -60,9 +68,7 @@ class FavoriteViewModel : ViewModel(), KoinComponent {
      * Set delete item id
      * */
     fun setDeleteItemId(id: String?) {
-        id?.let {
-            _deleteItemId.value = it
-        }
+        _deleteItemId.value = id
     }
 
     /**

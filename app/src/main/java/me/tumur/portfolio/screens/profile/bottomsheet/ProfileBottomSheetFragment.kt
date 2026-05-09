@@ -10,14 +10,14 @@ import android.view.ViewGroup
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
+import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.android.synthetic.main.fragment_profile_bottom_sheet.view.*
+import dagger.hilt.android.AndroidEntryPoint
 import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.FragmentProfileBottomSheetBinding
 import me.tumur.portfolio.repository.database.model.profile.SocialModel
@@ -25,7 +25,9 @@ import me.tumur.portfolio.screens.profile.ProfileViewModel
 import me.tumur.portfolio.utils.adapters.listItemAdapters.social.SocialAdapter
 import me.tumur.portfolio.utils.adapters.listItemAdapters.social.SocialClickListener
 import me.tumur.portfolio.utils.constants.Constants
+import me.tumur.portfolio.utils.extensions.collectFlow
 
+@AndroidEntryPoint
 class ProfileBottomSheetFragment: BottomSheetDialogFragment() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -45,7 +47,7 @@ class ProfileBottomSheetFragment: BottomSheetDialogFragment() {
      * this Fragment is attached i.e.,after Fragment.onAttach,
      * and access prior to that will result in IllegalArgumentException.
      * */
-    private val viewModel: ProfileViewModel by navGraphViewModels(R.id.profile_screen)
+    private val viewModel: ProfileViewModel by hiltNavGraphViewModels(R.id.profile_screen)
 
     /** Databinding */
     private lateinit var binding: FragmentProfileBottomSheetBinding
@@ -81,7 +83,7 @@ class ProfileBottomSheetFragment: BottomSheetDialogFragment() {
         val socialAdapter = SocialAdapter(SocialClickListener { viewModel.socialItemOnClick(it) })
         val layoutManagerSocial = LinearLayoutManager(context)
         layoutManagerSocial.orientation = LinearLayoutManager.VERTICAL
-        val socialList = binding.profileBsSocialList.profile_bs_social_list
+        val socialList = binding.root.findViewById<RecyclerView>(R.id.profile_bs_social_list)
 
         socialList.apply {
             this.layoutManager = layoutManagerSocial
@@ -90,40 +92,40 @@ class ProfileBottomSheetFragment: BottomSheetDialogFragment() {
         }
 
         binding.apply {
-            // Set the lifecycleOwner so DataBinding can observe LiveData
+            // Set the lifecycleOwner so DataBinding can observe Flow
             this.lifecycleOwner = viewLifecycleOwner
             // Set the viewmodel so layout can display data
             this.model = viewModel
         }
 
         /** Observer for social adapter */
-        val socialAdapterObserver = Observer<List<SocialModel>> { data ->
-            data?.let {
-                socialAdapter.submitList(data)
-            }
+        viewLifecycleOwner.collectFlow(viewModel.profileFlow) {
+            binding.invalidateAll()
         }
-        viewModel.social.observe(viewLifecycleOwner, socialAdapterObserver)
+
+        val socialAdapterObserver: suspend (List<SocialModel>) -> Unit = { data ->
+            socialAdapter.submitList(data)
+        }
+        viewLifecycleOwner.collectFlow(viewModel.socialFlow, collector = socialAdapterObserver)
 
         /** Observer for social item on click */
-        val socialItemClickObserver = Observer<SocialModel> { item ->
-                item?.let {
-                    //Hide dialog and reset onclick value
-                    dlg.dismiss()
-                    viewModel.socialItemClicked()
-                    // Set chrome custom tab
-                    val builder = CustomTabsIntent.Builder()
-                    builder.setToolbarColor(ContextCompat.getColor(context!!, R.color.colorPrimary))
-                    builder.setShowTitle(true)
-                    val intent = builder.build()
-                    intent.launchUrl(context, Uri.parse(item.url))
-                    this.findNavController().popBackStack()
-                }
+        viewLifecycleOwner.collectFlow(viewModel.socialItemOnClickFlow) { item ->
+            item?.let {
+                //Hide dialog and reset onclick value
+                dlg.dismiss()
+                viewModel.socialItemClicked()
+                // Set chrome custom tab
+                val builder = CustomTabsIntent.Builder()
+                builder.setToolbarColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
+                builder.setShowTitle(true)
+                val intent = builder.build()
+                intent.launchUrl(requireContext(), Uri.parse(item.url))
+                this.findNavController().popBackStack()
             }
-        viewModel.socialItemOnClick.observe(viewLifecycleOwner, socialItemClickObserver)
+        }
 
         /** Observer for email item on click */
-        val emailItemClickObserver = Observer<Boolean> { item ->
-
+        viewLifecycleOwner.collectFlow(viewModel.emailItemOnClickFlow) { item ->
             if(item){
                 //Set email intent
                 val intent = Intent(Intent.ACTION_SENDTO)
@@ -139,7 +141,6 @@ class ProfileBottomSheetFragment: BottomSheetDialogFragment() {
                 }
             }
         }
-        viewModel.emailItemOnClick.observe(viewLifecycleOwner, emailItemClickObserver)
 
         return binding.root
 

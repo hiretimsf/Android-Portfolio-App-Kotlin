@@ -1,6 +1,6 @@
 package me.tumur.portfolio.repository.database.dao.task
 
-import androidx.paging.DataSource
+import androidx.paging.PagingSource
 import androidx.room.*
 import me.tumur.portfolio.repository.database.model.task.TaskModel
 import me.tumur.portfolio.utils.constants.DbConstants
@@ -25,5 +25,5 @@ abstract class TaskDao {
 
     /** Get list items */
     @Query(DbConstants.TASK_GET_LIST_ITEMS)
-    abstract fun getListItems(id: String): DataSource.Factory<Int, TaskModel>
+    abstract fun getListItems(id: String): PagingSource<Int, TaskModel>
 }

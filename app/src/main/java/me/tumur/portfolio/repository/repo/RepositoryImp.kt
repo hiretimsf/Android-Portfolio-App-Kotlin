@@ -17,31 +17,29 @@ import me.tumur.portfolio.repository.network.Failed
 import me.tumur.portfolio.repository.network.RestApi
 import me.tumur.portfolio.repository.network.Result
 import me.tumur.portfolio.repository.network.Success
-import org.koin.core.KoinComponent
-import org.koin.core.inject
 import java.io.IOException
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class RepositoryImp : Repository, KoinComponent {
+@Singleton
+class RepositoryImp @Inject constructor(
+    private val welcomeDao: WelcomeDao,
+    private val profileDao: ProfileDao,
+    private val socialDao: SocialDao,
+    private val aboutDao: AboutDao,
+    private val appDao: AppDao,
+    private val portfolioDao: PortfolioDao,
+    private val experienceDao: ExperienceDao,
+    private val buttonDao: ButtonDao,
+    private val taskDao: TaskDao,
+    private val categoryDao: CategoryDao,
+    private val screenShotDao: ScreenShotDao,
+    private val locationDao: LocationDao,
+    private val resourceDao: ResourceDao,
+    private val api: RestApi
+) : Repository {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-    /** DATABASE API ------------------------------------------------------------------------------------------------ */
-    private val welcomeDao: WelcomeDao by inject()
-    private val profileDao: ProfileDao by inject()
-    private val socialDao: SocialDao by inject()
-    private val aboutDao: AboutDao by inject()
-    private val appDao: AppDao by inject()
-    private val portfolioDao: PortfolioDao by inject()
-    private val experienceDao: ExperienceDao by inject()
-    private val buttonDao: ButtonDao by inject()
-    private val taskDao: TaskDao by inject()
-    private val categoryDao: CategoryDao by inject()
-    private val screenShotDao: ScreenShotDao by inject()
-    private val locationDao: LocationDao by inject()
-    private val resourceDao: ResourceDao by inject()
-
-    /** NETWORK API ------------------------------------------------------------------------------------------------- */
-    private val api: RestApi by inject()
 
     /**
      * Fetch data from network and update the database,

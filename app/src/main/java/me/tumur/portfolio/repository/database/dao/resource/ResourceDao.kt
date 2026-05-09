@@ -1,7 +1,7 @@
 package me.tumur.portfolio.repository.database.dao.resource
 
-import androidx.lifecycle.LiveData
-import androidx.paging.DataSource
+import kotlinx.coroutines.flow.Flow
+import androidx.paging.PagingSource
 import androidx.room.*
 import me.tumur.portfolio.repository.database.model.resource.ResourceModel
 import me.tumur.portfolio.utils.constants.DbConstants
@@ -26,11 +26,11 @@ abstract class ResourceDao {
 
     /** Get list items */
     @Query(DbConstants.RESOURCE_GET_LIST_ITEMS)
-    abstract fun getListItems(id: String): DataSource.Factory<Int, ResourceModel>
+    abstract fun getListItems(id: String): PagingSource<Int, ResourceModel>
 
     /** Check table */
     @Query(DbConstants.RESOURCE_CHECK)
-    abstract fun check(id: String): LiveData<Int>
+    abstract fun check(id: String): Flow<Int>
 
 
 }

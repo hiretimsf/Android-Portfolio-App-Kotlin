@@ -1,7 +1,7 @@
 package me.tumur.portfolio.utils.adapters.listItemAdapters.experience.resource
 
 import android.view.ViewGroup
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import me.tumur.portfolio.repository.database.model.resource.ResourceModel
 import me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio.button.ButtonClickListener
@@ -11,7 +11,7 @@ import me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio.button.Butto
  * */
 
 class ResourceAdapter(private val clickListener: ButtonClickListener) :
-    PagedListAdapter<ResourceModel, ResourceViewHolder>(
+    PagingDataAdapter<ResourceModel, ResourceViewHolder>(
         ResourceDiffCallBack()
     ) {
 

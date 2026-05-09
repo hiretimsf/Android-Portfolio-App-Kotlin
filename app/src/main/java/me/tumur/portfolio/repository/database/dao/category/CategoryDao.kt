@@ -1,6 +1,6 @@
 package me.tumur.portfolio.repository.database.dao.category
 
-import androidx.paging.DataSource
+import androidx.paging.PagingSource
 import androidx.room.*
 import me.tumur.portfolio.repository.database.model.category.CategoryModel
 import me.tumur.portfolio.utils.constants.DbConstants
@@ -25,5 +25,5 @@ abstract class CategoryDao {
 
     /** Get list items */
     @Query(DbConstants.CATEGORY_GET_LIST_ITEMS)
-    abstract fun getListItems(type: Int): DataSource.Factory<Int, CategoryModel>
+    abstract fun getListItems(type: Int): PagingSource<Int, CategoryModel>
 }

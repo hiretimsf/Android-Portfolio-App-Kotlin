@@ -7,10 +7,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
 import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.FragmentPortfolioBinding
 import me.tumur.portfolio.repository.database.model.portfolio.PortfolioModel
@@ -18,6 +17,7 @@ import me.tumur.portfolio.screens.MainViewModel
 import me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio.PortfolioAdapter
 import me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio.PortfolioClickListener
 import me.tumur.portfolio.utils.constants.Constants
+import me.tumur.portfolio.utils.extensions.collectFlow
 import me.tumur.portfolio.utils.state.ToastEmpty
 import me.tumur.portfolio.utils.state.ToastShow
 import me.tumur.portfolio.utils.state.ToastState
@@ -26,6 +26,7 @@ import me.tumur.portfolio.utils.state.ToastState
 /**
  * An fragment that inflates a portfolio layout.
  */
+@AndroidEntryPoint
 class PortfolioFragment : Fragment() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -147,17 +148,14 @@ class PortfolioFragment : Fragment() {
         /**
          * Observer for portfolio adapters data
          * */
-        val observerData = Observer<PagedList<PortfolioModel>> { data ->
-            data?.let {
-                portfolioAdapter.submitList(it)
-            }
+        viewLifecycleOwner.collectFlow(viewModel.data) { data ->
+            portfolioAdapter.submitData(viewLifecycleOwner.lifecycle, data)
         }
-        viewModel.data.observe(viewLifecycleOwner, observerData)
 
         /**
          * Click listener for portfolio item
          * */
-        val observerSelectedItem = Observer<PortfolioModel> {
+        viewLifecycleOwner.collectFlow(viewModel.selectedItemFlow) {
             it?.let {
                 val action =
                     PortfolioFragmentDirections.actionToPortfolioDetailScreen(it.id, it.title)
@@ -165,34 +163,30 @@ class PortfolioFragment : Fragment() {
                 viewModel.setSelectedItem(null)
             }
         }
-        viewModel.selectedItem.observe(viewLifecycleOwner, observerSelectedItem)
 
         /**
          * Set observer for refresh status
          * */
-        val observerRefresh = Observer<Boolean> { status ->
+        viewLifecycleOwner.collectFlow(viewModel.isRefreshingFlow) { status ->
             if (!pullToRefresh.isRefreshing && status) {
                 pullToRefresh.isRefreshing = status
                 viewModel.fetch()
             } else if (pullToRefresh.isRefreshing && !status)
                 pullToRefresh.isRefreshing = status
         }
-        viewModel.isRefreshing.observe(viewLifecycleOwner, observerRefresh)
 
         /**
          * Observer for show toast message from activity
          * */
-        val observerShowToast = Observer<ToastState> { state ->
-            state?.let {
-                when (state) {
-                    ToastShow -> {
-                        sharedViewModel.setShowToast(state)
-                        viewModel.setShowToast(ToastEmpty)
-                    }
+        viewLifecycleOwner.collectFlow(viewModel.showToastFlow) { state ->
+            when (state) {
+                ToastShow -> {
+                    sharedViewModel.setShowToast(state)
+                    viewModel.setShowToast(ToastEmpty)
                 }
+                else -> Unit
             }
         }
-        viewModel.showToast.observe(viewLifecycleOwner, observerShowToast)
     }
 
 

@@ -1,12 +1,17 @@
 package me.tumur.portfolio.screens.portfolio
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagedList
-import androidx.paging.toLiveData
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.tumur.portfolio.repository.database.dao.portfolio.PortfolioDao
@@ -18,37 +23,36 @@ import me.tumur.portfolio.utils.constants.DbConstants
 import me.tumur.portfolio.utils.state.ToastEmpty
 import me.tumur.portfolio.utils.state.ToastShow
 import me.tumur.portfolio.utils.state.ToastState
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import javax.inject.Inject
 
-class PortfolioViewModel : ViewModel(), KoinComponent {
+@HiltViewModel
+class PortfolioViewModel @Inject constructor(
+    private val dao: PortfolioDao,
+    private val repo: Repository
+) : ViewModel() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-    /** Repository */
-    private val dao: PortfolioDao by inject()
-    private val repo: Repository by inject()
-
     /** Selected item id */
-    private val _selectedItem = MutableLiveData<PortfolioModel>()
-    val selectedItem: LiveData<PortfolioModel> = _selectedItem
+    private val _selectedItem = MutableStateFlow<PortfolioModel?>(null)
+    val selectedItemFlow: StateFlow<PortfolioModel?> = _selectedItem.asStateFlow()
+    val selectedItem: PortfolioModel? get() = _selectedItem.value
 
     /** Pull to refresh status  */
-    private val _isRefreshing = MutableLiveData<Boolean>()
-    val isRefreshing: LiveData<Boolean> = _isRefreshing
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshingFlow: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+    val isRefreshing: Boolean get() = _isRefreshing.value
 
     /** Show toast message from activity  */
-    private val _showToast = MutableLiveData<ToastState>().apply { value = ToastEmpty }
-    val showToast: LiveData<ToastState> = _showToast
+    private val _showToast = MutableStateFlow<ToastState>(ToastEmpty)
+    val showToastFlow: StateFlow<ToastState> = _showToast.asStateFlow()
 
     /** Portfolio pager data */
-    private val config = PagedList.Config.Builder()
-        .setPageSize(10)
-        .setEnablePlaceholders(true)
-        .setInitialLoadSizeHint(5)
-        .build()
+    private val config = PagingConfig(pageSize = 10, enablePlaceholders = true, initialLoadSize = 5)
 
-    val data: LiveData<PagedList<PortfolioModel>> = dao.getListItems(DbConstants.PERSON_ID).toLiveData(config)
+    val data: Flow<PagingData<PortfolioModel>> = Pager(config) {
+        dao.getListItems(DbConstants.PERSON_ID)
+    }.flow.cachedIn(viewModelScope)
 
     /** FUNCTIONS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 

@@ -3,7 +3,6 @@ package me.tumur.portfolio.utils.adapters.bindingAdapters
 import android.view.View
 import android.view.animation.AnimationUtils
 import androidx.databinding.BindingAdapter
-import androidx.lifecycle.LiveData
 import androidx.viewpager.widget.ViewPager
 import me.tumur.portfolio.R
 import me.tumur.portfolio.screens.portfolio.detail.preview.PreviewFragmentViewModel
@@ -16,6 +15,8 @@ import me.tumur.portfolio.utils.state.ProgressBar
 /** OnPage listener */
 @BindingAdapter("onScreenShotScrolled")
 fun setPreviewViewPagerPageChangeListener(viewPager: ViewPager, viewModel: PreviewFragmentViewModel) {
+    if (viewPager.getTag(R.id.tag_preview_page_listener) == viewModel) return
+    viewPager.setTag(R.id.tag_preview_page_listener, viewModel)
     viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
             viewModel.setCurrentItem(position)
@@ -28,8 +29,8 @@ fun setPreviewViewPagerPageChangeListener(viewPager: ViewPager, viewModel: Previ
 
 /** Current item */
 @BindingAdapter("scrollToScreenShot", "smoothScrollScreenShot", requireAll = false)
-fun setPreviewViewPagerCurrentItem(viewPager: ViewPager, scrollToItem: LiveData<Int>?, smoothScroll: Boolean = false) {
-    scrollToItem?.value?.let { viewPager.setCurrentItem(it, smoothScroll) }
+fun setPreviewViewPagerCurrentItem(viewPager: ViewPager, scrollToItem: Int?, smoothScroll: Boolean = false) {
+    scrollToItem?.let { viewPager.setCurrentItem(it, smoothScroll) }
 }
 
 /** Progress bar */

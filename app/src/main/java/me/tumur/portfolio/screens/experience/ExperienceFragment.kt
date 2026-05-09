@@ -10,10 +10,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
 import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.FragmentExperienceBinding
 import me.tumur.portfolio.repository.database.model.experience.ExperienceModel
@@ -21,10 +20,12 @@ import me.tumur.portfolio.screens.MainViewModel
 import me.tumur.portfolio.utils.adapters.listItemAdapters.experience.ExperienceAdapter
 import me.tumur.portfolio.utils.adapters.listItemAdapters.experience.ExperienceClickListener
 import me.tumur.portfolio.utils.constants.Constants
+import me.tumur.portfolio.utils.extensions.collectFlow
 
 /**
  * An fragment that inflates a portfolio layout.
  */
+@AndroidEntryPoint
 class ExperienceFragment : Fragment() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -120,17 +121,14 @@ class ExperienceFragment : Fragment() {
         /**
          * Observer for portfolio adapters data
          * */
-        val observerData = Observer<PagedList<ExperienceModel>> { data ->
-            data?.let {
-                experienceAdapter.submitList(it)
-            }
+        viewLifecycleOwner.collectFlow(viewModel.data) { data ->
+            experienceAdapter.submitData(viewLifecycleOwner.lifecycle, data)
         }
-        viewModel.data.observe(viewLifecycleOwner, observerData)
 
         /**
          * Click listener for experience item
          * */
-        val observerItem = Observer<ExperienceModel> {
+        viewLifecycleOwner.collectFlow(viewModel.selectedItemFlow) {
             it?.let {
                 val action =
                     ExperienceFragmentDirections.actionToExperienceDetailScreen(it.id, it.company)
@@ -138,6 +136,5 @@ class ExperienceFragment : Fragment() {
                 viewModel.setSelectedItem(null)
             }
         }
-        viewModel.selectedItem.observe(viewLifecycleOwner, observerItem)
     }
 }

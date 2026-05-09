@@ -8,23 +8,6 @@ import me.tumur.portfolio.utils.state.*
 
 /** BINDING ADAPTERS FOR MAIN SCREEN */
 
-/** Splash Screen */
-@BindingAdapter("screenSplash")
-fun setScreenSplash(view: View, screen: ScreenState?) {
-    val fadeIn = AnimationUtils.loadAnimation(view.context, R.anim.fade_in)
-    val fadeOut = AnimationUtils.loadAnimation(view.context, R.anim.fade_out)
-    when(screen != null && screen is SplashScreen){
-        true -> {
-            view.visibility = View.VISIBLE
-            view.startAnimation(fadeIn)
-        }
-        false -> {
-            view.visibility = View.GONE
-            view.startAnimation(fadeOut)
-        }
-    }
-}
-
 /** Main Screen */
 @BindingAdapter("screenMain")
 fun setScreenMain(view: View, screen: ScreenState?) {

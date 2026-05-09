@@ -1,6 +1,6 @@
 package me.tumur.portfolio.repository.database.dao.profile
 
-import androidx.lifecycle.LiveData
+import kotlinx.coroutines.flow.Flow
 import androidx.room.*
 import me.tumur.portfolio.repository.database.model.profile.ProfileModel
 import me.tumur.portfolio.utils.constants.DbConstants
@@ -25,7 +25,7 @@ abstract class ProfileDao {
 
     /** Get single item */
     @Query(DbConstants.PROFILE_GET_SINGLE_ITEM)
-    abstract fun getSingleItem(id: String): LiveData<ProfileModel>
+    abstract fun getSingleItem(id: String): Flow<ProfileModel>
 
 
 }

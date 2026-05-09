@@ -1,7 +1,7 @@
 package me.tumur.portfolio.repository.database.dao.portfolio
 
-import androidx.lifecycle.LiveData
-import androidx.paging.DataSource
+import kotlinx.coroutines.flow.Flow
+import androidx.paging.PagingSource
 import androidx.room.*
 import me.tumur.portfolio.repository.database.model.portfolio.PortfolioModel
 import me.tumur.portfolio.utils.constants.DbConstants
@@ -26,15 +26,15 @@ abstract class PortfolioDao {
 
     /** Get list items */
     @Query(DbConstants.PORTFOLIO_GET_LIST_ITEMS)
-    abstract fun getListItems(id: String): DataSource.Factory<Int, PortfolioModel>
+    abstract fun getListItems(id: String): PagingSource<Int, PortfolioModel>
 
 
     /** Get single item */
     @Query(DbConstants.PORTFOLIO_GET_SINGLE_ITEM)
-    abstract fun getSingleItem(id: String): LiveData<PortfolioModel>
+    abstract fun getSingleItem(id: String): Flow<PortfolioModel>
 
 //    /** Search by query */
 //    @Query(DbConstants.GET_PORTFOLIO_BY_QUERY)
-//    abstract fun getByQuery(query: String): LiveData<List<PortfolioModel>>
+//    abstract fun getByQuery(query: String): Flow<List<PortfolioModel>>
 
 }

@@ -1,7 +1,7 @@
 package me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio
 
 import android.view.ViewGroup
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import me.tumur.portfolio.repository.database.model.portfolio.PortfolioModel
 
@@ -9,7 +9,7 @@ import me.tumur.portfolio.repository.database.model.portfolio.PortfolioModel
  * An adapter that provides a list of [PortfolioModel] to a [RecyclerView]
  * */
 
-class PortfolioAdapter(private val clickListener: PortfolioClickListener) : PagedListAdapter<PortfolioModel, PortfolioViewHolder>(PortfolioDiffCallBack()) {
+class PortfolioAdapter(private val clickListener: PortfolioClickListener) : PagingDataAdapter<PortfolioModel, PortfolioViewHolder>(PortfolioDiffCallBack()) {
 
     /**
      * Part of the RecyclerView adapter, called when RecyclerView needs a new [PortfolioViewHolder]

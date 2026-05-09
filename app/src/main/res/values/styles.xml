@@ -49,6 +49,12 @@
 
     </style>
 
+    <style name="Theme.Portfolio.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/colorSurface</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_logo</item>
+        <item name="postSplashScreenTheme">@style/AppTheme</item>
+    </style>
+
     <!-- * * * * * * * * * * * TEXT APPEARANCE * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  -->
 
     <!-- HEADLINE - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
@@ -134,6 +140,11 @@
     <style name="AppModalStyle"
            parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/rounded_dialog</item>
+    </style>
+
+    <style name="ShapeAppearance.Portfolio.Circle" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
     </style>
 
 </resources>

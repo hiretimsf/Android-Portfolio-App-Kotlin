@@ -1,12 +1,12 @@
 package me.tumur.portfolio.screens.experience.detail
 
-import android.content.Context
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.location.Address
 import android.location.Geocoder
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,9 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
-import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -39,15 +37,16 @@ import me.tumur.portfolio.utils.adapters.listItemAdapters.experience.task.TaskAd
 import me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio.button.ButtonAdapter
 import me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio.button.ButtonClickListener
 import me.tumur.portfolio.utils.constants.Constants
+import me.tumur.portfolio.utils.extensions.collectFlow
 import me.tumur.portfolio.utils.state.Empty
 import me.tumur.portfolio.utils.state.NotEmpty
-import org.koin.android.ext.android.inject
-import timber.log.Timber
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
 
 /**
  * An fragment that inflates a portfolio detail layout.
  */
+@AndroidEntryPoint
 class ExperienceDetailFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -55,10 +54,6 @@ class ExperienceDetailFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMar
     companion object {
         fun newInstance() = ExperienceDetailFragment()
     }
-
-    /** Context */
-
-    private val ctx: Context by inject()
 
     /** ViewModel */
 
@@ -126,24 +121,22 @@ class ExperienceDetailFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMar
         return binding.root
     }
 
-    override fun onMapReady(googleMap: GoogleMap?) {
-        googleMap?.let {
-            mMap = it
-            val mapStyleDark = MapStyleOptions.loadRawResourceStyle(ctx, R.raw.map_style_dark)
-            val mapStyle = MapStyleOptions.loadRawResourceStyle(ctx, R.raw.map_style)
-            mMap?.let { map ->
-                map.uiSettings.isZoomControlsEnabled = true
-                map.setOnMarkerClickListener(this)
-                if (activity?.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
-                    map.setMapStyle(mapStyleDark)
-                } else {
-                    map.setMapStyle(mapStyle)
-                }
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+        val mapStyleDark = MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style_dark)
+        val mapStyle = MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style)
+        mMap?.let { map ->
+            map.uiSettings.isZoomControlsEnabled = true
+            map.setOnMarkerClickListener(this)
+            if (activity?.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
+                map.setMapStyle(mapStyleDark)
+            } else {
+                map.setMapStyle(mapStyle)
             }
         }
     }
 
-    override fun onMarkerClick(marker: Marker?) = false
+    override fun onMarkerClick(marker: Marker) = false
 
     /** FUNCTIONS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -193,47 +186,43 @@ class ExperienceDetailFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMar
     private fun setObservers(buttonAdapter: ButtonAdapter, taskAdapter: TaskAdapter, resourceAdapter: ResourceAdapter) {
 
         /** Set observer for button */
-        val observerButton = Observer<PagedList<ButtonModel>> { button ->
-            button?.let {
-                buttonAdapter.submitList(it)
-            }
+        viewLifecycleOwner.collectFlow(viewModel.dataFlow) {
+            binding.invalidateAll()
         }
-        viewModel.button.observe(viewLifecycleOwner, observerButton)
+
+        viewLifecycleOwner.collectFlow(viewModel.resourceStateFlow) {
+            binding.invalidateAll()
+        }
+
+        viewLifecycleOwner.collectFlow(viewModel.button) { button ->
+            buttonAdapter.submitData(viewLifecycleOwner.lifecycle, button)
+        }
 
         /** Set observer for task */
-        val observerTask = Observer<PagedList<TaskModel>> { task ->
-            task?.let {
-                taskAdapter.submitList(it)
-            }
+        viewLifecycleOwner.collectFlow(viewModel.task) { task ->
+            taskAdapter.submitData(viewLifecycleOwner.lifecycle, task)
         }
-        viewModel.task.observe(viewLifecycleOwner, observerTask)
 
         /** Set observer for resource */
-        val observerResource = Observer<PagedList<ResourceModel>> { task ->
-            task?.let {
-                resourceAdapter.submitList(it)
-            }
+        viewLifecycleOwner.collectFlow(viewModel.resource) { resource ->
+            resourceAdapter.submitData(viewLifecycleOwner.lifecycle, resource)
         }
-        viewModel.resource.observe(viewLifecycleOwner, observerResource)
 
         /** Set observer for check resource table */
-        val observerCheckResourceTable = Observer<Int> { task ->
-            task?.let {
-                if (it > 0) viewModel.setResourceState(NotEmpty) else viewModel.setResourceState(Empty)
-            }
+        viewLifecycleOwner.collectFlow(viewModel.checkResourceTable) {
+            if (it > 0) viewModel.setResourceState(NotEmpty) else viewModel.setResourceState(Empty)
         }
-        viewModel.checkResourceTable.observe(viewLifecycleOwner, observerCheckResourceTable)
 
         /** Set observer for url */
-        val observerUrl = Observer<String> {
+        viewLifecycleOwner.collectFlow(viewModel.urlFlow) {
             it?.let {
                 startCustomTab(it)
+                viewModel.setUrl(null)
             }
         }
-        viewModel.url.observe(viewLifecycleOwner, observerUrl)
 
         /** Set observer for location */
-        val observerLocation = Observer<LocationModel> {
+        viewLifecycleOwner.collectFlow(viewModel.locationFlow) {
             it?.let { location ->
                 location.latitude?.let { lat ->
                     location.longitude?.let { long ->
@@ -248,7 +237,6 @@ class ExperienceDetailFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMar
                 }
             }
         }
-        viewModel.location.observe(viewLifecycleOwner, observerLocation)
     }
 
     /**
@@ -260,10 +248,10 @@ class ExperienceDetailFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMar
         url?.let {
             /** Chrome custom tab  */
             val builder = CustomTabsIntent.Builder().apply {
-                this.setToolbarColor(ContextCompat.getColor(context!!, R.color.colorPrimary))
+                this.setToolbarColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
                 this.setShowTitle(true)
             }
-            builder.build().launchUrl(context, (Uri.parse(url)))
+            builder.build().launchUrl(requireContext(), (Uri.parse(url)))
         }
     }
 
@@ -279,7 +267,7 @@ class ExperienceDetailFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMar
     /** Get address */
     private fun getAddress(latLng: LatLng): String {
         // 1
-        val geocoder = Geocoder(ctx)
+        val geocoder = Geocoder(requireContext())
         val addresses: List<Address>?
         val address: Address?
         var addressText = ""
@@ -295,7 +283,7 @@ class ExperienceDetailFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMar
                 }
             }
         } catch (e: IOException) {
-            Timber.tag(Constants.FRAGMENT_EXPERIENCE).d(e.localizedMessage)
+            Log.d(Constants.FRAGMENT_EXPERIENCE, e.localizedMessage.orEmpty())
         }
 
         return addressText

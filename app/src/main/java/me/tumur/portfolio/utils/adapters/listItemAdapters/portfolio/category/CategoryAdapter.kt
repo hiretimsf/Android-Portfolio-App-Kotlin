@@ -1,7 +1,7 @@
 package me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio.category
 
 import android.view.ViewGroup
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import me.tumur.portfolio.repository.database.model.category.CategoryModel
 
@@ -9,7 +9,7 @@ import me.tumur.portfolio.repository.database.model.category.CategoryModel
  * An adapter that provides a list of [CategoryModel] to a [RecyclerView]
  * */
 
-class CategoryAdapter : PagedListAdapter<CategoryModel, CategoryViewHolder>(CategoryDiffCallBack()) {
+class CategoryAdapter : PagingDataAdapter<CategoryModel, CategoryViewHolder>(CategoryDiffCallBack()) {
 
     /**
      * Part of the RecyclerView adapter, called when RecyclerView needs a new [CategoryViewHolder]

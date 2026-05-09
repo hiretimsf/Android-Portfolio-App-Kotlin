@@ -14,12 +14,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        <!-- Splash Screen -->
-        <include
-                layout="@layout/screen_splash"
-                tools:showIn="@layout/screen_splash"
-                bind:model="@{model}"/>
-
         <!-- Main Screen -->
         <include
                 layout="@layout/screen_main"

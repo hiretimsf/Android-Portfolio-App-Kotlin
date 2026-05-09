@@ -6,7 +6,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import me.tumur.portfolio.utils.constants.DbConstants
 
 @Entity(tableName = DbConstants.SOCIAL, indices = [Index(value = [DbConstants.ID, DbConstants.OWNER_ID], unique = true)])

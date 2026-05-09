@@ -1,7 +1,7 @@
 package me.tumur.portfolio.repository.database.dao.favorite
 
-import androidx.lifecycle.LiveData
-import androidx.paging.DataSource
+import kotlinx.coroutines.flow.Flow
+import androidx.paging.PagingSource
 import androidx.room.*
 import me.tumur.portfolio.repository.database.model.favorite.FavoriteModel
 import me.tumur.portfolio.utils.constants.DbConstants
@@ -30,15 +30,15 @@ abstract class FavoriteDao {
 
     /** Get single item */
     @Query(DbConstants.FAVORITE_GET_SINGLE_ITEM)
-    abstract fun getSingleItem(id: String): LiveData<FavoriteModel>
+    abstract fun getSingleItem(id: String): Flow<FavoriteModel>
 
     /** Get paged list items */
     @Query(DbConstants.FAVORITE_GET_LIST_ITEMS)
-    abstract fun getListItems(): DataSource.Factory<Int, FavoriteModel>
+    abstract fun getListItems(): PagingSource<Int, FavoriteModel>
 
     /** Exist single item */
     @Query(DbConstants.FAVORITE_EXIST_SINGLE_ITEM)
-    abstract fun existSingleItem(id: String): LiveData<Int>
+    abstract fun existSingleItem(id: String): Flow<Int>
 
     /** Get max order */
     @Query(DbConstants.FAVORITE_GET_MAX_ORDER)
@@ -46,5 +46,5 @@ abstract class FavoriteDao {
 
     /** Check table */
     @Query(DbConstants.FAVORITE_CHECK)
-    abstract fun check(): LiveData<Int>
+    abstract fun check(): Flow<Int>
 }

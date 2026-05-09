@@ -1,6 +1,6 @@
 package me.tumur.portfolio.repository.database.dao.welcome
 
-import androidx.lifecycle.LiveData
+import kotlinx.coroutines.flow.Flow
 import androidx.room.*
 import me.tumur.portfolio.repository.database.model.welcome.WelcomeModel
 import me.tumur.portfolio.utils.constants.DbConstants
@@ -30,9 +30,9 @@ abstract class WelcomeDao {
 
     /** Get list items */
     @Query(DbConstants.WELCOME_GET_LIST_ITEMS)
-    abstract fun getListItems(): LiveData<List<WelcomeModel>>
+    abstract fun getListItems(): Flow<List<WelcomeModel>>
 
     /** Get single item */
     @Query(DbConstants.WELCOME_GET_SINGLE_ITEM)
-    abstract fun getSingleItem(id: String): LiveData<WelcomeModel>
+    abstract fun getSingleItem(id: String): Flow<WelcomeModel>
 }

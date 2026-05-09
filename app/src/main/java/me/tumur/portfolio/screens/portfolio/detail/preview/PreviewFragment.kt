@@ -11,10 +11,13 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
+import dagger.hilt.android.AndroidEntryPoint
 import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.FragmentPreviewBinding
 import me.tumur.portfolio.screens.portfolio.detail.preview.pager.PreviewPagerAdapter
+import me.tumur.portfolio.utils.extensions.collectFlow
 
+@AndroidEntryPoint
 class PreviewFragment : Fragment() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -84,11 +87,11 @@ class PreviewFragment : Fragment() {
         }
 
         binding.apply {
-            // Set the lifecycleOwner so DataBinding can observe LiveData
             this.lifecycleOwner = viewLifecycleOwner
-            // Set the viewmodel so layout can display data
             this.model = viewModel
         }
+
+        setObservers()
 
         /** Set view pager */
         setPreviewScreenViewPager()
@@ -98,6 +101,19 @@ class PreviewFragment : Fragment() {
     }
 
     /** FUNCTIONS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * Observe flow-backed properties used by data binding.
+     */
+    private fun setObservers() {
+        viewLifecycleOwner.collectFlow(viewModel.scrollToItemFlow) {
+            binding.invalidateAll()
+        }
+
+        viewLifecycleOwner.collectFlow(viewModel.currentItemFlow) {
+            binding.invalidateAll()
+        }
+    }
 
     /**
      * Setup preview screen's view pager with adapter
@@ -121,8 +137,8 @@ class PreviewFragment : Fragment() {
          * will only be called when MyFragment is at least Started.
          * */
         requireActivity().onBackPressedDispatcher.addCallback(this) {
-            val currentItem = viewModel.currentItem.value
-            if (currentItem != null && currentItem > 0) {
+            val currentItem = viewModel.currentItem
+            if (currentItem > 0) {
                 this.isEnabled = true
                 viewModel.setScrollToItem(currentItem - 1)
                 if (currentItem - 1 == 0) this.isEnabled = false
