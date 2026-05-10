@@ -1,7 +1,7 @@
 package me.tumur.portfolio.utils.adapters.listItemAdapters.about
 
 import androidx.recyclerview.widget.RecyclerView
-import me.tumur.portfolio.repository.database.model.profile.AboutModel
+import me.tumur.portfolio.repository.network.model.AboutSection
 
 /**
  * Sealed class for composited list data
@@ -9,8 +9,12 @@ import me.tumur.portfolio.repository.database.model.profile.AboutModel
  * for [RecyclerView]
  * */
 sealed class AboutItem {
-    data class About(val about: AboutModel): AboutItem() {
-        override val id = about.id
+    data class About(val about: AboutSection): AboutItem() {
+        override val id = about.title + about.content
+    }
+
+    data class Carousel(val images: List<CarouselImage>): AboutItem() {
+        override val id = images.joinToString(prefix = "carousel-") { it.url }
     }
 
     data class Header(val header: String): AboutItem() {
@@ -19,3 +23,8 @@ sealed class AboutItem {
 
     abstract val id: String
 }
+
+data class CarouselImage(
+    val url: String,
+    val description: String,
+)

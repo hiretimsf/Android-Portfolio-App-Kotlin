@@ -10,12 +10,13 @@
             android:scrollbars="none"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- About texts -->
-        <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/profile_screen_about_content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="true"
-                android:scrollbars="none"
-                tools:listitem="@tools:sample/avatars"/>
+    <!-- About texts -->
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/profile_screen_about_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:scrollbars="none"
+            tools:listitem="@tools:sample/avatars"/>
+
     </androidx.core.widget.NestedScrollView>

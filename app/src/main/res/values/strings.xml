@@ -32,6 +32,8 @@
 	<string name="cd_company">Company\'s name</string>
 	<string name="cd_location">Company\'s location</string>
     <string name="cd_more_profile_options">Open profile contact options</string>
+    <string name="cd_previous_photo">Show previous photo</string>
+    <string name="cd_next_photo">Show next photo</string>
     <string name="cd_external_link">External link</string>
 	<string name="copy_right">You can get in touch with me \n ✉️ tumur.alex@gmail.com</string>
 	<string name="preference_key_data">data</string>

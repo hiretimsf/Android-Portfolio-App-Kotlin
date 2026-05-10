@@ -26,10 +26,12 @@ import me.tumur.portfolio.repository.network.RestApi
 import me.tumur.portfolio.repository.repo.Repository
 import me.tumur.portfolio.repository.repo.RepositoryImp
 import me.tumur.portfolio.utils.constants.DbConstants
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.util.Properties
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
@@ -47,6 +49,11 @@ object Http {
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    private val networkJson = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+    }
+
     @Provides
     @Singleton
     fun provideNetworkProperties(@ApplicationContext context: Context): Properties {
@@ -61,7 +68,7 @@ object AppModule {
         return Retrofit.Builder()
             .baseUrl(properties.getProperty(Http.URL))
             .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(networkJson.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(RestApi::class.java)
     }

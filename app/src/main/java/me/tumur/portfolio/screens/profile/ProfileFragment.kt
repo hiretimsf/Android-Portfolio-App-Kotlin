@@ -12,6 +12,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import dagger.hilt.android.AndroidEntryPoint
 import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.FragmentProfileBinding
@@ -140,16 +141,22 @@ class ProfileFragment : Fragment() {
         /** Observer for show profile bottom sheet dialog ------------------------------------------------------------*/
         viewLifecycleOwner.collectFlow(viewModel.profileFlow) { profile ->
             binding.root.findViewById<android.widget.TextView>(R.id.profile_screen_header_greeting).text = profile?.greeting
-            binding.root.findViewById<android.widget.TextView>(R.id.profile_screen_header_name).text = getString(R.string.name)
-            binding.root.findViewById<android.widget.TextView>(R.id.profile_screen_header_title).text = getString(R.string.title)
-            binding.root.findViewById<android.widget.TextView>(R.id.profile_screen_header_collapsed_name).text = getString(R.string.name)
+            binding.root.findViewById<android.widget.TextView>(R.id.profile_screen_header_name).text = profile?.name
+            binding.root.findViewById<android.widget.TextView>(R.id.profile_screen_header_title).text = profile?.title
+            binding.root.findViewById<android.widget.TextView>(R.id.profile_screen_header_collapsed_name).text = profile?.name
             binding.root.findViewById<android.widget.ImageView>(R.id.profile_screen_header_avatar).apply {
                 contentDescription = profile?.imageDescription
-                setImageResource(R.drawable.profile)
+                load(profile?.image) {
+                    placeholder(R.drawable.profile)
+                    error(R.drawable.profile)
+                }
             }
             binding.root.findViewById<android.widget.ImageView>(R.id.profile_screen_header_collapsed_avatar).apply {
                 contentDescription = profile?.imageDescription
-                setImageResource(R.drawable.profile)
+                load(profile?.image) {
+                    placeholder(R.drawable.profile)
+                    error(R.drawable.profile)
+                }
             }
         }
 
@@ -161,8 +168,8 @@ class ProfileFragment : Fragment() {
         }
 
         /** Observer for about adapter -------------------------------------------------------------------------------*/
-        viewLifecycleOwner.collectFlow(viewModel.aboutFlow) { data ->
-            aboutAdapter.addHeaderAndSubmitList(data)
+        viewLifecycleOwner.collectFlow(viewModel.aboutScreenFlow) { data ->
+            aboutAdapter.addHeaderAndSubmitList(data.sections, data.introductionImages)
         }
     }
 

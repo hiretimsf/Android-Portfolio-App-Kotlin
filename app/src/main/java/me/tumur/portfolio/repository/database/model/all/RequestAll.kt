@@ -1,6 +1,7 @@
 package me.tumur.portfolio.repository.database.model.all
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import me.tumur.portfolio.repository.database.model.LocationModel
 import me.tumur.portfolio.repository.database.model.button.ButtonModel
 import me.tumur.portfolio.repository.database.model.category.CategoryModel
@@ -16,44 +17,45 @@ import me.tumur.portfolio.repository.database.model.task.TaskModel
 import me.tumur.portfolio.repository.database.model.welcome.WelcomeModel
 import me.tumur.portfolio.utils.constants.DbConstants
 
+@Serializable
 data class RequestAll (
 
-    @SerializedName(DbConstants.WELCOME)
+    @SerialName(DbConstants.WELCOME)
     val welcome: List<WelcomeModel>,
 
-    @SerializedName(DbConstants.PROFILE)
+    @SerialName(DbConstants.PROFILE)
     val profile: List<ProfileModel>,
 
-    @SerializedName(DbConstants.SOCIAL)
+    @SerialName(DbConstants.SOCIAL)
     val social: List<SocialModel>,
 
-    @SerializedName(DbConstants.ABOUT)
+    @SerialName(DbConstants.ABOUT)
     val about: List<AboutModel>,
 
-    @SerializedName(DbConstants.APP)
+    @SerialName(DbConstants.APP)
     val app: List<AppModel>,
 
-    @SerializedName(DbConstants.PORTFOLIO)
+    @SerialName(DbConstants.PORTFOLIO)
     val portfolio: List<PortfolioModel>,
 
-    @SerializedName(DbConstants.EXPERIENCE)
+    @SerialName(DbConstants.EXPERIENCE)
     val experience: List<ExperienceModel>,
 
-    @SerializedName(DbConstants.BUTTON)
+    @SerialName(DbConstants.BUTTON)
     val button: List<ButtonModel>,
 
-    @SerializedName(DbConstants.TASK)
+    @SerialName(DbConstants.TASK)
     val task: List<TaskModel>,
 
-    @SerializedName(DbConstants.CATEGORY)
+    @SerialName(DbConstants.CATEGORY)
     val category: List<CategoryModel>,
 
-    @SerializedName(DbConstants.SCREENSHOT)
+    @SerialName(DbConstants.SCREENSHOT)
     val screenshot: List<ScreenShotModel>,
 
-    @SerializedName(DbConstants.LOCATION)
+    @SerialName(DbConstants.LOCATION)
     val location: List<LocationModel>,
 
-    @SerializedName(DbConstants.RESOURCE)
+    @SerialName(DbConstants.RESOURCE)
     val resource: List<ResourceModel>
 )

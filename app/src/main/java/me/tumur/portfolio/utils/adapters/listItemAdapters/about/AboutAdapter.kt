@@ -3,11 +3,11 @@ package me.tumur.portfolio.utils.adapters.listItemAdapters.about
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import me.tumur.portfolio.repository.database.model.profile.AboutModel
+import me.tumur.portfolio.repository.network.model.AboutSection
 import me.tumur.portfolio.utils.constants.Constants
 
 /**
- * An adapter that provides a list of [AboutModel] to a [RecyclerView]
+ * An adapter that provides a list of [AboutSection] to a [RecyclerView]
  * */
 
 class AboutAdapter : ListAdapter<AboutItem, RecyclerView.ViewHolder>(AboutDiffCallBack()) {
@@ -16,11 +16,18 @@ class AboutAdapter : ListAdapter<AboutItem, RecyclerView.ViewHolder>(AboutDiffCa
      * Composition of about item text and header
      * into a separate list for the [RecyclerView].
      * */
-    fun addHeaderAndSubmitList(list: List<AboutModel>?) {
+    fun addHeaderAndSubmitList(list: List<AboutSection>?, introductionImages: List<CarouselImage>) {
+        var carouselAdded = false
         val compositedList = list.orEmpty()
-            .groupBy(AboutModel::header)
-            .flatMap { (header, items) ->
-                listOf(AboutItem.Header(header)) + items.map(AboutItem::About)
+            .flatMap { section ->
+                buildList {
+                    add(AboutItem.Header(section.title))
+                    add(AboutItem.About(section))
+                    if (!carouselAdded && introductionImages.isNotEmpty()) {
+                        add(AboutItem.Carousel(introductionImages))
+                        carouselAdded = true
+                    }
+                }
             }
         submitList(compositedList)
     }
@@ -35,6 +42,7 @@ class AboutAdapter : ListAdapter<AboutItem, RecyclerView.ViewHolder>(AboutDiffCa
         return when (viewType) {
             Constants.HEADER -> AboutHeaderViewHolder.from(parent)
             Constants.ITEM -> AboutItemViewHolder.from(parent)
+            Constants.CAROUSEL -> AboutCarouselViewHolder.from(parent)
             else -> throw ClassCastException("Unknown viewType ${viewType}")
         }
     }
@@ -55,6 +63,10 @@ class AboutAdapter : ListAdapter<AboutItem, RecyclerView.ViewHolder>(AboutDiffCa
                 val header = getItem(position) as AboutItem.Header
                 holder.bind(header)
             }
+            is AboutCarouselViewHolder -> {
+                val carousel = getItem(position) as AboutItem.Carousel
+                holder.bind(carousel)
+            }
         }
 
     }
@@ -67,6 +79,7 @@ class AboutAdapter : ListAdapter<AboutItem, RecyclerView.ViewHolder>(AboutDiffCa
         return when (getItem(position)) {
             is AboutItem.Header -> Constants.HEADER
             is AboutItem.About -> Constants.ITEM
+            is AboutItem.Carousel -> Constants.CAROUSEL
         }
     }
 }

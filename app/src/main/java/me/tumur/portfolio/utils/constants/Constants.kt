@@ -36,6 +36,7 @@ object Constants {
     /** LIST ITEMS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     const val HEADER = 0
     const val ITEM = 1
+    const val CAROUSEL = 4
     const val CATEGORY_ANDROID = "android"
     const val CATEGORY_WEB = "web"
     const val CATEGORY_CODE = "code"
