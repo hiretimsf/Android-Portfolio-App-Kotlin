@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
@@ -12,6 +11,9 @@ import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.PagerItemPreviewScreenBinding
 import me.tumur.portfolio.repository.database.model.screenshot.ScreenShotModel
 import me.tumur.portfolio.screens.portfolio.detail.preview.PreviewFragmentViewModel
+import me.tumur.portfolio.utils.adapters.bindingAdapters.loadImage
+import me.tumur.portfolio.utils.adapters.bindingAdapters.setPreviewImage
+import me.tumur.portfolio.utils.adapters.bindingAdapters.setPreviewProgressBar
 import me.tumur.portfolio.utils.constants.Constants
 import me.tumur.portfolio.utils.extensions.collectFlow
 import me.tumur.portfolio.utils.state.PreviewImage
@@ -64,13 +66,7 @@ class PreviewPagerFragment : Fragment() {
      */
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        /** Databinding */
-        binding = DataBindingUtil.inflate(inflater, R.layout.pager_item_preview_screen, container, false)
-        binding.apply {
-            this.lifecycleOwner = viewLifecycleOwner
-            this.model = viewModel
-            this.shared = sharedViewModel
-        }
+        binding = PagerItemPreviewScreenBinding.inflate(inflater, container, false)
         /** Set data for ViewPager adapter */
         arguments?.takeIf { it.containsKey(Constants.POSITION) }?.apply {
             position = this.getInt(Constants.POSITION)
@@ -91,8 +87,17 @@ class PreviewPagerFragment : Fragment() {
                 val screenshot = it
                 viewModel.setData(screenshot)
                 viewModel.setState(PreviewImage)
-                binding.invalidateAll()
+                updateScreen()
             }
         }
+        viewLifecycleOwner.collectFlow(viewModel.stateFlow) { updateScreen() }
+    }
+
+    private fun updateScreen() {
+        val data = viewModel.data
+        setPreviewProgressBar(binding.loaderScreenProgressBar, viewModel.state)
+        setPreviewImage(binding.pagerItemPreviewScreenImage, viewModel.state)
+        binding.pagerItemPreviewScreenImage.contentDescription = data?.imageDescription
+        loadImage(binding.pagerItemPreviewScreenImage, data?.url)
     }
 }

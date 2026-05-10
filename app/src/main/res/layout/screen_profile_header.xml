@@ -1,22 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
-    <data>
-        <import type="android.view.View"/>
-        <variable name="model" type="me.tumur.portfolio.screens.profile.ProfileViewModel"/>
-    </data>
 
-    <me.tumur.portfolio.utils.toolbar.CollapsibleToolbar
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/profile_screen_header"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:minHeight="@dimen/_40sdp"
             android:background="?attr/colorPrimary"
-            android:fitsSystemWindows="true"
-            app:layoutDescription="@xml/profile_screen_header_motion"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:fitsSystemWindows="false"
             app:layout_scrollFlags="scroll|enterAlways|snap|exitUntilCollapsed">
 
+    <me.tumur.portfolio.utils.toolbar.CollapsibleToolbar
+            android:id="@+id/profile_screen_header_motion"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:minHeight="@dimen/_40sdp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            app:layoutDescription="@xml/profile_screen_header_motion">
 
         <!-- Vertical screen divider -->
         <androidx.constraintlayout.widget.Guideline
@@ -50,11 +54,12 @@
                 android:layout_marginTop="@dimen/_5sdp"
                 android:layout_marginBottom="@dimen/_5sdp"
                 android:textAppearance="?attr/textAppearanceHeadline1"
-                android:textSize="@dimen/dimen_24sp"
+                android:textSize="@dimen/dimen_22sp"
                 android:letterSpacing="0.05"
                 android:textAlignment="center"
-                android:textColor="?attr/colorOnPrimary"
-                android:text="@{model.profile.greeting}"/>
+                android:gravity="center"
+                android:singleLine="true"
+                android:textColor="?attr/colorOnPrimary"/>
 
         <!-- Avatar -->
         <com.google.android.material.imageview.ShapeableImageView
@@ -62,35 +67,78 @@
                 android:id="@+id/profile_screen_header_avatar"
                 android:layout_width="@dimen/_80sdp"
                 android:layout_height="@dimen/_80sdp"
-                app:imageLoad="@{model.profile.image}"
-                android:contentDescription="@{model.profile.imageDescription}"
+                android:scaleType="centerCrop"
                 app:strokeWidth="@dimen/_1sdp"
                 app:strokeColor="?attr/colorOnPrimary"/>
 
         <!-- Name-->
         <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/profile_screen_header_name"
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/dimen_0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginEnd="@dimen/_10sdp"
                 android:textAppearance="?attr/textAppearanceHeadline1"
                 android:textSize="@dimen/dimen_20sp"
                 android:letterSpacing="0.05"
                 android:textAlignment="center"
-                android:textColor="?attr/colorOnPrimary"
-                android:text="@{model.profile.name}"/>
+                android:gravity="center"
+                android:singleLine="true"
+                android:textColor="?attr/colorOnPrimary"/>
 
         <!-- Title-->
         <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/profile_screen_header_title"
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/dimen_0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginEnd="@dimen/_10sdp"
                 android:textAppearance="?attr/textAppearanceHeadline1"
                 android:textSize="@dimen/dimen_18sp"
                 android:letterSpacing="0.05"
                 android:textAlignment="center"
-                android:textColor="?attr/colorOnPrimary"
-                android:text="@{model.profile.title}"/>
+                android:gravity="center"
+                android:singleLine="true"
+                android:textColor="?attr/colorOnPrimary"/>
 
     </me.tumur.portfolio.utils.toolbar.CollapsibleToolbar>
 
-</layout>
+    <LinearLayout
+            android:id="@+id/profile_screen_header_collapsed_row"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:alpha="0"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/_8sdp"
+            android:paddingEnd="@dimen/_8sdp">
+
+        <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/profile_screen_header_collapsed_avatar"
+                android:layout_width="@dimen/_30sdp"
+                android:layout_height="@dimen/_30sdp"
+                android:contentDescription="@string/cd_avatar"
+                android:scaleType="centerCrop"
+                android:src="@drawable/profile"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Portfolio.Circle"
+                app:strokeColor="?attr/colorOnPrimary"
+                app:strokeWidth="@dimen/_1sdp"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/profile_screen_header_collapsed_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_8sdp"
+                android:gravity="center_vertical"
+                android:letterSpacing="0.05"
+                android:singleLine="true"
+                android:text="@string/name"
+                android:textAppearance="?attr/textAppearanceHeadline1"
+                android:textColor="?attr/colorOnPrimary"
+                android:textSize="@dimen/dimen_16sp"/>
+
+    </LinearLayout>
+
+</FrameLayout>

@@ -1,18 +1,14 @@
 package me.tumur.portfolio.screens.experience.detail
 
-import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.location.Address
 import android.location.Geocoder
-import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.content.ContextCompat
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
@@ -36,8 +32,12 @@ import me.tumur.portfolio.utils.adapters.listItemAdapters.experience.resource.Re
 import me.tumur.portfolio.utils.adapters.listItemAdapters.experience.task.TaskAdapter
 import me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio.button.ButtonAdapter
 import me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio.button.ButtonClickListener
+import me.tumur.portfolio.utils.adapters.bindingAdapters.loadImage
+import me.tumur.portfolio.utils.adapters.bindingAdapters.setDateFromTo
+import me.tumur.portfolio.utils.adapters.bindingAdapters.setScreenFavoriteNotEmpty
 import me.tumur.portfolio.utils.constants.Constants
 import me.tumur.portfolio.utils.extensions.collectFlow
+import me.tumur.portfolio.utils.extensions.launchCustomTab
 import me.tumur.portfolio.utils.state.Empty
 import me.tumur.portfolio.utils.state.NotEmpty
 import dagger.hilt.android.AndroidEntryPoint
@@ -94,12 +94,7 @@ class ExperienceDetailFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMar
      */
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
-        /** Lock fragment in portrait screen orientation */
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-
-        /** Data binding */
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_experience_detail, container, false)
+        binding = FragmentExperienceDetailBinding.inflate(inflater, container, false)
 
         /** Set experience item id for detail screen */
         args.id?.let {
@@ -114,10 +109,6 @@ class ExperienceDetailFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMar
         /** Set observers and adapters */
         setAdapters()
 
-        binding.apply {
-            this.lifecycleOwner = viewLifecycleOwner
-            this.model = viewModel
-        }
         return binding.root
     }
 
@@ -186,12 +177,22 @@ class ExperienceDetailFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMar
     private fun setObservers(buttonAdapter: ButtonAdapter, taskAdapter: TaskAdapter, resourceAdapter: ResourceAdapter) {
 
         /** Set observer for button */
-        viewLifecycleOwner.collectFlow(viewModel.dataFlow) {
-            binding.invalidateAll()
+        viewLifecycleOwner.collectFlow(viewModel.dataFlow) { item ->
+            item ?: return@collectFlow
+            binding.experienceItemDetailCoverImage.contentDescription = item.imageDescription
+            loadImage(binding.experienceItemDetailCoverImage, item.coverImage)
+            binding.experienceItemDetailLogo.contentDescription = item.logoDescription
+            loadImage(binding.experienceItemDetailLogo, item.logo)
+            binding.experienceItemDetailJobTitle.text = item.title
+            binding.experienceItemDetailCompanyName.text = item.company
+            binding.experienceItemDetailLocationName.text = item.location
+            binding.experienceItemDetailDateToFrom.setDateFromTo(item.dateFrom, item.dateTo)
+            binding.experienceItemDetailInfo.text = item.info
         }
 
-        viewLifecycleOwner.collectFlow(viewModel.resourceStateFlow) {
-            binding.invalidateAll()
+        viewLifecycleOwner.collectFlow(viewModel.resourceStateFlow) { state ->
+            setScreenFavoriteNotEmpty(binding.experienceItemDetailSectionResource, state)
+            setScreenFavoriteNotEmpty(binding.experienceItemDetailResource, state)
         }
 
         viewLifecycleOwner.collectFlow(viewModel.button) { button ->
@@ -228,10 +229,13 @@ class ExperienceDetailFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMar
                     location.longitude?.let { long ->
 
                         val currentLatLng = LatLng(lat, long)
-                        val title = getAddress(currentLatLng)
-                        placeMarkerOnMap(title, currentLatLng)
-                        mMap?.let { map ->
-                            map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
+                        resolveAddress(currentLatLng) { title ->
+                            binding.root.post {
+                                placeMarkerOnMap(title, currentLatLng)
+                                mMap?.let { map ->
+                                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
+                                }
+                            }
                         }
                     }
                 }
@@ -246,12 +250,7 @@ class ExperienceDetailFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMar
     private fun startCustomTab(url: String?) {
 
         url?.let {
-            /** Chrome custom tab  */
-            val builder = CustomTabsIntent.Builder().apply {
-                this.setToolbarColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
-                this.setShowTitle(true)
-            }
-            builder.build().launchUrl(requireContext(), (Uri.parse(url)))
+            requireContext().launchCustomTab(it)
         }
     }
 
@@ -264,28 +263,45 @@ class ExperienceDetailFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMar
         }
     }
 
-    /** Get address */
-    private fun getAddress(latLng: LatLng): String {
-        // 1
+    /** Resolve address */
+    @Suppress("DEPRECATION")
+    private fun resolveAddress(latLng: LatLng, onResolved: (String) -> Unit) {
         val geocoder = Geocoder(requireContext())
-        val addresses: List<Address>?
-        val address: Address?
-        var addressText = ""
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            geocoder.getFromLocation(
+                latLng.latitude,
+                latLng.longitude,
+                1,
+                object : Geocoder.GeocodeListener {
+                    override fun onGeocode(addresses: MutableList<Address>) {
+                        onResolved(formatAddress(addresses.firstOrNull()))
+                    }
 
-        try {
-            // 2
-            addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-            // 3
-            if (null != addresses && addresses.isNotEmpty()) {
-                address = addresses[0]
-                for (i in 0 until address.maxAddressLineIndex) {
-                    addressText += if (i == 0) address.getAddressLine(i) else "\n" + address.getAddressLine(i)
+                    override fun onError(errorMessage: String?) {
+                        Log.d(Constants.FRAGMENT_EXPERIENCE, errorMessage.orEmpty())
+                        onResolved("")
+                    }
                 }
-            }
-        } catch (e: IOException) {
-            Log.d(Constants.FRAGMENT_EXPERIENCE, e.localizedMessage.orEmpty())
+            )
+            return
         }
 
-        return addressText
+        try {
+            onResolved(formatAddress(geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)?.firstOrNull()))
+        } catch (e: IOException) {
+            Log.d(Constants.FRAGMENT_EXPERIENCE, e.localizedMessage.orEmpty())
+            onResolved("")
+        }
+    }
+
+    /** Format address */
+    private fun formatAddress(address: Address?): String {
+        return buildString {
+            if (address != null) {
+                for (i in 0 until address.maxAddressLineIndex) {
+                    append(if (i == 0) address.getAddressLine(i) else "\n" + address.getAddressLine(i))
+                }
+            }
+        }
     }
 }

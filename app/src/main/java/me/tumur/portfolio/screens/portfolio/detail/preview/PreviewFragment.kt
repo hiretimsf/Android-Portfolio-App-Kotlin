@@ -1,13 +1,10 @@
 package me.tumur.portfolio.screens.portfolio.detail.preview
 
-import android.annotation.SuppressLint
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
@@ -15,6 +12,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.FragmentPreviewBinding
 import me.tumur.portfolio.screens.portfolio.detail.preview.pager.PreviewPagerAdapter
+import me.tumur.portfolio.utils.adapters.bindingAdapters.setPagerDots
+import me.tumur.portfolio.utils.adapters.bindingAdapters.setPreviewViewPagerCurrentItem
+import me.tumur.portfolio.utils.adapters.bindingAdapters.setPreviewViewPagerPageChangeListener
 import me.tumur.portfolio.utils.extensions.collectFlow
 
 @AndroidEntryPoint
@@ -67,14 +67,8 @@ class PreviewFragment : Fragment() {
      * @return Return the View for the fragment's UI.
      */
 
-    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
-        /** Lock fragment in portrait screen orientation */
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-
-        /** Data binding */
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_preview, container, false)
+        binding = FragmentPreviewBinding.inflate(inflater, container, false)
 
         /** Set portfolio owner id and order for preview screen */
         args.id?.let {
@@ -84,11 +78,6 @@ class PreviewFragment : Fragment() {
         args.order.let {
             viewModel.setCurrentItem(it)
             viewModel.setScrollToItem(it - 1)
-        }
-
-        binding.apply {
-            this.lifecycleOwner = viewLifecycleOwner
-            this.model = viewModel
         }
 
         setObservers()
@@ -107,11 +96,11 @@ class PreviewFragment : Fragment() {
      */
     private fun setObservers() {
         viewLifecycleOwner.collectFlow(viewModel.scrollToItemFlow) {
-            binding.invalidateAll()
+            setPreviewViewPagerCurrentItem(binding.previewViewPager, it, true)
         }
 
-        viewLifecycleOwner.collectFlow(viewModel.currentItemFlow) {
-            binding.invalidateAll()
+        viewLifecycleOwner.collectFlow(viewModel.currentItemFlow) { current ->
+            setPagerDots(binding.previewPageIndicator, 6, current)
         }
     }
 
@@ -122,18 +111,16 @@ class PreviewFragment : Fragment() {
 
         /** View pager */
         val viewPager = binding.previewViewPager
-        /** View pager's indicator */
-        val viewPagerIndicator = binding.previewPageIndicator
 
         /** Set view pager' adapter */
-        previewPagerAdapter = PreviewPagerAdapter(childFragmentManager)
+        previewPagerAdapter = PreviewPagerAdapter(this)
         viewPager.adapter = previewPagerAdapter
-        /** Set view pager' indicator */
-        viewPagerIndicator.setViewPager(viewPager)
+        setPreviewViewPagerPageChangeListener(viewPager, viewModel)
+        setPagerDots(binding.previewPageIndicator, 6, viewModel.currentItem)
 
         /**
          * Setup view pager's back button
-         * Handling back button from Fragment for ViewPager scrolling. This callback
+         * Handling back button from Fragment for ViewPager2 scrolling. This callback
          * will only be called when MyFragment is at least Started.
          * */
         requireActivity().onBackPressedDispatcher.addCallback(this) {

@@ -2,14 +2,11 @@ package me.tumur.portfolio.screens.profile.bottomsheet
 
 import android.app.Dialog
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.content.ContextCompat
-import androidx.databinding.DataBindingUtil
+import androidx.core.net.toUri
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,6 +23,7 @@ import me.tumur.portfolio.utils.adapters.listItemAdapters.social.SocialAdapter
 import me.tumur.portfolio.utils.adapters.listItemAdapters.social.SocialClickListener
 import me.tumur.portfolio.utils.constants.Constants
 import me.tumur.portfolio.utils.extensions.collectFlow
+import me.tumur.portfolio.utils.extensions.launchCustomTab
 
 @AndroidEntryPoint
 class ProfileBottomSheetFragment: BottomSheetDialogFragment() {
@@ -76,8 +74,7 @@ class ProfileBottomSheetFragment: BottomSheetDialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        /** Data binding */
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_profile_bottom_sheet, container, false)
+        binding = FragmentProfileBottomSheetBinding.inflate(inflater, container, false)
 
         /** Social items */
         val socialAdapter = SocialAdapter(SocialClickListener { viewModel.socialItemOnClick(it) })
@@ -91,16 +88,16 @@ class ProfileBottomSheetFragment: BottomSheetDialogFragment() {
             this.adapter = socialAdapter
         }
 
-        binding.apply {
-            // Set the lifecycleOwner so DataBinding can observe Flow
-            this.lifecycleOwner = viewLifecycleOwner
-            // Set the viewmodel so layout can display data
-            this.model = viewModel
+        binding.clContactMe.setOnClickListener {
+            viewModel.emailItemOnClick(true)
         }
 
         /** Observer for social adapter */
-        viewLifecycleOwner.collectFlow(viewModel.profileFlow) {
-            binding.invalidateAll()
+        viewLifecycleOwner.collectFlow(viewModel.profileFlow) { profile ->
+            binding.profileBsAvatar.contentDescription = profile?.imageDescription
+            binding.profileBsAvatar.setImageResource(R.drawable.profile)
+            binding.profileBsName.text = getString(R.string.name)
+            binding.profileBsEmail.text = profile?.email
         }
 
         val socialAdapterObserver: suspend (List<SocialModel>) -> Unit = { data ->
@@ -114,12 +111,7 @@ class ProfileBottomSheetFragment: BottomSheetDialogFragment() {
                 //Hide dialog and reset onclick value
                 dlg.dismiss()
                 viewModel.socialItemClicked()
-                // Set chrome custom tab
-                val builder = CustomTabsIntent.Builder()
-                builder.setToolbarColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
-                builder.setShowTitle(true)
-                val intent = builder.build()
-                intent.launchUrl(requireContext(), Uri.parse(item.url))
+                requireContext().launchCustomTab(item.url)
                 this.findNavController().popBackStack()
             }
         }
@@ -129,10 +121,10 @@ class ProfileBottomSheetFragment: BottomSheetDialogFragment() {
             if(item){
                 //Set email intent
                 val intent = Intent(Intent.ACTION_SENDTO)
-                intent.data = Uri.parse(Constants.MAILTO) // only email apps should handle this
+                intent.data = Constants.MAILTO.toUri() // only email apps should handle this
                 intent.putExtra(Intent.EXTRA_EMAIL, Constants.EMAIL)
                 intent.putExtra(Intent.EXTRA_SUBJECT, Constants.SUBJECT)
-                if (intent.resolveActivity(activity!!.packageManager) != null) {
+                if (intent.resolveActivity(requireActivity().packageManager) != null) {
                     //Hide dialog and reset onclick value
                     dlg.dismiss()
                     viewModel.emailItemClicked()

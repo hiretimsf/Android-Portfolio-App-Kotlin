@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import me.tumur.portfolio.databinding.ListItemButtonBinding
 import me.tumur.portfolio.repository.database.model.button.ButtonModel
+import me.tumur.portfolio.utils.adapters.bindingAdapters.setButtonIcon
 
 /**
  * Button normal viewholder
@@ -12,9 +13,9 @@ import me.tumur.portfolio.repository.database.model.button.ButtonModel
 class ButtonNormalViewHolder private constructor(val binding: ListItemButtonBinding) :
     RecyclerView.ViewHolder(binding.root) {
     fun bind(item: ButtonModel, clickListener: ButtonClickListener) {
-        binding.clickListener = clickListener
-        binding.button = item
-        binding.executePendingBindings()
+        binding.listItemMaterialButton.text = item.title
+        binding.listItemMaterialButton.setButtonIcon(item.type)
+        binding.listItemMaterialButton.setOnClickListener { clickListener.onClick(item.url) }
     }
 
     companion object {

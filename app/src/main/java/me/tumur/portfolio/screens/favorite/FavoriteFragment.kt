@@ -1,21 +1,23 @@
 package me.tumur.portfolio.screens.favorite
 
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.*
-import androidx.databinding.DataBindingUtil
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.FragmentFavoriteBinding
-import me.tumur.portfolio.repository.database.model.favorite.FavoriteModel
 import me.tumur.portfolio.screens.MainViewModel
 import me.tumur.portfolio.utils.adapters.listItemAdapters.favorite.FavoriteAdapter
 import me.tumur.portfolio.utils.adapters.listItemAdapters.favorite.FavoriteClickListener
+import me.tumur.portfolio.utils.adapters.bindingAdapters.setScreenFavoriteEmpty
+import me.tumur.portfolio.utils.adapters.bindingAdapters.setScreenFavoriteNotEmpty
 import me.tumur.portfolio.utils.constants.Constants
 import me.tumur.portfolio.utils.extensions.collectFlow
 import me.tumur.portfolio.utils.state.Empty
@@ -57,9 +59,6 @@ class FavoriteFragment : Fragment() {
      */
     private lateinit var binding: FragmentFavoriteBinding
 
-    /** Action bar menu */
-    private var favoriteMenu: Menu? = null
-
     /** INITIALIZATION * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
@@ -80,12 +79,7 @@ class FavoriteFragment : Fragment() {
      */
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
-        /** Lock fragment in portrait screen orientation */
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-
-        /** Data binding */
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_favorite, container, false)
+        binding = FragmentFavoriteBinding.inflate(inflater, container, false)
 
         /** Set fragment state in shared view model */
         sharedViewModel.setFragmentStateHolder(Constants.FRAGMENT_FAVORITE)
@@ -102,13 +96,7 @@ class FavoriteFragment : Fragment() {
             this.adapter = favoriteAdapter
         }
 
-        binding.apply {
-            this.lifecycleOwner = viewLifecycleOwner
-            this.model = viewModel
-        }
-
-        /** Options menu */
-        setHasOptionsMenu(true)
+        setupOptionsMenu()
 
         /** Set observers */
         setObservers(favoriteAdapter)
@@ -116,30 +104,40 @@ class FavoriteFragment : Fragment() {
         return binding.root
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        favoriteMenu = menu
-        inflater.inflate(R.menu.favorite_list_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_delete_all -> {
-                val favoriteItem = viewModel.selectedItem
-                if (favoriteItem != null) {
-                    val action =
-                        FavoriteFragmentDirections.actionToPortfolioDetailScreen(favoriteItem.id, favoriteItem.title)
-                    findNavController().navigate(action)
-                    viewModel.setSelectedItem(null, false)
-                } else {
-                    viewModel.deleteAllItems()
-                }
-            }
-        }
-        return true
-    }
-
     /** FUNCTIONS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    private fun setupOptionsMenu() {
+        (requireActivity() as MenuHost).addMenuProvider(
+            object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(R.menu.favorite_list_menu, menu)
+                }
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    return when (menuItem.itemId) {
+                        R.id.menu_delete_all -> {
+                            handleDeleteAllOrOpenSelected()
+                            true
+                        }
+                        else -> false
+                    }
+                }
+            },
+            viewLifecycleOwner,
+            Lifecycle.State.RESUMED,
+        )
+    }
+
+    private fun handleDeleteAllOrOpenSelected() {
+        val favoriteItem = viewModel.selectedItem
+        if (favoriteItem != null) {
+            val action = FavoriteFragmentDirections.actionToPortfolioDetailScreen(favoriteItem.id, favoriteItem.title)
+            findNavController().navigate(action)
+            viewModel.setSelectedItem(null, false)
+        } else {
+            viewModel.deleteAllItems()
+        }
+    }
 
     private fun setObservers(favoriteAdapter: FavoriteAdapter) {
         /**
@@ -154,14 +152,7 @@ class FavoriteFragment : Fragment() {
          * */
         viewLifecycleOwner.collectFlow(viewModel.selectedItemFlow) {
             it?.let {
-                favoriteMenu?.let { menu ->
-                    val menuAction = menu.findItem(R.id.menu_delete_all)
-                    menuAction?.let { action ->
-                        onOptionsItemSelected(action)
-                    }
-
-                }
-
+                handleDeleteAllOrOpenSelected()
             }
         }
 
@@ -170,6 +161,11 @@ class FavoriteFragment : Fragment() {
          * */
         viewLifecycleOwner.collectFlow(viewModel.table) {
             if (it > 0) viewModel.setState(NotEmpty) else viewModel.setState(Empty)
+        }
+
+        viewLifecycleOwner.collectFlow(viewModel.stateFlow) { state ->
+            setScreenFavoriteEmpty(binding.favoriteScreenEmpty, state)
+            setScreenFavoriteNotEmpty(binding.favoriteScreenList, state)
         }
 
         /**

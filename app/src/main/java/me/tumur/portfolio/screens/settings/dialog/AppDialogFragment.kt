@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -64,8 +63,7 @@ class AppDialogFragment : DialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        /** Data binding */
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_dialog_app_info, container, false)
+        binding = FragmentDialogAppInfoBinding.inflate(inflater, container, false)
 
         /** Social items */
         val appInfoAdapter = AppAdapter()
@@ -79,12 +77,7 @@ class AppDialogFragment : DialogFragment() {
             this.adapter = appInfoAdapter
         }
 
-        binding.apply {
-            // Set the lifecycleOwner so DataBinding can observe Flow
-            this.lifecycleOwner = viewLifecycleOwner
-            // Set the viewmodel so layout can display data
-            this.model = viewModel
-        }
+        binding.dialogFooterBtn.setOnClickListener { viewModel.setCloseButtonOnClick(true) }
 
         /** Observer for social adapter */
         viewLifecycleOwner.collectFlow(viewModel.appInfo) { data ->

@@ -79,8 +79,8 @@ android {
 
     buildFeatures {
         buildConfig = true
-        dataBinding = true
         resValues = true
+        viewBinding = true
     }
 
     packaging {
@@ -107,14 +107,14 @@ dependencies {
 
     // AndroidX Foundation
     implementation(libs.androidx.core)
-    implementation(libs.androidx.legacy)
     implementation(libs.androidx.futures)
     implementation(libs.androidx.vector)
     implementation(libs.androidx.constraint)
-    implementation(libs.androidx.viewpager)
+    implementation(libs.androidx.viewpager2)
     implementation(libs.androidx.emoji)
     implementation(libs.androidx.preferences)
     implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.swipe.refresh)
 
     // Activity
     implementation(libs.activity.appcompat)
@@ -140,7 +140,6 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.core)
     implementation(libs.firebase.crashlytics)
-    implementation(libs.firebase.appindex)
     implementation(libs.firebase.monitoring)
 
     // Dependency injection
@@ -154,22 +153,16 @@ dependencies {
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.android)
     implementation(libs.retrofit.core)
-    implementation(libs.retrofit.coroutines)
     implementation(libs.gson.core)
     implementation(libs.gson.converter)
     implementation(libs.okhttp.core)
     implementation(libs.okhttp.logging)
-    implementation(libs.okhttp.okio)
     implementation(libs.coil.core)
-    implementation(libs.stetho.core)
-    implementation(libs.stetho.okhttp)
 
     // Utilities
     implementation(libs.sdp)
-    implementation(libs.ink.page.indicator)
     implementation(libs.androidx.browser)
     implementation(libs.toasty)
-    implementation(libs.shape.view)
 
     // Test
     testImplementation(libs.junit)

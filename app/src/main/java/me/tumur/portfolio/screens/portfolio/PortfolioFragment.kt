@@ -1,18 +1,18 @@
 package me.tumur.portfolio.screens.portfolio
 
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.*
-import androidx.databinding.DataBindingUtil
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.FragmentPortfolioBinding
-import me.tumur.portfolio.repository.database.model.portfolio.PortfolioModel
 import me.tumur.portfolio.screens.MainViewModel
 import me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio.PortfolioAdapter
 import me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio.PortfolioClickListener
@@ -20,7 +20,6 @@ import me.tumur.portfolio.utils.constants.Constants
 import me.tumur.portfolio.utils.extensions.collectFlow
 import me.tumur.portfolio.utils.state.ToastEmpty
 import me.tumur.portfolio.utils.state.ToastShow
-import me.tumur.portfolio.utils.state.ToastState
 
 
 /**
@@ -64,8 +63,6 @@ class PortfolioFragment : Fragment() {
      */
     private val pullToRefresh by lazy { binding.portfolioScreenRefresh }
 
-    private lateinit var portfolioMenu: Menu
-
     /** INITIALIZATION * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
@@ -86,12 +83,7 @@ class PortfolioFragment : Fragment() {
      */
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
-        /** Lock fragment in portrait screen orientation */
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-
-        /** Data binding */
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_portfolio, container, false)
+        binding = FragmentPortfolioBinding.inflate(inflater, container, false)
 
         /** Set fragment state in shared view model */
         sharedViewModel.setFragmentStateHolder(Constants.FRAGMENT_PORTFOLIO)
@@ -108,13 +100,7 @@ class PortfolioFragment : Fragment() {
             this.adapter = portfolioAdapter
         }
 
-        binding.apply {
-            this.lifecycleOwner = viewLifecycleOwner
-            this.model = viewModel
-        }
-
-        /** Options menu */
-        setHasOptionsMenu(true)
+        setupOptionsMenu()
 
         /** Set listeners */
         setPullToRefreshListener()
@@ -125,23 +111,30 @@ class PortfolioFragment : Fragment() {
         return binding.root
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        portfolioMenu = menu
-        inflater.inflate(R.menu.portfolio_list_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_refresh -> {
-                viewModel.setRefreshStatus(true)
-                viewModel.fetch()
-            }
-        }
-        return true
-    }
-
     /** FUNCTIONS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    private fun setupOptionsMenu() {
+        (requireActivity() as MenuHost).addMenuProvider(
+            object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(R.menu.portfolio_list_menu, menu)
+                }
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    return when (menuItem.itemId) {
+                        R.id.menu_refresh -> {
+                            viewModel.setRefreshStatus(true)
+                            viewModel.fetch()
+                            true
+                        }
+                        else -> false
+                    }
+                }
+            },
+            viewLifecycleOwner,
+            Lifecycle.State.RESUMED,
+        )
+    }
 
     /** Set observers */
     private fun setObservers(portfolioAdapter: PortfolioAdapter) {

@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import me.tumur.portfolio.databinding.ListItemScreenshotBinding
 import me.tumur.portfolio.repository.database.model.screenshot.ScreenShotModel
+import me.tumur.portfolio.utils.adapters.bindingAdapters.loadImage
 
 /**
  * Screenshot viewholder
@@ -12,9 +13,11 @@ import me.tumur.portfolio.repository.database.model.screenshot.ScreenShotModel
 class ScreenShotViewHolder private constructor(val binding: ListItemScreenshotBinding) :
     RecyclerView.ViewHolder(binding.root) {
     fun bind(item: ScreenShotModel?, clickListener: ScreenShotClickListener) {
-        binding.clickListener = clickListener
-        binding.item = item
-        binding.executePendingBindings()
+        binding.listItemScreenshot.setOnClickListener {
+            item?.let(clickListener::onClick)
+        }
+        binding.listItemScreenshotImage.contentDescription = item?.imageDescription
+        loadImage(binding.listItemScreenshotImage, item?.url)
     }
 
     companion object {

@@ -1,8 +1,8 @@
 # Portfolio [![Kotlin Version](https://img.shields.io/badge/kotlin-1.3.41-blue.svg)](https://kotlinlang.org) [![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21) [![Ktlint](https://camo.githubusercontent.com/5652fd33142bf88d0f46018325126931fe65d01d/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f636f64652532307374796c652d2545322539442541342d4646343038312e737667)](https://github.com/pinterest/ktlint) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 <img src="https://firebasestorage.googleapis.com/v0/b/portfolio-app-147b5.appspot.com/o/app_icon_new.png?alt=media&token=2ccaa4c8-081d-40e4-9de9-cf08486b6c13" align="left" width="150" hspace="10" vspace="10">
-👋Hello, My name is Tumur Bazarragchaa and you can call me Alex. 
-I'm an Android Developer, specializing in the user interface, and with three years of experience in Kotlin, Java. 
+👋Hello, My name is Tim Baz.
+I'm a Design Engineer, specializing in the user interface, and with three years of experience in Kotlin, Java.
 I've published two Kotlin Android apps and up to date with the latest technologies such as Android Jetpack Components and Kotlin Coroutines. I built this app to show my skills and passion for design and development. </br>
 <a href="https://tumur.me/about.html" taget="_blank">You can read more about me here</a><br/></br>
 <i>Ps: This is a result of what I've learned during my learning of Kotlin, Android Jetpack, Material Design components, and Firebase, Google Cloud Functions. I tried to implement as many as possible best practices from the Android community and I'm very thankful to everyone who shared their valuable knowledge and experience through social media and blog posts.</i>
@@ -365,8 +365,8 @@ the option to use the gradle wrapper
 
 ## Project Maintained By
 <img src="https://firebasestorage.googleapis.com/v0/b/portfolio-app-147b5.appspot.com/o/pro.png?alt=media&token=f10a1d13-5ffb-46ed-9460-1bdb966365fe" align="left" width="60" hspace="10" vspace="10">
-<b>Tumur.B (Alex)</b><br/>
-Android Developer
+<b>Tim Baz</b><br/>
+Design Engineer
 <br/>
 <br/>
 <a href="https://play.google.com/store/apps/dev?id=8351593314191223257"><img src="https://firebasestorage.googleapis.com/v0/b/ioco-5c746.appspot.com/o/icon_google.png?alt=media&token=df311441-34fe-44dd-bf24-c5cbf8f4a6c9" width="60"></a> <a href="https://tumur.me"><img src="https://firebasestorage.googleapis.com/v0/b/ioco-5c746.appspot.com/o/icon_web.png?alt=media&token=3854f445-8465-4ad3-8cd8-7aca2999964f" width="60"></a>
@@ -376,7 +376,7 @@ Android Developer
 
 ## License
 
-    Copyright 2019 Tumur.B (Alex)
+    Copyright 2019 Tim Baz
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

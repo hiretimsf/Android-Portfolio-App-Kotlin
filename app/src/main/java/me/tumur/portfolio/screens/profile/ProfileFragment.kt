@@ -1,28 +1,25 @@
 package me.tumur.portfolio.screens.profile
 
-import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.pm.ActivityInfo
-import android.net.Uri
 import android.os.Bundle
 import android.view.*
-import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.content.ContextCompat
-import androidx.databinding.DataBindingUtil
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.FragmentProfileBinding
-import me.tumur.portfolio.repository.database.model.profile.AboutModel
 import me.tumur.portfolio.screens.MainViewModel
 import me.tumur.portfolio.utils.adapters.listItemAdapters.about.AboutAdapter
 import me.tumur.portfolio.utils.constants.Constants
 import me.tumur.portfolio.utils.extensions.collectFlow
+import me.tumur.portfolio.utils.extensions.launchCustomTab
 
 /**
  * An fragment that inflates a profile layout.
@@ -72,14 +69,8 @@ class ProfileFragment : Fragment() {
      * @return Return the View for the fragment's UI.
      */
 
-    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
-        /** Lock fragment in portrait screen orientation */
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-
-        /** Data binding */
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_profile, container, false)
+        binding = FragmentProfileBinding.inflate(inflater, container, false)
 
         /** About items */
         val aboutAdapter = AboutAdapter()
@@ -93,16 +84,12 @@ class ProfileFragment : Fragment() {
             this.adapter = aboutAdapter
         }
 
-        binding.apply {
-            // Set the lifecycleOwner so DataBinding can observe Flow
-            this.lifecycleOwner = viewLifecycleOwner
-            // Set the viewmodel so layout can display data
-            this.model = viewModel
-            this.shared = sharedViewModel
+        binding.screenProfileFabButton.setOnClickListener {
+            viewModel.setShowProfileBottomsheet(true)
         }
 
-        /** Set options menu */
-        setHasOptionsMenu(true)
+        setupOptionsMenu()
+        setupCollapsedProfileHeader()
 
         /** Set fragment state in shared view model */
         sharedViewModel.setFragmentStateHolder(Constants.FRAGMENT_PROFILE)
@@ -113,30 +100,57 @@ class ProfileFragment : Fragment() {
         return binding.root
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        // Inflate menu resource file.
-        inflater.inflate(R.menu.profile_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
+    private fun setupOptionsMenu() {
+        (requireActivity() as MenuHost).addMenuProvider(
+            object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(R.menu.profile_menu, menu)
+                }
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    return when (menuItem.itemId) {
+                        R.id.menu_share -> {
+                            getShareIntent()
+                            true
+                        }
+                        R.id.menu_privacy -> {
+                            startCustomTab(Constants.PRIVACY_URL)
+                            true
+                        }
+                        else -> false
+                    }
+                }
+            },
+            viewLifecycleOwner,
+            Lifecycle.State.RESUMED,
+        )
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.menu_share -> {
-                getShareIntent()
-
+    private fun setupCollapsedProfileHeader() {
+        val collapsedRow = binding.root.findViewById<View>(R.id.profile_screen_header_collapsed_row)
+        binding.root.findViewById<com.google.android.material.appbar.AppBarLayout>(R.id.app_bar)
+            .addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+                val progress = -verticalOffset / appBarLayout.totalScrollRange.toFloat()
+                collapsedRow.alpha = ((progress - 0.75f) / 0.25f).coerceIn(0f, 1f)
             }
-            R.id.menu_privacy -> startCustomTab(Constants.PRIVACY_URL)
-        }
-        return true
     }
-
-    /** FUNCTIONS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     private fun setObservers(aboutAdapter: AboutAdapter){
 
         /** Observer for show profile bottom sheet dialog ------------------------------------------------------------*/
-        viewLifecycleOwner.collectFlow(viewModel.profileFlow) {
-            binding.invalidateAll()
+        viewLifecycleOwner.collectFlow(viewModel.profileFlow) { profile ->
+            binding.root.findViewById<android.widget.TextView>(R.id.profile_screen_header_greeting).text = profile?.greeting
+            binding.root.findViewById<android.widget.TextView>(R.id.profile_screen_header_name).text = getString(R.string.name)
+            binding.root.findViewById<android.widget.TextView>(R.id.profile_screen_header_title).text = getString(R.string.title)
+            binding.root.findViewById<android.widget.TextView>(R.id.profile_screen_header_collapsed_name).text = getString(R.string.name)
+            binding.root.findViewById<android.widget.ImageView>(R.id.profile_screen_header_avatar).apply {
+                contentDescription = profile?.imageDescription
+                setImageResource(R.drawable.profile)
+            }
+            binding.root.findViewById<android.widget.ImageView>(R.id.profile_screen_header_collapsed_avatar).apply {
+                contentDescription = profile?.imageDescription
+                setImageResource(R.drawable.profile)
+            }
         }
 
         viewLifecycleOwner.collectFlow(viewModel.showProfileBottomSheetFlow) { data ->
@@ -173,12 +187,7 @@ class ProfileFragment : Fragment() {
     private fun startCustomTab(url: String?){
 
         url?.let {
-            /** Chrome custom tab  */
-            val builder = CustomTabsIntent.Builder().apply {
-                this.setToolbarColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
-                this.setShowTitle(true)
-            }
-            builder.build().launchUrl(requireContext(), (Uri.parse(url)))
+            requireContext().launchCustomTab(it)
         }
     }
 }

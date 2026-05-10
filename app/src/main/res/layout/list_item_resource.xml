@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
+
+<!-- Card view -->
+    <com.google.android.material.card.MaterialCardView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools">
-    <data>
-        <variable name="item" type="me.tumur.portfolio.repository.database.model.resource.ResourceModel"/>
-        <variable name="clickListener"
-                  type="me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio.button.ButtonClickListener"/>
-    </data>
-
-    <!-- Card view -->
-    <com.google.android.material.card.MaterialCardView
+        xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/list_item_resource_card_view"
             android:layout_width="@dimen/_150sdp"
             android:layout_height="wrap_content"
@@ -19,7 +13,6 @@
             android:layout_marginTop="@dimen/_5sdp"
             android:layout_marginBottom="@dimen/_5sdp"
             android:clickable="true"
-            android:onClick="@{() -> clickListener.onClick(item.url)}"
             android:focusable="true"
             app:cardCornerRadius="@dimen/_5sdp"
             app:cardElevation="@dimen/_5sdp">
@@ -37,8 +30,6 @@
                     android:layout_height="@dimen/_100sdp"
                     android:layout_marginBottom="@dimen/_10sdp"
                     android:scaleType="centerCrop"
-                    android:contentDescription="@{item.imageDescription}"
-                    app:imageLoad="@{item.image}"
                     app:layout_constraintBottom_toTopOf="@+id/list_item_resource_title_content"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -67,7 +58,6 @@
                         android:textAppearance="?attr/textAppearanceHeadline1"
                         android:textSize="@dimen/dimen_14sp"
                         android:textColor="?attr/colorOnPrimarySurface"
-                        android:text="@{item.title}"
                         tools:text="@string/cd_avatar"/>
 
                 <!-- Resource link icon -->
@@ -93,8 +83,6 @@
                     android:textAppearance="?attr/textAppearanceHeadline1"
                     android:textSize="@dimen/dimen_12sp"
                     android:textColor="?attr/colorOnSurface"
-                    app:dateFrom="@{item.dateFrom}"
-                    app:dateTo="@{item.dateTo}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -103,4 +91,3 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
-</layout>

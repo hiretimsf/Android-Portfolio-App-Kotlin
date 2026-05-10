@@ -1,35 +1,29 @@
 package me.tumur.portfolio.screens.portfolio.detail
 
 import android.content.Intent
-import android.content.pm.ActivityInfo
-import android.net.Uri
 import android.os.Bundle
 import android.view.*
-import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.content.ContextCompat
-import androidx.databinding.DataBindingUtil
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.FragmentPortfolioDetailBinding
-import me.tumur.portfolio.repository.database.model.button.ButtonModel
-import me.tumur.portfolio.repository.database.model.category.CategoryModel
-import me.tumur.portfolio.repository.database.model.screenshot.ScreenShotModel
 import me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio.button.ButtonAdapter
 import me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio.button.ButtonClickListener
 import me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio.category.CategoryAdapter
 import me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio.screenshot.ScreenShotAdapter
 import me.tumur.portfolio.utils.adapters.listItemAdapters.portfolio.screenshot.ScreenShotClickListener
+import me.tumur.portfolio.utils.adapters.bindingAdapters.loadImage
+import me.tumur.portfolio.utils.adapters.bindingAdapters.setDateFromTo
 import me.tumur.portfolio.utils.extensions.collectFlow
+import me.tumur.portfolio.utils.extensions.launchCustomTab
 
 
 /**
@@ -70,10 +64,6 @@ class PortfolioDetailFragment : Fragment() {
     /** Safe args */
     private val args: PortfolioDetailFragmentArgs by navArgs()
 
-    /** Coroutines */
-    private val job = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main.immediate + job)
-
     /** Portfolio id */
     private lateinit var id: String
 
@@ -101,12 +91,7 @@ class PortfolioDetailFragment : Fragment() {
      */
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
-        /** Lock fragment in portrait screen orientation */
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-
-        /** Data binding */
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_portfolio_detail, container, false)
+        binding = FragmentPortfolioDetailBinding.inflate(inflater, container, false)
 
         /** Set portfolio id for detail screen */
         args.id?.let {
@@ -114,72 +99,63 @@ class PortfolioDetailFragment : Fragment() {
             id = it
         }
 
-        /** Set options menu */
-        setHasOptionsMenu(true)
+        setupOptionsMenu()
 
         /** Set observers and adapters */
         setAdapters()
         setObservers()
 
-        binding.apply {
-            this.lifecycleOwner = viewLifecycleOwner
-            this.model = viewModel
-            this.clickListener = VideoClickListener(viewModel::setVideoUrl)
-        }
         return binding.root
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        // Inflate menu resource file.
-        inflater.inflate(R.menu.portfolio_detail_menu, menu)
-        topMenu = menu
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        uiScope.launch {
-            if (viewModel.favorite == 1) {
-                menu.findItem(R.id.menu_saved).isVisible = true
-                menu.findItem(R.id.menu_save).isVisible = false
-            } else {
-                menu.findItem(R.id.menu_saved).isVisible = false
-                menu.findItem(R.id.menu_save).isVisible = true
-            }
-        }
-
-        super.onPrepareOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_save -> {
-                viewModel.portfolio?.let {
-                    viewModel.saveToFavorite(it)
-                }
-                topMenu?.findItem(R.id.menu_saved)?.isVisible = true
-                topMenu?.findItem(R.id.menu_save)?.isVisible = false
-            }
-            R.id.menu_saved -> {
-                viewModel.removeFromFavorite(id)
-                topMenu?.findItem(R.id.menu_saved)?.isVisible = false
-                topMenu?.findItem(R.id.menu_save)?.isVisible = true
-            }
-            R.id.menu_route -> {
-                viewModel.clickedScreenShot?.let { routeToPreview(it.ownerId, it.order) }
-            }
-            R.id.menu_share -> {
-                getShareIntent()
-            }
-        }
-        return true
-    }
-
-    override fun onPause() {
-        job.cancel()
-        super.onPause()
-    }
-
     /** FUNCTIONS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    private fun setupOptionsMenu() {
+        (requireActivity() as MenuHost).addMenuProvider(
+            object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(R.menu.portfolio_detail_menu, menu)
+                    topMenu = menu
+                    updateFavoriteMenu(menu)
+                }
+
+                override fun onPrepareMenu(menu: Menu) {
+                    updateFavoriteMenu(menu)
+                }
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    return when (menuItem.itemId) {
+                        R.id.menu_save -> {
+                            viewModel.portfolio?.let(viewModel::saveToFavorite)
+                            updateFavoriteMenu(saved = true)
+                            true
+                        }
+                        R.id.menu_saved -> {
+                            viewModel.removeFromFavorite(id)
+                            updateFavoriteMenu(saved = false)
+                            true
+                        }
+                        R.id.menu_route -> {
+                            viewModel.clickedScreenShot?.let { routeToPreview(it.ownerId, it.order) }
+                            true
+                        }
+                        R.id.menu_share -> {
+                            getShareIntent()
+                            true
+                        }
+                        else -> false
+                    }
+                }
+            },
+            viewLifecycleOwner,
+            Lifecycle.State.RESUMED,
+        )
+    }
+
+    private fun updateFavoriteMenu(menu: Menu? = topMenu, saved: Boolean = viewModel.favorite == 1) {
+        menu?.findItem(R.id.menu_saved)?.isVisible = saved
+        menu?.findItem(R.id.menu_save)?.isVisible = !saved
+    }
 
     /** Adapters */
     private fun setAdapters() {
@@ -222,8 +198,19 @@ class PortfolioDetailFragment : Fragment() {
     private fun setObservers() {
 
         /** Set observer for button */
-        viewLifecycleOwner.collectFlow(viewModel.portfolioFlow) {
-            binding.invalidateAll()
+        viewLifecycleOwner.collectFlow(viewModel.portfolioFlow) { portfolio ->
+            portfolio ?: return@collectFlow
+            binding.portfolioItemDetailImage.contentDescription = portfolio.imageDescription
+            loadImage(binding.portfolioItemDetailImage, portfolio.coverImage)
+            binding.portfolioItemDetailLogo.contentDescription = portfolio.logoDescription
+            loadImage(binding.portfolioItemDetailLogo, portfolio.logo)
+            binding.portfolioItemDetailImageOverlayForeground.setOnClickListener {
+                viewModel.setVideoUrl(portfolio.videoUrl)
+            }
+            binding.portfolioItemDetailSubTitle.text = portfolio.subTitle
+            binding.portfolioItemDate.setDateFromTo(portfolio.dateFrom, portfolio.dateTo)
+            binding.portfolioItemText.text = portfolio.text
+            binding.portfolioItemInfo.text = portfolio.info
         }
 
         viewLifecycleOwner.collectFlow(viewModel.button) { data ->
@@ -243,12 +230,7 @@ class PortfolioDetailFragment : Fragment() {
         /** Set observer for button click listener */
         viewLifecycleOwner.collectFlow(viewModel.buttonUrlFlow) {
             it?.let {
-                // Set chrome custom tab
-                val builder = CustomTabsIntent.Builder()
-                builder.setToolbarColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
-                builder.setShowTitle(true)
-                val intent = builder.build()
-                intent.launchUrl(requireContext(), Uri.parse(it))
+                requireContext().launchCustomTab(it)
                 viewModel.setButtonUrl(null)
             }
         }
@@ -256,12 +238,7 @@ class PortfolioDetailFragment : Fragment() {
         /** Set observer for screenshot click listener */
         viewLifecycleOwner.collectFlow(viewModel.clickedScreenShotFlow) {
             it?.let {
-                topMenu?.let { menu ->
-                    val menuAction = menu.findItem(R.id.menu_route)
-                    menuAction?.let { item ->
-                        onOptionsItemSelected(item)
-                    }
-                }
+                routeToPreview(it.ownerId, it.order)
             }
         }
 
@@ -275,19 +252,7 @@ class PortfolioDetailFragment : Fragment() {
 
         /** Set observer for favorite */
         viewLifecycleOwner.collectFlow(viewModel.favoriteFlow) {
-            topMenu?.let { menu ->
-                val menuSaved = menu.findItem(R.id.menu_saved)
-                val menuSave = menu.findItem(R.id.menu_save)
-                val condition1 = it > 0 && menuSave != null && menuSave.isVisible
-                val condition2 = it == 0 && menuSaved != null && menuSaved.isVisible
-                if (condition1) {
-                    menuSave.isVisible = false
-                    menuSaved.isVisible = true
-                } else if (condition2) {
-                    menuSaved.isVisible = false
-                    menuSave.isVisible = true
-                }
-            }
+            updateFavoriteMenu(saved = it > 0)
         }
     }
 
@@ -298,12 +263,7 @@ class PortfolioDetailFragment : Fragment() {
     private fun startCustomTab(url: String?) {
 
         url?.let {
-            /** Chrome custom tab  */
-            val builder = CustomTabsIntent.Builder().apply {
-                this.setToolbarColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
-                this.setShowTitle(true)
-            }
-            builder.build().launchUrl(requireContext(), (Uri.parse(url)))
+            requireContext().launchCustomTab(it)
         }
     }
 

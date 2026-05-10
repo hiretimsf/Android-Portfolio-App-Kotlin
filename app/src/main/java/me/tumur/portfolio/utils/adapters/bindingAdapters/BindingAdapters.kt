@@ -9,7 +9,6 @@ import android.graphics.Paint
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.IdRes
-import androidx.databinding.BindingAdapter
 import coil.load
 import coil.transform.RoundedCornersTransformation
 import coil.transform.Transformation
@@ -36,7 +35,6 @@ private class GrayscaleTransformation : Transformation {
 }
 
 /** Load image from the network or cache with placeholder and error images */
-@BindingAdapter("imageLoad")
 fun loadImage(imageView: ImageView, url: String?) {
     url?.let {
         imageView.load(it) {
@@ -55,7 +53,6 @@ fun loadImage(imageView: ImageView, url: String?) {
 }
 
 /** Load image from the network or cache with placeholder and error images */
-@BindingAdapter("android:src")
 fun setImageDrawable(imageView: ImageView, @IdRes drawable: Int?) {
     drawable?.let {
         imageView.load(it) {
@@ -74,7 +71,6 @@ fun setImageDrawable(imageView: ImageView, @IdRes drawable: Int?) {
 }
 
 /** Date from and date to */
-@BindingAdapter("dateFrom", "dateTo", requireAll = true)
 fun TextView.setDateFromTo(dateFrom: Date?, dateTo: Date?) {
     if (dateFrom != null && dateTo != null) {
 
@@ -103,7 +99,6 @@ fun TextView.setDateFromTo(dateFrom: Date?, dateTo: Date?) {
 }
 
 /** Social icon */
-@BindingAdapter("socialIcon")
 fun ImageView.setSocialIcon(name: String?) {
     name?.let {
         setImageResource( when(name){
@@ -117,7 +112,6 @@ fun ImageView.setSocialIcon(name: String?) {
 }
 
 /** Category icon */
-@BindingAdapter("categoryIcon")
 fun ImageView.setCategoryIcon(icon: String?) {
     icon?.let {
         setImageResource(
@@ -131,7 +125,6 @@ fun ImageView.setCategoryIcon(icon: String?) {
     }
 }
 
-@BindingAdapter("buttonIcon")
 fun MaterialButton.setButtonIcon(type: String?) {
     type?.let {
         setIconResource(

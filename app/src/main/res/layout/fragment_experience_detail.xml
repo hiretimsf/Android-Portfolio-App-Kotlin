@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
-    <data>
-        <variable name="model" type="me.tumur.portfolio.screens.experience.detail.ExperienceDetailFragmentViewModel"/>
-    </data>
-    <!-- Nested scroll view -->
+
+<!-- Nested scroll view -->
     <androidx.core.widget.NestedScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/experience_item_detail_nested_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -27,7 +24,7 @@
                     android:layout_marginBottom="@dimen/_5sdp">
 
                 <!-- Cover image arch view -->
-                <com.github.florent37.shapeofview.shapes.ArcView
+                <FrameLayout
                         android:id="@+id/experience_item_detail_cover_image_arch_view"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/_150sdp"
@@ -35,20 +32,16 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_chainStyle="packed"
-                        app:shape_arc_height="@dimen/_20sdp"
-                        app:shape_arc_position="bottom">
+                        app:layout_constraintVertical_chainStyle="packed">
 
                     <!-- Cover image -->
                     <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/experience_item_detail_cover_image"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:scaleType="centerCrop"
-                            android:contentDescription="@{model.data.imageDescription}"
-                            app:imageLoad="@{model.data.coverImage}"/>
+                            android:scaleType="centerCrop"/>
 
-                </com.github.florent37.shapeofview.shapes.ArcView>
+                </FrameLayout>
 
                 <!-- Header content -->
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -65,7 +58,7 @@
                         app:layout_constraintTop_toBottomOf="@+id/experience_item_detail_cover_image_arch_view">
 
                     <!-- Logo frame -->
-                    <com.github.florent37.shapeofview.shapes.RoundRectView
+                    <com.google.android.material.card.MaterialCardView
                             android:id="@+id/experience_item_detail_logo_frame"
                             android:layout_width="@dimen/_80sdp"
                             android:layout_height="@dimen/_80sdp"
@@ -75,19 +68,16 @@
                             app:layout_constraintHorizontal_weight="0.25"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:shape_roundRect_bottomLeftRadius="@dimen/_5sdp"
-                            app:shape_roundRect_bottomRightRadius="@dimen/_5sdp"
-                            app:shape_roundRect_topLeftRadius="@dimen/_5sdp"
-                            app:shape_roundRect_topRightRadius="@dimen/_5sdp">
+                            app:cardCornerRadius="@dimen/_5sdp"
+                            app:cardElevation="@dimen/dimen_0dp"
+                            app:cardPreventCornerOverlap="false">
                         <!-- Logo -->
                         <androidx.appcompat.widget.AppCompatImageView
                                 android:id="@+id/experience_item_detail_logo"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:scaleType="centerCrop"
-                                android:contentDescription="@{model.data.logoDescription}"
-                                app:imageLoad="@{model.data.logo}"/>
-                    </com.github.florent37.shapeofview.shapes.RoundRectView>
+                                android:scaleType="centerCrop"/>
+                    </com.google.android.material.card.MaterialCardView>
 
 
                     <!-- Job and company content -->
@@ -141,7 +131,6 @@
                                     android:textAppearance="?attr/textAppearanceHeadline1"
                                     android:textSize="@dimen/dimen_14sp"
                                     android:textColor="?attr/colorOnPrimarySurface"
-                                    android:text="@{model.data.title}"
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintHorizontal_weight="0.90"
@@ -187,7 +176,6 @@
                                     android:textAppearance="?attr/textAppearanceBody1"
                                     android:textSize="@dimen/dimen_14sp"
                                     android:textColor="?attr/colorOnSurface"
-                                    android:text="@{model.data.company}"
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintHorizontal_weight="0.90"
@@ -234,7 +222,6 @@
                                     android:textAppearance="?attr/textAppearanceBody1"
                                     android:textSize="@dimen/dimen_14sp"
                                     android:textColor="?attr/colorOnSurface"
-                                    android:text="@{model.data.location}"
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintHorizontal_weight="0.90"
@@ -280,8 +267,6 @@
                                     android:textAppearance="?attr/textAppearanceBody1"
                                     android:textSize="@dimen/dimen_14sp"
                                     android:textColor="?attr/colorOnSurface"
-                                    app:dateFrom="@{model.data.dateFrom}"
-                                    app:dateTo="@{model.data.dateTo}"
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintHorizontal_weight="0.90"
@@ -357,7 +342,6 @@
                         android:maxLines="1"
                         android:ellipsize="end"
                         android:textColor="?attr/colorOnPrimarySurface"
-                        android:text="@{model.data.info}"
                         app:layout_constraintBottom_toTopOf="@+id/experience_item_detail_section_task"
                         app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintStart_toStartOf="parent"
@@ -419,7 +403,6 @@
                         android:layout_height="wrap_content"
                         android:background="@color/colorHeaderBackground"
                         android:elevation="@dimen/dimen_1dp"
-                        app:screenFavoriteNotEmpty="@{model.resourceState}"
                         app:layout_constraintBottom_toTopOf="@+id/experience_item_detail_resource"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -455,7 +438,6 @@
                         android:layout_marginTop="@dimen/_10sdp"
                         android:orientation="horizontal"
                         android:scrollbars="none"
-                        app:screenFavoriteNotEmpty="@{model.resourceState}"
                         app:layout_constraintBottom_toTopOf="@+id/experience_item_detail_section_map"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -494,9 +476,9 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <fragment
+                <androidx.fragment.app.FragmentContainerView
                         android:id="@+id/experience_item_detail_map"
-                        class="com.google.android.gms.maps.SupportMapFragment"
+                        android:name="com.google.android.gms.maps.SupportMapFragment"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/_200sdp"
                         app:layout_constraintTop_toBottomOf="@+id/experience_item_detail_section_map"
@@ -507,4 +489,3 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-</layout>

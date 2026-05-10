@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
+
+<!-- Card view -->
+    <com.google.android.material.card.MaterialCardView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools">
-    <data>
-        <variable name="item"
-                  type="me.tumur.portfolio.repository.database.model.experience.ExperienceModel"/>
-        <variable name="clickListener"
-                  type="me.tumur.portfolio.utils.adapters.listItemAdapters.experience.ExperienceClickListener"/>
-    </data>
-
-    <!-- Card view -->
-    <com.google.android.material.card.MaterialCardView
+        xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/list_item_experience_card_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -20,7 +13,6 @@
             android:layout_marginTop="@dimen/_5sdp"
             android:layout_marginBottom="@dimen/_5sdp"
             android:clickable="true"
-            android:onClick="@{() -> clickListener.onClick(item)}"
             android:focusable="true"
             app:cardCornerRadius="@dimen/_5sdp"
             app:cardElevation="@dimen/_2sdp">
@@ -37,8 +29,6 @@
                     android:layout_width="@dimen/_80sdp"
                     android:layout_height="@dimen/_80sdp"
                     android:scaleType="centerCrop"
-                    android:contentDescription="@{item.logoDescription}"
-                    app:imageLoad="@{item.logo}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/list_item_experience_text_content"
                     app:layout_constraintHorizontal_chainStyle="packed"
@@ -99,7 +89,6 @@
                             android:textAppearance="?attr/textAppearanceHeadline1"
                             android:textSize="@dimen/dimen_14sp"
                             android:textColor="?attr/colorOnPrimarySurface"
-                            android:text="@{item.title}"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintHorizontal_weight="0.90"
@@ -146,7 +135,6 @@
                             android:textAppearance="?attr/textAppearanceBody1"
                             android:textSize="@dimen/dimen_14sp"
                             android:textColor="?attr/colorOnSurface"
-                            android:text="@{item.company}"
                             app:layout_constraintHorizontal_weight="0.90"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -194,7 +182,6 @@
                             android:textAppearance="?attr/textAppearanceBody1"
                             android:textSize="@dimen/dimen_14sp"
                             android:textColor="?attr/colorOnSurface"
-                            android:text="@{item.location}"
                             app:layout_constraintHorizontal_weight="0.90"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -241,8 +228,6 @@
                             android:textAppearance="?attr/textAppearanceBody1"
                             android:textSize="@dimen/dimen_12sp"
                             android:textColor="?attr/colorOnSurface"
-                            app:dateFrom="@{item.dateFrom}"
-                            app:dateTo="@{item.dateTo}"
                             app:layout_constraintHorizontal_weight="0.90"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -256,4 +241,3 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
-</layout>

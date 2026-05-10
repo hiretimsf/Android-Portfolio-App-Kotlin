@@ -10,8 +10,7 @@ import me.tumur.portfolio.databinding.ListItemAboutHeaderBinding
  * */
 class AboutHeaderViewHolder private constructor(val binding: ListItemAboutHeaderBinding) : RecyclerView.ViewHolder(binding.root){
     fun bind(header: AboutItem.Header){
-        binding.header = header
-        binding.executePendingBindings()
+        binding.aboutListItemHeaderTitle.text = header.header
     }
 
     companion object {

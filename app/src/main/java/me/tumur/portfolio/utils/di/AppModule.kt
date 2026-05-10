@@ -2,7 +2,6 @@ package me.tumur.portfolio.utils.di
 
 import android.content.Context
 import androidx.room.Room
-import com.facebook.stetho.okhttp3.StethoInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -75,7 +74,6 @@ object AppModule {
             .readTimeout(properties.getProperty(Http.READ).toLong(), TimeUnit.SECONDS)
             .writeTimeout(properties.getProperty(Http.WRITE).toLong(), TimeUnit.SECONDS)
             .addInterceptor(interceptor)
-            .addNetworkInterceptor(StethoInterceptor())
             .build()
     }
 

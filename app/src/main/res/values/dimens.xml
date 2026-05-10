@@ -3,14 +3,7 @@
 	<dimen name="dimen_0dp">0dp</dimen>
 	<dimen name="dimen_1dp">1dp</dimen>
 	<dimen name="dimen_2dp">2dp</dimen>
-	<dimen name="dimen_20dp">20dp</dimen>
-	<dimen name="dimen_4dp">4dp</dimen>
-	<dimen name="dimen_230dp">230dp</dimen>
-    <dimen name="dimen_480dp">480dp</dimen>
-	<dimen name="dimen_welcome_btn_corner_start">80</dimen>
-	<dimen name="dimen_welcome_btn_corner_end">0</dimen>
 	<dimen name="dimen_5sp">5sp</dimen>
-    <dimen name="dimen_4sp">4sp</dimen>
 	<dimen name="dimen_10sp">10sp</dimen>
 	<dimen name="dimen_12sp">12sp</dimen>
 	<dimen name="dimen_14sp">14sp</dimen>
@@ -22,6 +15,5 @@
 	<dimen name="dimen_24sp">24sp</dimen>
 	<dimen name="dimen_26sp">26sp</dimen>
 	<dimen name="elevation_16dp">16dp</dimen>
-	<dimen name="elevation_8dp">8dp</dimen>
 	<dimen name="elevation_4dp">4dp</dimen>
 </resources>

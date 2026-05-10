@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
@@ -12,6 +11,7 @@ import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.PagerItemWelcomeScreenBinding
 import me.tumur.portfolio.repository.database.model.welcome.WelcomeModel
 import me.tumur.portfolio.screens.welcome.WelcomeViewModel
+import me.tumur.portfolio.utils.adapters.bindingAdapters.setPagerIcon
 import me.tumur.portfolio.utils.constants.Constants
 import me.tumur.portfolio.utils.extensions.collectFlow
 
@@ -60,25 +60,31 @@ class WelcomePagerFragment : Fragment() {
      */
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        /** Databinding */
-        binding = DataBindingUtil.inflate(inflater, R.layout.pager_item_welcome_screen, container, false)
-        binding.apply {
-            this.lifecycleOwner = viewLifecycleOwner
-            this.model = viewModel
-            this.shared = sharedViewModel
-        }
+        binding = PagerItemWelcomeScreenBinding.inflate(inflater, container, false)
         /** Set data for ViewPager adapter */
         arguments?.takeIf { it.containsKey(Constants.POSITION) }?.apply {
             viewModel.setPosition(this.getInt(Constants.POSITION))
-            binding.invalidateAll()
+            updateScreen()
         }
 
         /** Observer for welcome screen's data -----------------------------------------------------------------------*/
         viewLifecycleOwner.collectFlow(sharedViewModel.welcomeScreenFlow) {
             sharedViewModel.getWelcomeScreenData(viewModel.position)?.let { model -> viewModel.setData(model) }
-            binding.invalidateAll()
+            updateScreen()
+        }
+        viewLifecycleOwner.collectFlow(sharedViewModel.currentItemFlow) {
+            updateScreen()
         }
 
         return binding.root
+    }
+
+    private fun updateScreen() {
+        val data = viewModel.data ?: return
+        binding.welcomeScreenItemTitle.text = data.title
+        binding.welcomeScreenItemIcon.contentDescription = data.imageDescription
+        setPagerIcon(binding.welcomeScreenItemIcon, data.order, sharedViewModel.currentItem, viewModel.position)
+        binding.welcomeScreenItemSubTitle.text = data.subTitle
+        binding.welcomeScreenItemText.text = data.text
     }
 }

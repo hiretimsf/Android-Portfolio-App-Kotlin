@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
+
+<androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools">
-    <data>
-
-        <variable name="model" type="me.tumur.portfolio.screens.portfolio.detail.preview.pager.PreviewPagerViewModel"/>
-        <variable name="shared" type="me.tumur.portfolio.screens.portfolio.detail.preview.PreviewFragmentViewModel"/>
-
-    </data>
-    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/pager_item_preview_screen"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -20,7 +14,6 @@
                 android:id="@+id/loader_screen_progress_bar"
                 android:layout_width="@dimen/_40sdp"
                 android:layout_height="@dimen/_40sdp"
-                app:screenPreviewProgressBar="@{model.state}"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintVertical_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
@@ -37,9 +30,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="fitCenter"
-                app:screenPreviewImage="@{model.state}"
-                android:contentDescription="@{model.data.imageDescription}"
-                app:imageLoad="@{model.data.url}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -47,4 +37,3 @@
                 tools:src="@drawable/ic_avatar_placeholder"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>

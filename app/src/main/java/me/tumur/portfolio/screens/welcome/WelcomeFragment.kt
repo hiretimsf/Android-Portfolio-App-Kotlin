@@ -1,21 +1,21 @@
 package me.tumur.portfolio.screens.welcome
 
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.viewpager.widget.ViewPager
-import com.pixelcan.inkpageindicator.InkPageIndicator
+import androidx.viewpager2.widget.ViewPager2
 import dagger.hilt.android.AndroidEntryPoint
 import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.FragmentWelcomeBinding
 import me.tumur.portfolio.screens.welcome.pager.WelcomePagerAdapter
+import me.tumur.portfolio.utils.adapters.bindingAdapters.setPagerDots
+import me.tumur.portfolio.utils.adapters.bindingAdapters.setViewPagerCurrentItem
+import me.tumur.portfolio.utils.adapters.bindingAdapters.setViewPagerPageChangeListener
 import me.tumur.portfolio.utils.extensions.collectFlow
 
 /**
@@ -73,17 +73,9 @@ class WelcomeFragment : Fragment() {
      */
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
-        /** Lock fragment in portrait screen orientation */
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-
-        /** Data binding */
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_welcome, container, false)
-        binding.apply {
-            // Set the lifecycleOwner so DataBinding can observe Flow
-            this.lifecycleOwner = viewLifecycleOwner
-            // Set the viewmodel so layout can display data
-            this.model = viewModel
+        binding = FragmentWelcomeBinding.inflate(inflater, container, false)
+        binding.root.findViewById<View>(R.id.welcome_screen_btn).setOnClickListener {
+            viewModel.setOnClicked(true)
         }
 
         /** Set observer */
@@ -100,18 +92,22 @@ class WelcomeFragment : Fragment() {
     private fun setObservers() {
         /** Observer for skip and next button onClick ---------------------------------------------------------------*/
         viewLifecycleOwner.collectFlow(viewModel.buttonTextFlow) {
-            binding.invalidateAll()
+            binding.root.findViewById<com.google.android.material.button.MaterialButton>(R.id.welcome_screen_btn).text = it
         }
 
         viewLifecycleOwner.collectFlow(viewModel.scrollToItemFlow) {
-            binding.invalidateAll()
+            setViewPagerCurrentItem(
+                binding.root.findViewById(R.id.welcome_screen_view_pager),
+                it,
+                true,
+            )
         }
 
         viewLifecycleOwner.collectFlow(viewModel.onClickedFlow) { state ->
             if(state){
 
                 val currentPage = viewModel.currentItem
-                val lastPage = welcomePagerAdapter.count -1
+                val lastPage = welcomePagerAdapter.itemCount - 1
 
                 when( currentPage == lastPage){
                     true -> {
@@ -128,9 +124,10 @@ class WelcomeFragment : Fragment() {
 
         /** Observer for skip and next button text ---------------------------------------------------------------*/
         viewLifecycleOwner.collectFlow(viewModel.currentItemFlow) { current ->
+            setPagerDots(binding.root.findViewById(R.id.welcome_screen_page_indicator), welcomePagerAdapter.itemCount, current)
             val textFinish = this.getString(R.string.button_finish)
             val textNext = this.getString(R.string.button_next)
-            if (current == welcomePagerAdapter.count - 1) {
+            if (current == welcomePagerAdapter.itemCount - 1) {
                 viewModel.setButtonText(textFinish)
             } else if (viewModel.buttonText != textNext) {
                 viewModel.setButtonText(textNext)
@@ -143,20 +140,16 @@ class WelcomeFragment : Fragment() {
      */
     private fun setWelcomeScreenViewPager() {
 
-        /** View pager */
-        val viewPager = binding.root.findViewById<ViewPager>(R.id.welcome_screen_view_pager)
-        /** View pager's indicator */
-        val viewPagerIndicator = binding.root.findViewById<InkPageIndicator>(R.id.welcome_screen_page_indicator)
-
         /** Set view pager' adapter */
-        welcomePagerAdapter = WelcomePagerAdapter(childFragmentManager)
+        welcomePagerAdapter = WelcomePagerAdapter(this)
+        val viewPager = binding.root.findViewById<ViewPager2>(R.id.welcome_screen_view_pager)
         viewPager.adapter = welcomePagerAdapter
-        /** Set view pager' indicator */
-        viewPagerIndicator.setViewPager(viewPager)
+        setViewPagerPageChangeListener(viewPager, viewModel)
+        setPagerDots(binding.root.findViewById(R.id.welcome_screen_page_indicator), welcomePagerAdapter.itemCount, viewModel.currentItem)
 
         /**
          * Setup view pager's back button
-         * Handling back button from Fragment for ViewPager scrolling. This callback
+         * Handling back button from Fragment for ViewPager2 scrolling. This callback
          * will only be called when MyFragment is at least Started.
          * */
         requireActivity().onBackPressedDispatcher.addCallback(this) {

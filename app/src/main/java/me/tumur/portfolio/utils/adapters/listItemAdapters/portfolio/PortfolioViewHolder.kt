@@ -5,15 +5,24 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import me.tumur.portfolio.databinding.ListItemPortfolioBinding
 import me.tumur.portfolio.repository.database.model.portfolio.PortfolioModel
+import me.tumur.portfolio.utils.adapters.bindingAdapters.loadImage
+import me.tumur.portfolio.utils.adapters.bindingAdapters.setDateFromTo
 
 /**
  * Portfolio item viewholder
  * */
 class PortfolioViewHolder private constructor(val binding: ListItemPortfolioBinding) : RecyclerView.ViewHolder(binding.root){
     fun bind(item: PortfolioModel?, clickListener: PortfolioClickListener){
-        binding.clickListener = clickListener
-        binding.item = item
-        binding.executePendingBindings()
+        binding.listItemPortfolioCardView.setOnClickListener {
+            item?.let(clickListener::onClick)
+        }
+        binding.listItemPortfolioImage.contentDescription = item?.imageDescription
+        loadImage(binding.listItemPortfolioImage, item?.coverImage)
+        binding.listItemPortfolioLogo.contentDescription = item?.logoDescription
+        loadImage(binding.listItemPortfolioLogo, item?.logo)
+        binding.listItemPortfolioSubTitle.text = item?.subTitle
+        binding.listItemPortfolioText.text = item?.text
+        binding.listItemPortfolioDate.setDateFromTo(item?.dateFrom, item?.dateTo)
     }
 
     companion object {

@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
+
+<androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools">
-    <data>
-        <import type="android.view.View"/>
-        <variable name="item" type="me.tumur.portfolio.repository.database.model.settings.AppModel"/>
-    </data>
-    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/list_item_dialog_app_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -27,7 +23,6 @@
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:textColor="?attr/colorOnPrimarySurface"
-                    android:text="@{item.title}"
                     android:textAlignment="gravity"
                     android:gravity="start"
                     app:layout_constraintBottom_toTopOf="@+id/list_item_dialog_app_info_text"
@@ -49,7 +44,6 @@
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:textColor="?attr/colorOnSurface"
-                    android:text="@{item.text}"
                     android:textAlignment="gravity"
                     android:gravity="start"
                     app:layout_constraintBottom_toTopOf="@+id/list_item_dialog_app_info_divider"
@@ -70,4 +64,3 @@
                 app:layout_constraintTop_toBottomOf="@+id/list_item_dialog_app_info_text"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>

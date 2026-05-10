@@ -25,7 +25,7 @@
 
         <!-- Background -->
         <Constraint
-                android:id="@+id/profile_screen_header_bg"
+                android:id="@+id/profile_screen_header_foreground"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 motion:layout_constraintTop_toTopOf="parent"
@@ -74,8 +74,10 @@
         <!-- Name-->
         <Constraint
                 android:id="@+id/profile_screen_header_name"
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/dimen_0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginEnd="@dimen/_10sdp"
                 android:layout_marginBottom="@dimen/_5sdp"
                 motion:layout_constraintTop_toBottomOf="@+id/profile_screen_header_avatar"
                 motion:layout_constraintStart_toStartOf="parent"
@@ -91,8 +93,10 @@
         <!-- Title-->
         <Constraint
                 android:id="@+id/profile_screen_header_title"
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/dimen_0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginEnd="@dimen/_10sdp"
                 android:alpha="1.0"
                 motion:layout_constraintTop_toBottomOf="@+id/profile_screen_header_name"
                 motion:layout_constraintStart_toStartOf="parent"
@@ -106,7 +110,7 @@
 
         <!-- Background -->
         <Constraint
-                android:id="@+id/profile_screen_header_bg"
+                android:id="@+id/profile_screen_header_foreground"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
@@ -135,9 +139,10 @@
                 android:id="@+id/profile_screen_header_avatar"
                 android:layout_width="@dimen/_30sdp"
                 android:layout_height="@dimen/_30sdp"
-                android:layout_marginBottom="@dimen/_5sdp"
+                android:layout_marginTop="@dimen/_8sdp"
                 motion:layout_constraintHorizontal_chainStyle="packed"
-                motion:layout_constraintBottom_toBottomOf="parent"
+                motion:layout_constraintHorizontal_bias="0.5"
+                motion:layout_constraintTop_toTopOf="parent"
                 motion:layout_constraintStart_toStartOf="parent"
                 motion:layout_constraintEnd_toStartOf="@+id/profile_screen_header_name"/>
 
@@ -147,6 +152,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_5sdp"
+                android:layout_marginEnd="@dimen/_10sdp"
                 motion:layout_constraintTop_toTopOf="@+id/profile_screen_header_avatar"
                 motion:layout_constraintBottom_toBottomOf="@+id/profile_screen_header_avatar"
                 motion:layout_constraintStart_toEndOf="@+id/profile_screen_header_avatar"

@@ -3,10 +3,6 @@ package me.tumur.portfolio.utils.adapters.listItemAdapters.about
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.tumur.portfolio.repository.database.model.profile.AboutModel
 import me.tumur.portfolio.utils.constants.Constants
 
@@ -17,33 +13,16 @@ import me.tumur.portfolio.utils.constants.Constants
 class AboutAdapter : ListAdapter<AboutItem, RecyclerView.ViewHolder>(AboutDiffCallBack()) {
 
     /**
-     * Coroutine scope
-     * */
-    private val adapterScope = CoroutineScope(Dispatchers.Default)
-
-    /**
      * Composition of about item text and header
-     * in to a separate list on background thread
-     * and submit this list on main thread to the [RecyclerView]
+     * into a separate list for the [RecyclerView].
      * */
     fun addHeaderAndSubmitList(list: List<AboutModel>?) {
-        adapterScope.launch {
-
-            val compositedList = mutableListOf<AboutItem>()
-
-            list?.let {
-                for(item in it ){
-
-                    compositedList.add(AboutItem.Header(item.header))
-
-                    val itemsSortedByHeader = list.filter { listItem -> listItem.header == item.header }.map { about -> AboutItem.About(about) }
-                    compositedList.addAll(itemsSortedByHeader)
-                }
+        val compositedList = list.orEmpty()
+            .groupBy(AboutModel::header)
+            .flatMap { (header, items) ->
+                listOf(AboutItem.Header(header)) + items.map(AboutItem::About)
             }
-            withContext(Dispatchers.Main) {
-                submitList(compositedList.distinct())
-            }
-        }
+        submitList(compositedList)
     }
 
     /**

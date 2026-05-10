@@ -3,13 +3,12 @@ package me.tumur.portfolio
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.Build
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.*
-import com.facebook.stetho.Stetho
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import me.tumur.portfolio.repository.network.DbRefresh
 import me.tumur.portfolio.utils.constants.Constants
@@ -27,19 +26,14 @@ class App : Application(), Configuration.Provider {
      * thread to avoid delaying app start.
      */
 
-    /** Coroutine scope to delayed initialization*/
-    private val applicationScope = CoroutineScope(Dispatchers.Default)
+    /** Coroutine scope for application background work. */
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
     override fun onCreate() {
         super.onCreate()
-
-        /**
-         * STETHO
-         * */
-        Stetho.initializeWithDefaults(this)
 
         /**
          * THEME SETTINGS
@@ -80,12 +74,7 @@ class App : Application(), Configuration.Provider {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .setRequiresBatteryNotLow(true)
-            .setRequiresCharging(true)
-            .apply {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    setRequiresDeviceIdle(true)
-                }
-            }.build()
+            .build()
 
         val repeatingRequest
                 = PeriodicWorkRequestBuilder<DbRefresh>(12, TimeUnit.HOURS)

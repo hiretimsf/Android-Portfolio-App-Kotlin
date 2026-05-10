@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import me.tumur.portfolio.databinding.ListItemTaskBinding
 import me.tumur.portfolio.repository.database.model.task.TaskModel
+import java.util.Locale
 
 /**
  * Task viewholder
@@ -12,8 +13,8 @@ import me.tumur.portfolio.repository.database.model.task.TaskModel
 class TaskViewHolder private constructor(val binding: ListItemTaskBinding) :
     RecyclerView.ViewHolder(binding.root) {
     fun bind(item: TaskModel?) {
-        binding.item = item
-        binding.executePendingBindings()
+        binding.listItemTaskNumber.text = item?.order?.let { String.format(Locale.US, "%d", it) }
+        binding.listItemTaskText.text = item?.task
     }
 
     companion object {

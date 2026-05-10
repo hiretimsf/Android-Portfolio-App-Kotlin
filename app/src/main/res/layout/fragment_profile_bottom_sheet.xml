@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
+
+<androidx.constraintlayout.motion.widget.MotionLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        app:behavior_peekHeight="800dp"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-        tools:context=".screens.profile.bottomsheet.ProfileBottomSheetFragment">
-    <data>
-        <variable name="model" type="me.tumur.portfolio.screens.profile.ProfileViewModel"/>
-    </data>
-    <androidx.constraintlayout.motion.widget.MotionLayout
+        tools:context=".screens.profile.bottomsheet.ProfileBottomSheetFragment"
             android:id="@+id/profile_bottom_sheet"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -37,8 +32,6 @@
                 android:layout_width="@dimen/_30sdp"
                 android:layout_height="@dimen/_30sdp"
                 android:layout_marginStart="@dimen/_15sdp"
-                android:contentDescription="@{model.profile.imageDescription}"
-                app:imageLoad="@{model.profile.image}"
                 app:strokeWidth="@dimen/_1sdp"
                 app:strokeColor="?attr/colorOnPrimary"
                 app:layout_constraintTop_toBottomOf="@+id/profile_bs_top_indicator"
@@ -59,7 +52,6 @@
                 app:layout_constraintStart_toEndOf="@+id/profile_bs_avatar"
                 app:layout_constraintBottom_toTopOf="@+id/profile_bs_email"
                 android:textColor="?attr/colorOnPrimarySurface"
-                android:text="@{model.profile.name}"
                 tools:text="@tools:sample/full_names"/>
 
         <!-- Email -->
@@ -76,7 +68,6 @@
                 app:layout_constraintStart_toEndOf="@+id/profile_bs_avatar"
                 app:layout_constraintBottom_toBottomOf="@+id/profile_bs_avatar"
                 android:textColor="?attr/colorOnSurface"
-                android:text="@{model.profile.email}"
                 tools:text="@tools:sample/full_names"/>
 
         <!-- Divider top -->
@@ -111,7 +102,6 @@
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
-                android:onClick="@{() -> model.emailItemOnClick(true)}"
                 android:focusable="true"
                 app:layout_constraintTop_toBottomOf="@+id/profile_bs_social_list"
                 app:layout_constraintStart_toStartOf="parent"
@@ -155,6 +145,3 @@
 
 
     </androidx.constraintlayout.motion.widget.MotionLayout>
-
-
-</layout>

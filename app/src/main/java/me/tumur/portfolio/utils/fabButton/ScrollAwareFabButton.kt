@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.isVisible
 import androidx.core.view.ViewCompat
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -17,20 +18,28 @@ class ScrollAwareFABBehavior(context: Context, attrs: AttributeSet): FloatingAct
             child, directTargetChild, target, axes, type)
     }
 
-    override fun onNestedScroll(coordinatorLayout: CoordinatorLayout,
-                                child: FloatingActionButton, target: View, dxConsumed: Int, dyConsumed: Int,
-                                dxUnconsumed: Int, dyUnconsumed: Int, type: Int) {
+    override fun onNestedScroll(
+        coordinatorLayout: CoordinatorLayout,
+        child: FloatingActionButton,
+        target: View,
+        dxConsumed: Int,
+        dyConsumed: Int,
+        dxUnconsumed: Int,
+        dyUnconsumed: Int,
+        type: Int,
+        consumed: IntArray,
+    ) {
         super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed,
-            dyUnconsumed, type)
+            dyUnconsumed, type, consumed)
 
-        if (dyConsumed > 0 && child.visibility == View.VISIBLE) {
+        if (dyConsumed > 0 && child.isVisible) {
             child.hide(object : FloatingActionButton.OnVisibilityChangedListener() {
                 override fun onHidden(fab: FloatingActionButton) {
                     super.onHidden(fab)
                     fab.visibility = View.INVISIBLE
                 }
             })
-        } else if (dyConsumed < 0 && child.visibility != View.VISIBLE) {
+        } else if (dyConsumed < 0 && !child.isVisible) {
             child.show()
         }
     }

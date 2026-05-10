@@ -1,23 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layout
+
+<!-- Welcome screen: Portrait mode -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools">
-
-    <data>
-        <import type="android.view.View"/>
-        <variable name="model" type="me.tumur.portfolio.screens.welcome.WelcomeViewModel"/>
-    </data>
-
-    <!-- Welcome screen: Portrait mode -->
-    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/welcome_screen"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
         <!-- ViewPager -->
-        <androidx.viewpager.widget.ViewPager
+        <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/welcome_screen_view_pager"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dimen_0dp"
@@ -27,27 +21,21 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/welcome_screen_page_indicator"
-                app:onPageScrolled="@{model}"
-                app:scrollToItem="@{model.scrollToItem}"
-                app:smoothScroll="@{true}"
                 tools:showIn="@layout/pager_item_welcome_screen"/>
 
         <!-- Page Indicator -->
-        <com.pixelcan.inkpageindicator.InkPageIndicator
+        <LinearLayout
                 android:id="@+id/welcome_screen_page_indicator"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/_10sdp"
+                android:gravity="center"
+                android:orientation="horizontal"
                 app:layout_constraintVertical_weight="1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/welcome_screen_view_pager"
-                app:layout_constraintBottom_toTopOf="@+id/welcome_screen_btn"
-                app:dotDiameter="@dimen/_8sdp"
-                app:dotGap="@dimen/_4sdp"
-                app:animationDuration="320"
-                app:pageIndicatorColor="@color/colorPageIndicatorBackground"
-                app:currentPageIndicatorColor="@color/colorPageIndicatorActive"/>
+                app:layout_constraintBottom_toTopOf="@+id/welcome_screen_btn"/>
 
         <!-- Button -->
         <com.google.android.material.button.MaterialButton
@@ -61,7 +49,6 @@
                 android:layout_marginBottom="@dimen/_10sdp"
                 android:paddingTop="@dimen/_10sdp"
                 android:paddingBottom="@dimen/_10sdp"
-                android:onClick="@{() -> model.setOnClicked(true)}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/welcome_screen_page_indicator"
@@ -72,9 +59,6 @@
                 android:textAllCaps="true"
                 android:textColor="?attr/colorOnPrimary"
                 app:backgroundTint="?attr/colorPrimary"
-                app:cornerRadius="@dimen/_4sdp"
-                android:text="@{model.buttonText}"/>
+                app:cornerRadius="@dimen/_4sdp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-</layout>

@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
+
+<!-- Card view -->
+    <com.google.android.material.card.MaterialCardView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools">
-    <data>
-        <import type="me.tumur.portfolio.repository.database.Converters"/>
-        <variable name="item"
-                  type="me.tumur.portfolio.repository.database.model.favorite.FavoriteModel"/>
-        <variable name="clickListener"
-                  type="me.tumur.portfolio.utils.adapters.listItemAdapters.favorite.FavoriteClickListener"/>
-    </data>
-
-    <!-- Card view -->
-    <com.google.android.material.card.MaterialCardView
+        xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/list_item_favorite_card_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -21,7 +13,6 @@
             android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginBottom="@dimen/_10sdp"
             android:clickable="true"
-            android:onClick="@{() -> clickListener.onClick(item, false)}"
             android:focusable="true"
             app:cardCornerRadius="@dimen/_5sdp"
             app:cardElevation="@dimen/_2sdp">
@@ -38,8 +29,6 @@
                     android:layout_width="@dimen/_80sdp"
                     android:layout_height="@dimen/_100sdp"
                     android:scaleType="centerCrop"
-                    android:contentDescription="@{item.imageDescription}"
-                    app:imageLoad="@{item.coverImage}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toStartOf="parent"
@@ -77,8 +66,6 @@
                             android:layout_height="@dimen/_15sdp"
                             android:layout_marginTop="@dimen/_5sdp"
                             android:layout_marginBottom="@dimen/_5sdp"
-                            android:contentDescription="@{item.logoDescription}"
-                            app:imageLoad="@{item.logo}"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toStartOf="@+id/list_item_favorite_sub_title"
                             app:layout_constraintStart_toStartOf="parent"
@@ -99,7 +86,6 @@
                             android:textAppearance="?attr/textAppearanceHeadline1"
                             android:textSize="@dimen/dimen_14sp"
                             android:textColor="?attr/colorOnPrimarySurface"
-                            android:text="@{item.subTitle}"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/list_item_favorite_logo"
@@ -121,7 +107,6 @@
                         android:textAppearance="?attr/textAppearanceBody1"
                         android:textSize="@dimen/dimen_14sp"
                         android:lineSpacingExtra="@dimen/_5sdp"
-                        android:text="@{item.text}"
                         app:layout_constraintBottom_toTopOf="@+id/list_item_favorite_date_icon_content"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -166,7 +151,6 @@
                             android:textAlignment="textStart"
                             android:textAppearance="?attr/textAppearanceBody1"
                             android:textSize="@dimen/dimen_12sp"
-                            app:dateConverter="@{item.date}"
                             app:layout_constraintVertical_bias="0.5"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -186,7 +170,6 @@
                     android:layout_width="@dimen/dimen_0dp"
                     android:layout_height="@dimen/dimen_0dp"
                     android:background="?attr/colorPrimary"
-                    android:onClick="@{() -> clickListener.onClick(item, true)}"
                     android:foreground="?attr/selectableItemBackground"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -210,4 +193,3 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
-</layout>

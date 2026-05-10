@@ -1,16 +1,14 @@
 package me.tumur.portfolio.utils.adapters.bindingAdapters
 
 import android.widget.ImageView
-import androidx.databinding.BindingAdapter
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
-import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.widget.ViewPager2
 import me.tumur.portfolio.R
 import me.tumur.portfolio.screens.welcome.WelcomeViewModel
 
 /** BINDING ADAPTERS FOR WELCOME SCREEN */
 
 /** Pager Adapter Icon */
-@BindingAdapter("order", "scrolledPagerItem", "pagerPosition")
 fun setPagerIcon(view: ImageView, order: Int, scrolledPagerItem: Int, pagerPosition: Int) {
     val pagerIcon = when(order){
         1 -> R.drawable.ic_welcome_screen_icon_1_avd
@@ -27,21 +25,17 @@ fun setPagerIcon(view: ImageView, order: Int, scrolledPagerItem: Int, pagerPosit
 }
 
 /** OnPage listener */
-@BindingAdapter("onPageScrolled")
-fun setViewPagerPageChangeListener(viewPager: ViewPager, viewModel: WelcomeViewModel) {
+fun setViewPagerPageChangeListener(viewPager: ViewPager2, viewModel: WelcomeViewModel) {
     if (viewPager.getTag(R.id.tag_welcome_page_listener) == viewModel) return
     viewPager.setTag(R.id.tag_welcome_page_listener, viewModel)
-    viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-        override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+    viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
             viewModel.setCurrentItem(position)
         }
-        override fun onPageScrollStateChanged(state: Int) { }
-        override fun onPageSelected(position: Int) { }
     })
 }
 
 /** Current item */
-@BindingAdapter("scrollToItem", "smoothScroll", requireAll = false)
-fun setViewPagerCurrentItem(viewPager: ViewPager, scrollToItem: Int?, smoothScroll: Boolean = false) {
+fun setViewPagerCurrentItem(viewPager: ViewPager2, scrollToItem: Int?, smoothScroll: Boolean = false) {
     scrollToItem?.let { viewPager.setCurrentItem(it, smoothScroll)}
 }

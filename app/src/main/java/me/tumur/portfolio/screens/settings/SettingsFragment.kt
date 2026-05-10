@@ -1,10 +1,7 @@
 package me.tumur.portfolio.screens.settings
 
-import android.content.pm.ActivityInfo
-import android.net.Uri
 import android.os.Bundle
-import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
@@ -16,6 +13,7 @@ import me.tumur.portfolio.R.string
 import me.tumur.portfolio.R.xml
 import me.tumur.portfolio.screens.MainViewModel
 import me.tumur.portfolio.utils.constants.Constants
+import me.tumur.portfolio.utils.extensions.launchCustomTab
 import me.tumur.portfolio.utils.theme.ThemeHelper
 
 
@@ -43,9 +41,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
     /** INITIALIZATION * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        /** Lock fragment in portrait screen orientation */
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-
         /** Set fragment state in shared view model */
         sharedViewModel.setFragmentStateHolder(Constants.FRAGMENT_SETTINGS)
 
@@ -103,11 +98,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         /** Custom summary and intent data */
         val version = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0).versionName
-        val uri = Uri.parse("market://details?id=" + requireContext().packageName)
         // App version
         pref.findPreference<Preference>(appVersion)?.summary = version
         // Rate this app
-        pref.findPreference<Preference>(rate)?.intent?.data = uri
+        pref.findPreference<Preference>(rate)?.intent?.data =
+            "market://details?id=${requireContext().packageName}".toUri()
         // Theme
         val themePref = pref.findPreference<Preference>(theme)
         themePref?.let {
@@ -126,12 +121,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private fun startCustomTab(url: String?){
 
         url?.let {
-            /** Chrome custom tab  */
-            val builder = CustomTabsIntent.Builder().apply {
-                this.setToolbarColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
-                this.setShowTitle(true)
-            }
-            builder.build().launchUrl(requireContext(), (Uri.parse(url)))
+            requireContext().launchCustomTab(it)
         }
     }
 }

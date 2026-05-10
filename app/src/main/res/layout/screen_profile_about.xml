@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
+
+<androidx.core.widget.NestedScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools">
-    <data>
-        <variable name="model" type="me.tumur.portfolio.screens.profile.ProfileViewModel"/>
-        <variable name="about" type="me.tumur.portfolio.repository.database.model.profile.AboutModel"/>
-    </data>
-    <androidx.core.widget.NestedScrollView
+        xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/screen_profile_about_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -23,4 +19,3 @@
                 android:scrollbars="none"
                 tools:listitem="@tools:sample/avatars"/>
     </androidx.core.widget.NestedScrollView>
-</layout>

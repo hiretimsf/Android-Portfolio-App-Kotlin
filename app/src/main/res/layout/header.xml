@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
+
+<!-- Header -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        tools:context=".screens.MainActivity">
-
-    <!-- Header -->
-    <androidx.constraintlayout.widget.ConstraintLayout
+        tools:context=".screens.MainActivity"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_120sdp"
             android:background="?attr/colorPrimary">
@@ -80,4 +79,3 @@
                 app:layout_constraintTop_toBottomOf="@+id/header_name"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>

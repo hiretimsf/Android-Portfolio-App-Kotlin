@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
+
+<androidx.core.widget.NestedScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools">
-    <data>
-        <variable name="model" type="me.tumur.portfolio.screens.portfolio.detail.PortfolioDetailFragmentViewModel"/>
-        <variable name="clickListener" type="me.tumur.portfolio.screens.portfolio.detail.VideoClickListener"/>
-    </data>
-
-    <androidx.core.widget.NestedScrollView
+        xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/portfolio_item_detail_screen_scroll"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -28,26 +23,20 @@
                     android:layout_marginBottom="@dimen/_5sdp">
 
                 <!-- Cover image arch view -->
-                <com.github.florent37.shapeofview.shapes.ArcView
+                <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/portfolio_item_detail_video_arch_view"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/_200sdp"
                         app:layout_constraintBottom_toTopOf="@+id/portfolio_item_detail_logo"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:shape_arc_height="@dimen/_20sdp"
-                        app:shape_arc_position="bottom">
+                        app:layout_constraintTop_toTopOf="parent">
 
                     <!-- Cover image play content -->
                     <androidx.constraintlayout.widget.ConstraintLayout
                             android:id="@+id/portfolio_item_detail_video"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            app:layout_constraintBottom_toTopOf="@+id/portfolio_item_detail_logo"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
+                            android:layout_height="match_parent">
 
                         <!-- Cover image -->
                         <androidx.appcompat.widget.AppCompatImageView
@@ -55,8 +44,6 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:scaleType="centerCrop"
-                                android:contentDescription="@{model.portfolio.imageDescription}"
-                                app:imageLoad="@{model.portfolio.coverImage}"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
@@ -97,7 +84,6 @@
                                 android:layout_height="match_parent"
                                 android:background="?attr/selectableItemBackground"
                                 android:clickable="true"
-                                android:onClick="@{() -> clickListener.onClick(model.portfolio.videoUrl)}"
                                 android:focusable="true"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
@@ -105,7 +91,7 @@
                                 app:layout_constraintTop_toTopOf="parent"/>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
-                </com.github.florent37.shapeofview.shapes.ArcView>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <!-- Logo -->
                 <androidx.appcompat.widget.AppCompatImageView
@@ -115,8 +101,6 @@
                         android:layout_marginStart="@dimen/_10sdp"
                         android:layout_marginTop="@dimen/_5sdp"
                         android:layout_marginBottom="@dimen/_5sdp"
-                        android:contentDescription="@{model.portfolio.logoDescription}"
-                        app:imageLoad="@{model.portfolio.logo}"
                         app:layout_constraintBottom_toTopOf="@+id/portfolio_item_detail_button"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/portfolio_item_detail_video_arch_view"
@@ -132,7 +116,6 @@
                         android:textAlignment="textStart"
                         android:textSize="@dimen/dimen_16sp"
                         android:textColor="?attr/colorOnPrimarySurface"
-                        android:text="@{model.portfolio.subTitle}"
                         app:layout_constraintBottom_toTopOf="@+id/portfolio_item_detail_date_icon"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/portfolio_item_detail_logo"
@@ -167,8 +150,6 @@
                         android:maxLines="1"
                         android:ellipsize="end"
                         android:textColor="?attr/colorOnSurface"
-                        app:dateFrom="@{model.portfolio.dateFrom}"
-                        app:dateTo="@{model.portfolio.dateTo}"
                         app:layout_constraintBottom_toBottomOf="@+id/portfolio_item_detail_date_icon"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/portfolio_item_detail_date_icon"
@@ -269,7 +250,6 @@
                         android:textAppearance="?attr/textAppearanceBody1"
                         android:textSize="@dimen/dimen_16sp"
                         android:lineSpacingExtra="@dimen/dimen_12sp"
-                        android:text="@{model.portfolio.text}"
                         app:layout_constraintBottom_toTopOf="@+id/section_info"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -301,7 +281,6 @@
                         android:textSize="@dimen/dimen_16sp"
                         android:textStyle="italic"
                         android:lineSpacingExtra="@dimen/dimen_12sp"
-                        android:text="@{model.portfolio.info}"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -311,4 +290,3 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-</layout>

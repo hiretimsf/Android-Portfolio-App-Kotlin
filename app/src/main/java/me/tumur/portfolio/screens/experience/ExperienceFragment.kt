@@ -1,12 +1,10 @@
 package me.tumur.portfolio.screens.experience
 
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -80,12 +78,7 @@ class ExperienceFragment : Fragment() {
      */
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
-        /** Lock fragment in portrait screen orientation */
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-
-        /** Data binding */
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_experience, container, false)
+        binding = FragmentExperienceBinding.inflate(inflater, container, false)
 
         /** Set fragment state in shared view model */
         sharedViewModel.setFragmentStateHolder(Constants.FRAGMENT_EXPERIENCE)
@@ -100,11 +93,6 @@ class ExperienceFragment : Fragment() {
             this.layoutManager = layoutManagerExperience
             this.hasFixedSize()
             this.adapter = experienceAdapter
-        }
-
-        binding.apply {
-            this.lifecycleOwner = viewLifecycleOwner
-            this.model = viewModel
         }
 
         /** Set observers */

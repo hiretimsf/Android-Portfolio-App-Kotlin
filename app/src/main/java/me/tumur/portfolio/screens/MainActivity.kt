@@ -3,13 +3,14 @@ package me.tumur.portfolio.screens
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.View
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.appbar.MaterialToolbar
@@ -17,13 +18,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import es.dmoral.toasty.Toasty
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.ActivityMainBinding
+import me.tumur.portfolio.utils.adapters.bindingAdapters.hideOrShowNavigation
+import me.tumur.portfolio.utils.adapters.bindingAdapters.setScreenMain
 import me.tumur.portfolio.utils.constants.Constants
-import me.tumur.portfolio.utils.extensions.activityBinding
 import me.tumur.portfolio.utils.extensions.collectFlow
 import me.tumur.portfolio.utils.state.*
 
@@ -50,14 +49,11 @@ class MainActivity : AppCompatActivity() {
      * */
     private val viewModel: MainViewModel by viewModels()
 
-    /** Databinding */
-    private val binding by activityBinding<ActivityMainBinding>(R.layout.activity_main)
+    /** View binding */
+    private lateinit var binding: ActivityMainBinding
 
     /** Navigation controller */
     private lateinit var navController: NavController
-
-    /** Coroutine scope for delayed initialization */
-    private val activityScope = CoroutineScope(Dispatchers.Default)
 
     /** Shared preference */
     private val prefs: SharedPreferences by lazy {
@@ -86,14 +82,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         splashScreen.setKeepOnScreenCondition { viewModel.screenState is SplashScreen }
 
-        /** Binding lifecycle and viewmodel to layout */
-        binding.apply {
-            this.lifecycleOwner = this@MainActivity
-            this.model = viewModel
-        }
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        updateScreenState(viewModel.screenState)
+        updateNavigationState(viewModel.navigation)
 
         /** Binding navigation controller with host fragment */
-        navController = findNavController(R.id.main_screen_host_fragment)
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.main_screen_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
 
         /** Set action bar */
         setSupportActionBar(binding.root.findViewById(R.id.main_screen_toolbar))
@@ -130,10 +127,8 @@ class MainActivity : AppCompatActivity() {
 
     /** Set delayed initialization */
     private fun delayedInit(){
-        activityScope.launch {
-            setBottomMenu()
-            setSideMenu()
-        }
+        setBottomMenu()
+        setSideMenu()
     }
 
     /** Set observers */
@@ -141,7 +136,7 @@ class MainActivity : AppCompatActivity() {
 
         /** Setup welcome screen observer  */
         collectFlow(viewModel.screenStateFlow) { state ->
-            binding.invalidateAll()
+            updateScreenState(state)
             if (state is WelcomeScreen && prefs.getBoolean(Constants.FIRST, true)) {
                 navController.navigate(R.id.action_global_to_welcome_screen)
             }
@@ -160,7 +155,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         collectFlow(viewModel.navigationFlow) {
-            binding.invalidateAll()
+            updateNavigationState(it)
         }
 
         /** Set observer for a toast message */
@@ -188,6 +183,17 @@ class MainActivity : AppCompatActivity() {
         }
         binding.root.findViewById<MaterialToolbar>(R.id.main_screen_toolbar)
             ?.setupWithNavController(navController, appBarConfiguration)
+    }
+
+    private fun updateScreenState(state: ScreenState) {
+        setScreenMain(binding.root.findViewById(R.id.main_screen_drawer_layout), state)
+    }
+
+    private fun updateNavigationState(state: NavigationState) {
+        binding.root.findViewById<View>(R.id.main_screen_app_bar)?.let { hideOrShowNavigation(it, state) }
+        binding.root.findViewById<View>(R.id.main_screen_toolbar)?.let { hideOrShowNavigation(it, state) }
+        binding.root.findViewById<View>(R.id.main_screen_bottom_menu)?.let { hideOrShowNavigation(it, state) }
+        binding.root.findViewById<View>(R.id.main_screen_side_menu)?.let { hideOrShowNavigation(it, state) }
     }
 
     /** Setup side menu */

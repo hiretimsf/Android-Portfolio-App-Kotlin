@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import me.tumur.portfolio.databinding.ListItemButtonOutlineBinding
 import me.tumur.portfolio.repository.database.model.button.ButtonModel
+import me.tumur.portfolio.utils.adapters.bindingAdapters.setButtonIcon
 
 /**
  * Button normal viewholder
@@ -12,9 +13,9 @@ import me.tumur.portfolio.repository.database.model.button.ButtonModel
 class ButtonOutlineViewHolder private constructor(val binding: ListItemButtonOutlineBinding) :
     RecyclerView.ViewHolder(binding.root) {
     fun bind(item: ButtonModel, clickListener: ButtonClickListener) {
-        binding.clickListener = clickListener
-        binding.button = item
-        binding.executePendingBindings()
+        binding.listItemMaterialButtonOutline.text = item.title
+        binding.listItemMaterialButtonOutline.setButtonIcon(item.type)
+        binding.listItemMaterialButtonOutline.setOnClickListener { clickListener.onClick(item.url) }
     }
 
     companion object {

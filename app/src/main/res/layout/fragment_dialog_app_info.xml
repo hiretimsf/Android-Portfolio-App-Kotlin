@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
+
+<androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools">
-    <data>
-        <import type="android.view.View"/>
-        <variable name="model" type="me.tumur.portfolio.screens.settings.dialog.AppDialogViewModel"/>
-    </data>
-    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -102,7 +98,6 @@
                     android:paddingTop="@dimen/_10sdp"
                     android:paddingBottom="@dimen/_10sdp"
                     android:background="@color/colorHeaderBackground"
-                    android:onClick="@{() -> model.setCloseButtonOnClick(true)}"
                     android:textAppearance="?attr/textAppearanceSubtitle2"
                     android:textStyle="bold"
                     android:letterSpacing="0.1"
@@ -123,4 +118,3 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>

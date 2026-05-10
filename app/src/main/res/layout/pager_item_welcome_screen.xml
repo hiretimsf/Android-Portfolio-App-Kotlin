@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layout
+
+<!-- Welcome Screen Item: Portrait mode -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
->
-
-    <data>
-        <import type="android.view.View"/>
-        <variable name="model" type="me.tumur.portfolio.screens.welcome.pager.WelcomePagerViewModel"/>
-        <variable name="shared" type="me.tumur.portfolio.screens.welcome.WelcomeViewModel"/>
-    </data>
-
-    <!-- Welcome Screen Item: Portrait mode -->
-    <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/welcome_screen_item"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -30,8 +22,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/welcome_screen_item_icon"
                 android:textAppearance="?attr/textAppearanceHeadline1"
                 android:textAllCaps="true"
-                android:textAlignment="center"
-                android:text="@{model.data.title}"/>
+                android:textAlignment="center"/>
 
         <!-- Icon -->
         <androidx.appcompat.widget.AppCompatImageView
@@ -41,11 +32,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/welcome_screen_item_title"
-                app:layout_constraintBottom_toTopOf="@+id/welcome_screen_item_sub_title"
-                android:contentDescription="@{model.data.imageDescription}"
-                app:order="@{model.data.order}"
-                app:scrolledPagerItem="@{shared.currentItem}"
-                app:pagerPosition="@{model.position}"/>
+                app:layout_constraintBottom_toTopOf="@+id/welcome_screen_item_sub_title"/>
 
         <!-- Sub Title -->
         <androidx.appcompat.widget.AppCompatTextView
@@ -58,8 +45,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/welcome_screen_item_text"
                 android:textAppearance="?attr/textAppearanceHeadline1"
                 android:textAlignment="center"
-                android:textAllCaps="true"
-                android:text="@{model.data.subTitle}"/>
+                android:textAllCaps="true"/>
 
         <!-- Text -->
         <androidx.appcompat.widget.AppCompatTextView
@@ -78,8 +64,6 @@
                 android:textAlignment="center"
                 android:lineSpacingExtra="@dimen/dimen_5sp"
                 android:ellipsize="end"
-                android:maxLines="10"
-                android:text="@{model.data.text}"/>
+                android:maxLines="10"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
