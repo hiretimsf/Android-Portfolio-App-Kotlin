@@ -134,11 +134,12 @@
     <LinearLayout
             android:id="@+id/profile_screen_header_collapsed_row"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/_40sdp"
+            android:layout_height="@dimen/_30sdp"
             android:layout_gravity="bottom|center_horizontal"
             android:layout_marginBottom="@dimen/_5sdp"
             android:alpha="0"
             android:gravity="center"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:paddingStart="@dimen/_8sdp"
             android:paddingEnd="@dimen/_8sdp">
@@ -157,9 +158,10 @@
         <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/profile_screen_header_collapsed_name"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginStart="@dimen/_8sdp"
-                android:gravity="center_vertical"
+                android:gravity="center"
+                android:includeFontPadding="false"
                 android:letterSpacing="0.05"
                 android:singleLine="true"
                 android:text="@string/name"
