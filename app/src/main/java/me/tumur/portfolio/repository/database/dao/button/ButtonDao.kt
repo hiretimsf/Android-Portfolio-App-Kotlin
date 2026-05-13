@@ -1,29 +1,29 @@
 package me.tumur.portfolio.repository.database.dao.button
 
 import androidx.paging.PagingSource
-import androidx.room.*
+import me.tumur.portfolio.repository.database.InMemoryDataStore
+import me.tumur.portfolio.repository.database.LocalPagingSource
 import me.tumur.portfolio.repository.database.model.button.ButtonModel
-import me.tumur.portfolio.utils.constants.DbConstants
+import javax.inject.Inject
 
-@Dao
-abstract class ButtonDao {
-
-    /** Update */
-    @Transaction
-    open suspend fun update(list: List<ButtonModel>): List<Long> {
-        delete()
-        return insert(list)
+class ButtonDao @Inject constructor(
+    private val store: InMemoryDataStore,
+) {
+    suspend fun update(list: List<ButtonModel>): List<Long> {
+        store.buttons.value = list.sortedBy { it.order }
+        return list.indices.map { it.toLong() }
     }
 
-    /** Insert */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(list: List<ButtonModel>): List<Long>
+    suspend fun insert(list: List<ButtonModel>): List<Long> {
+        store.buttons.value = (store.buttons.value.filterNot { old -> list.any { it.id == old.id } } + list).sortedBy { it.order }
+        return list.indices.map { it.toLong() }
+    }
 
-    /** Delete */
-    @Query(DbConstants.BUTTON_DELETE)
-    abstract suspend fun delete()
+    suspend fun delete() {
+        store.buttons.value = emptyList()
+    }
 
-    /** Get list items */
-    @Query(DbConstants.BUTTON_GET_LIST_ITEMS)
-    abstract fun getListItems(id: String): PagingSource<Int, ButtonModel>
+    fun getListItems(id: String): PagingSource<Int, ButtonModel> = LocalPagingSource {
+        store.buttons.value.filter { it.ownerId == id }.sortedBy { it.order }
+    }
 }

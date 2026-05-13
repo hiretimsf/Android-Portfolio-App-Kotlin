@@ -1,29 +1,29 @@
 package me.tumur.portfolio.repository.database.dao.task
 
 import androidx.paging.PagingSource
-import androidx.room.*
+import me.tumur.portfolio.repository.database.InMemoryDataStore
+import me.tumur.portfolio.repository.database.LocalPagingSource
 import me.tumur.portfolio.repository.database.model.task.TaskModel
-import me.tumur.portfolio.utils.constants.DbConstants
+import javax.inject.Inject
 
-@Dao
-abstract class TaskDao {
-
-    /** Update */
-    @Transaction
-    open suspend fun update(list: List<TaskModel>): List<Long> {
-        delete()
-        return insert(list)
+class TaskDao @Inject constructor(
+    private val store: InMemoryDataStore,
+) {
+    suspend fun update(list: List<TaskModel>): List<Long> {
+        store.tasks.value = list.sortedBy { it.order }
+        return list.indices.map { it.toLong() }
     }
 
-    /** Insert */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(list: List<TaskModel>): List<Long>
+    suspend fun insert(list: List<TaskModel>): List<Long> {
+        store.tasks.value = (store.tasks.value.filterNot { old -> list.any { it.id == old.id } } + list).sortedBy { it.order }
+        return list.indices.map { it.toLong() }
+    }
 
-    /** Delete */
-    @Query(DbConstants.TASK_DELETE)
-    abstract suspend fun delete()
+    suspend fun delete() {
+        store.tasks.value = emptyList()
+    }
 
-    /** Get list items */
-    @Query(DbConstants.TASK_GET_LIST_ITEMS)
-    abstract fun getListItems(id: String): PagingSource<Int, TaskModel>
+    fun getListItems(id: String): PagingSource<Int, TaskModel> = LocalPagingSource {
+        store.tasks.value.filter { it.ownerId == id }.sortedBy { it.order }
+    }
 }

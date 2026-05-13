@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.RecyclerView
+import coil.imageLoader
 import coil.load
 import me.tumur.portfolio.R
 
@@ -56,7 +57,7 @@ class FamilyPhotoAdapter(
         fun bind(image: CarouselImage) {
             imageView.contentDescription = image.description
             progressBar.visibility = View.VISIBLE
-            imageView.load(image.url) {
+            imageView.load(image.url, imageLoader = imageView.context.imageLoader) {
                 placeholder(R.drawable.profile)
                 error(R.drawable.profile)
                 listener(

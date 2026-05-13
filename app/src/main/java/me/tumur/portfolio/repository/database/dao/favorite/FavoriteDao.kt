@@ -1,50 +1,61 @@
 package me.tumur.portfolio.repository.database.dao.favorite
 
-import kotlinx.coroutines.flow.Flow
 import androidx.paging.PagingSource
-import androidx.room.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import me.tumur.portfolio.repository.database.InMemoryDataStore
+import me.tumur.portfolio.repository.database.LocalPagingSource
 import me.tumur.portfolio.repository.database.model.favorite.FavoriteModel
-import me.tumur.portfolio.utils.constants.DbConstants
+import javax.inject.Inject
 
-@Dao
-abstract class FavoriteDao {
+class FavoriteDao @Inject constructor(
+    private val store: InMemoryDataStore,
+) {
+    private val activeSources = mutableSetOf<LocalPagingSource<FavoriteModel>>()
 
-    /** Update single item */
-    @Transaction
-    open suspend fun update(item: FavoriteModel): Long {
+    suspend fun update(item: FavoriteModel): Long {
         deleteSingleItem(item.id)
         return insert(item)
     }
 
-    /** Insert */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(item: FavoriteModel): Long
+    suspend fun insert(item: FavoriteModel): Long {
+        store.favorites.value = (store.favorites.value.filterNot { it.id == item.id } + item).sortedBy { it.date }
+        invalidateSources()
+        return 1L
+    }
 
-    /** Delete */
-    @Query(DbConstants.FAVORITE_DELETE)
-    abstract suspend fun delete()
+    suspend fun delete() {
+        store.favorites.value = emptyList()
+        invalidateSources()
+    }
 
-    /** Delete single item */
-    @Query(DbConstants.FAVORITE_DELETE_SINGLE_ITEM)
-    abstract suspend fun deleteSingleItem(id: String): Int
+    suspend fun deleteSingleItem(id: String): Int {
+        val before = store.favorites.value.size
+        store.favorites.value = store.favorites.value.filterNot { it.id == id }
+        invalidateSources()
+        return before - store.favorites.value.size
+    }
 
-    /** Get single item */
-    @Query(DbConstants.FAVORITE_GET_SINGLE_ITEM)
-    abstract fun getSingleItem(id: String): Flow<FavoriteModel>
+    fun getSingleItem(id: String): Flow<FavoriteModel> = store.favorites.map { items ->
+        items.first { it.id == id }
+    }
 
-    /** Get paged list items */
-    @Query(DbConstants.FAVORITE_GET_LIST_ITEMS)
-    abstract fun getListItems(): PagingSource<Int, FavoriteModel>
+    fun getListItems(): PagingSource<Int, FavoriteModel> = LocalPagingSource {
+        store.favorites.value.sortedBy { it.date }
+    }.also { source ->
+        activeSources += source
+        source.registerInvalidatedCallback { activeSources -= source }
+    }
 
-    /** Exist single item */
-    @Query(DbConstants.FAVORITE_EXIST_SINGLE_ITEM)
-    abstract fun existSingleItem(id: String): Flow<Int>
+    fun existSingleItem(id: String): Flow<Int> = store.favorites.map { items ->
+        items.count { it.id == id }
+    }
 
-    /** Get max order */
-    @Query(DbConstants.FAVORITE_GET_MAX_ORDER)
-    abstract suspend fun getMaxOrder(): FavoriteModel
+    suspend fun getMaxOrder(): FavoriteModel = store.favorites.value.maxBy { it.order }
 
-    /** Check table */
-    @Query(DbConstants.FAVORITE_CHECK)
-    abstract fun check(): Flow<Int>
+    fun check(): Flow<Int> = store.favorites.map { it.size }
+
+    private fun invalidateSources() {
+        activeSources.toList().forEach { it.invalidate() }
+    }
 }

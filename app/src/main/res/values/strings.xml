@@ -36,10 +36,8 @@
     <string name="cd_next_photo">Show next photo</string>
     <string name="cd_external_link">External link</string>
 	<string name="copy_right">You can get in touch with me \n ✉️ tumur.alex@gmail.com</string>
-	<string name="preference_key_data">data</string>
     <string name="preference_key_theme">theme</string>
     <string name="preference_key_theme_option">theme_option</string>
-	<string name="preference_key_bg_sync">auto_background_sync_mode</string>
 	<string name="preference_key_app">app</string>
 	<string name="preference_key_app_version">app_version</string>
 	<string name="preference_key_source_code">source_code</string>
@@ -50,11 +48,8 @@
 	<string name="summary_tumur">You can find me on Twitter</string>
 	<string name="preference_key_footer">footer</string>
 	<string name="preference_key_email">email</string>
-	<string name="category_data_options">Data Options</string>
     <string name="category_theme_options">Display Options</string>
-    <string name="title_periodic_data_sync">Check updates periodically</string>
     <string name="title_choose_theme">Choose theme</string>
-    <string name="summary_periodic_data_sync">Check every 12 hours for content update</string>
 	<string name="category_app_info">App Info</string>
 	<string name="title_app_version">App Version</string>
 	<string name="summary_app_version">1.0.0-beta01</string>

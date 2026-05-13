@@ -1,38 +1,35 @@
 package me.tumur.portfolio.repository.database.dao.welcome
 
 import kotlinx.coroutines.flow.Flow
-import androidx.room.*
+import kotlinx.coroutines.flow.map
+import me.tumur.portfolio.repository.database.InMemoryDataStore
 import me.tumur.portfolio.repository.database.model.welcome.WelcomeModel
-import me.tumur.portfolio.utils.constants.DbConstants
+import javax.inject.Inject
 
-
-@Dao
-abstract class WelcomeDao {
-
-    /** Update */
-    @Transaction
-    open suspend fun update(list: List<WelcomeModel>): List<Long> {
-        delete()
-        return insert(list)
+class WelcomeDao @Inject constructor(
+    private val store: InMemoryDataStore,
+) {
+    suspend fun update(list: List<WelcomeModel>): List<Long> {
+        store.welcome.value = list.sortedBy { it.order }
+        return list.indices.map { it.toLong() }
     }
 
-    /** Check */
-    @Query(DbConstants.WELCOME_CHECK)
-    abstract suspend fun check(): Int
+    suspend fun check(): Int = store.welcome.value.size
 
-    /** Insert */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(data: List<WelcomeModel>): List<Long>
+    suspend fun insert(data: List<WelcomeModel>): List<Long> {
+        store.welcome.value = (store.welcome.value.filterNot { old -> data.any { it.id == old.id } } + data).sortedBy { it.order }
+        return data.indices.map { it.toLong() }
+    }
 
-    /** Delete */
-    @Query(DbConstants.WELCOME_DELETE)
-    abstract suspend fun delete()
+    suspend fun delete() {
+        store.welcome.value = emptyList()
+    }
 
-    /** Get list items */
-    @Query(DbConstants.WELCOME_GET_LIST_ITEMS)
-    abstract fun getListItems(): Flow<List<WelcomeModel>>
+    fun getListItems(): Flow<List<WelcomeModel>> = store.welcome.map { items ->
+        items.sortedBy { it.order }
+    }
 
-    /** Get single item */
-    @Query(DbConstants.WELCOME_GET_SINGLE_ITEM)
-    abstract fun getSingleItem(id: String): Flow<WelcomeModel>
+    fun getSingleItem(id: String): Flow<WelcomeModel> = store.welcome.map { items ->
+        items.first { it.id == id }
+    }
 }

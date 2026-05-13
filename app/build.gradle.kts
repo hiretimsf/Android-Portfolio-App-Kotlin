@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.legacy.kapt)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.navigation.safeargs)
@@ -80,6 +81,7 @@ android {
 
     buildFeatures {
         buildConfig = true
+        compose = true
         resValues = true
         viewBinding = true
     }
@@ -127,15 +129,15 @@ dependencies {
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.saved.state)
     implementation(libs.lifecycle.runtime)
-    implementation(libs.room.runtime)
-    implementation(libs.room.ktx)
-    implementation(libs.room.paging)
-    kapt(libs.room.compiler)
+    implementation(libs.lifecycle.runtime.compose)
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.foundation)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling.preview)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.paging.runtime)
-    implementation(libs.work.runtime)
-    implementation(libs.hilt.androidx.work)
 
     // Firebase components
     implementation(platform(libs.firebase.bom))
@@ -147,7 +149,6 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.fragment)
     kapt(libs.hilt.compiler)
-    kapt(libs.hilt.androidx.compiler)
     implementation(libs.splash.screen)
 
     // Network components
@@ -159,6 +160,7 @@ dependencies {
     implementation(libs.okhttp.core)
     implementation(libs.okhttp.logging)
     implementation(libs.coil.core)
+    implementation(libs.custom.activity.on.crash)
 
     // Utilities
     implementation(libs.sdp)
@@ -170,8 +172,7 @@ dependencies {
     androidTestImplementation(libs.androidx.test)
     androidTestImplementation(libs.androidx.espresso)
     testImplementation(libs.fragment.test)
-    testImplementation(libs.room.test)
     testImplementation(libs.androidx.arch.test)
     testImplementation(libs.paging.test)
-    androidTestImplementation(libs.work.test)
+    debugImplementation(libs.compose.ui.tooling)
 }

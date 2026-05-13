@@ -3,21 +3,22 @@ package me.tumur.portfolio
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.hilt.work.HiltWorkerFactory
-import androidx.work.*
+import cat.ereza.customactivityoncrash.config.CaocConfig
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import coil.disk.DiskCache
+import coil.memory.MemoryCache
+import coil.request.CachePolicy
+import coil.util.DebugLogger
 import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
-import me.tumur.portfolio.repository.network.DbRefresh
+import me.tumur.portfolio.screens.MainActivity
 import me.tumur.portfolio.utils.constants.Constants
 import me.tumur.portfolio.utils.theme.ThemeHelper
+import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 @HiltAndroidApp
-class App : Application(), Configuration.Provider {
+class App : Application(), ImageLoaderFactory {
 
     /**
      * onCreate is called before the first screen is shown to the user.
@@ -26,14 +27,12 @@ class App : Application(), Configuration.Provider {
      * thread to avoid delaying app start.
      */
 
-    /** Coroutine scope for application background work. */
-    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-
-    @Inject
-    lateinit var workerFactory: HiltWorkerFactory
-
     override fun onCreate() {
         super.onCreate()
+
+        CaocConfig.Builder.create()
+            .restartActivity(MainActivity::class.java)
+            .apply()
 
         /**
          * THEME SETTINGS
@@ -45,45 +44,32 @@ class App : Application(), Configuration.Provider {
         theme?.let {
             ThemeHelper.applyTheme(it)
         }
-
-        /**
-         * AUTO BACKGROUND PERIODIC SYNC
-         * */
-        /** Shared preferences */
-        if(sharedPref.getBoolean(resources.getString(R.string.preference_key_bg_sync), true)) setDelayedBackgroundSync()
-
     }
 
-    /**
-     * WorkManager
-     * On-demand initialization
-     * */
-    override val workManagerConfiguration: Configuration
-        get() = Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .setMinimumLoggingLevel(android.util.Log.INFO)
+    override fun newImageLoader(): ImageLoader {
+        val coilOkhttpClient = OkHttpClient.Builder()
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(100, TimeUnit.SECONDS)
             .build()
 
-    private fun setDelayedBackgroundSync() {
-        applicationScope.launch {
-            setupBackgroundSyncWork()
-        }
-    }
-
-    private fun setupBackgroundSyncWork() {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .setRequiresBatteryNotLow(true)
+        return ImageLoader(this).newBuilder()
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .memoryCache {
+                MemoryCache.Builder(this)
+                    .maxSizePercent(0.25)
+                    .strongReferencesEnabled(true)
+                    .build()
+            }
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .diskCache {
+                DiskCache.Builder()
+                    .maxSizePercent(0.05)
+                    .directory(cacheDir)
+                    .build()
+            }
+            .okHttpClient(coilOkhttpClient)
+            .logger(DebugLogger())
             .build()
-
-        val repeatingRequest
-                = PeriodicWorkRequestBuilder<DbRefresh>(12, TimeUnit.HOURS)
-            .setConstraints(constraints)
-            .build()
-
-        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
-            resources.getString(R.string.preference_key_bg_sync),
-            ExistingPeriodicWorkPolicy.KEEP,
-            repeatingRequest)
     }
 }

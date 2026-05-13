@@ -1,35 +1,35 @@
 package me.tumur.portfolio.repository.database.dao.experience
 
-import kotlinx.coroutines.flow.Flow
 import androidx.paging.PagingSource
-import androidx.room.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import me.tumur.portfolio.repository.database.InMemoryDataStore
+import me.tumur.portfolio.repository.database.LocalPagingSource
 import me.tumur.portfolio.repository.database.model.experience.ExperienceModel
-import me.tumur.portfolio.utils.constants.DbConstants
+import javax.inject.Inject
 
-@Dao
-abstract class ExperienceDao {
-
-    /** Update */
-    @Transaction
-    open suspend fun update(list: List<ExperienceModel>): List<Long> {
-        delete()
-        return insert(list)
+class ExperienceDao @Inject constructor(
+    private val store: InMemoryDataStore,
+) {
+    suspend fun update(list: List<ExperienceModel>): List<Long> {
+        store.experiences.value = list.sortedBy { it.order }
+        return list.indices.map { it.toLong() }
     }
 
-    /** Insert */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(list: List<ExperienceModel>): List<Long>
+    suspend fun insert(list: List<ExperienceModel>): List<Long> {
+        store.experiences.value = (store.experiences.value.filterNot { old -> list.any { it.id == old.id } } + list).sortedBy { it.order }
+        return list.indices.map { it.toLong() }
+    }
 
-    /** Delete */
-    @Query(DbConstants.EXPERIENCE_DELETE)
-    abstract suspend fun delete()
+    suspend fun delete() {
+        store.experiences.value = emptyList()
+    }
 
-    /** Get list items */
-    @Query(DbConstants.EXPERIENCE_GET_LIST_ITEMS)
-    abstract fun getListItems(id: String): PagingSource<Int, ExperienceModel>
+    fun getListItems(id: String): PagingSource<Int, ExperienceModel> = LocalPagingSource {
+        store.experiences.value.filter { it.ownerId == id }.sortedBy { it.order }
+    }
 
-
-    /** Get single item */
-    @Query(DbConstants.EXPERIENCE_GET_SINGLE_ITEM)
-    abstract fun getSingleItem(id: String): Flow<ExperienceModel>
+    fun getSingleItem(id: String): Flow<ExperienceModel> = store.experiences.map { items ->
+        items.first { it.id == id }
+    }
 }

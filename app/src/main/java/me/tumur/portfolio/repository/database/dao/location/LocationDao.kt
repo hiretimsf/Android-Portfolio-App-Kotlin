@@ -1,31 +1,29 @@
 package me.tumur.portfolio.repository.database.dao.location
 
 import kotlinx.coroutines.flow.Flow
-import androidx.room.*
+import kotlinx.coroutines.flow.map
+import me.tumur.portfolio.repository.database.InMemoryDataStore
 import me.tumur.portfolio.repository.database.model.LocationModel
-import me.tumur.portfolio.utils.constants.DbConstants
+import javax.inject.Inject
 
-@Dao
-abstract class LocationDao {
-
-    /** Update */
-    @Transaction
-    open suspend fun update(list: List<LocationModel>): List<Long> {
-        delete()
-        return insert(list)
+class LocationDao @Inject constructor(
+    private val store: InMemoryDataStore,
+) {
+    suspend fun update(list: List<LocationModel>): List<Long> {
+        store.locations.value = list
+        return list.indices.map { it.toLong() }
     }
 
-    /** Insert */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(list: List<LocationModel>): List<Long>
+    suspend fun insert(list: List<LocationModel>): List<Long> {
+        store.locations.value = store.locations.value.filterNot { old -> list.any { it.id == old.id } } + list
+        return list.indices.map { it.toLong() }
+    }
 
-    /** Delete */
-    @Query(DbConstants.LOCATION_DELETE)
-    abstract suspend fun delete()
+    suspend fun delete() {
+        store.locations.value = emptyList()
+    }
 
-
-    /** Get single item */
-    @Query(DbConstants.LOCATION_GET_SINGLE_ITEM)
-    abstract fun getSingleItem(id: String): Flow<LocationModel>
-
+    fun getSingleItem(id: String): Flow<LocationModel> = store.locations.map { items ->
+        items.first { it.ownerId == id }
+    }
 }

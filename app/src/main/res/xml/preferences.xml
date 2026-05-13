@@ -21,21 +21,6 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-            app:key="@string/preference_key_data"
-            app:title="@string/category_data_options"
-            app:layout="@layout/preference_category_title">
-
-        <SwitchPreferenceCompat
-                app:key="@string/preference_key_bg_sync"
-                app:title="@string/title_periodic_data_sync"
-                app:icon="@drawable/ic_sync"
-                app:summary="@string/summary_periodic_data_sync"
-                app:defaultValue="true"
-                app:layout="@layout/preference_item_switch"/>
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
             app:key="@string/preference_key_app"
             app:title="@string/category_app_info"
             app:layout="@layout/preference_category_title">

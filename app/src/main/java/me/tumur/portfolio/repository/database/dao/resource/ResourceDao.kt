@@ -1,36 +1,33 @@
 package me.tumur.portfolio.repository.database.dao.resource
 
-import kotlinx.coroutines.flow.Flow
 import androidx.paging.PagingSource
-import androidx.room.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import me.tumur.portfolio.repository.database.InMemoryDataStore
+import me.tumur.portfolio.repository.database.LocalPagingSource
 import me.tumur.portfolio.repository.database.model.resource.ResourceModel
-import me.tumur.portfolio.utils.constants.DbConstants
+import javax.inject.Inject
 
-@Dao
-abstract class ResourceDao {
-
-    /** Update */
-    @Transaction
-    open suspend fun update(list: List<ResourceModel>) {
-        delete()
-        insert(list)
+class ResourceDao @Inject constructor(
+    private val store: InMemoryDataStore,
+) {
+    suspend fun update(list: List<ResourceModel>) {
+        store.resources.value = list.sortedBy { it.order }
     }
 
-    /** Delete */
-    @Query(DbConstants.RESOURCE_DELETE)
-    abstract suspend fun delete()
+    suspend fun delete() {
+        store.resources.value = emptyList()
+    }
 
-    /** Insert */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(list: List<ResourceModel>)
+    suspend fun insert(list: List<ResourceModel>) {
+        store.resources.value = (store.resources.value.filterNot { old -> list.any { it.id == old.id } } + list).sortedBy { it.order }
+    }
 
-    /** Get list items */
-    @Query(DbConstants.RESOURCE_GET_LIST_ITEMS)
-    abstract fun getListItems(id: String): PagingSource<Int, ResourceModel>
+    fun getListItems(id: String): PagingSource<Int, ResourceModel> = LocalPagingSource {
+        store.resources.value.filter { it.ownerId == id }.sortedBy { it.order }
+    }
 
-    /** Check table */
-    @Query(DbConstants.RESOURCE_CHECK)
-    abstract fun check(id: String): Flow<Int>
-
-
+    fun check(id: String): Flow<Int> = store.resources.map { items ->
+        items.count { it.ownerId == id }
+    }
 }

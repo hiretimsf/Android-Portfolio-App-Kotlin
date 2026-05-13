@@ -1,29 +1,28 @@
 package me.tumur.portfolio.repository.database.dao.settings
 
 import kotlinx.coroutines.flow.Flow
-import androidx.room.*
+import kotlinx.coroutines.flow.map
+import me.tumur.portfolio.repository.database.InMemoryDataStore
 import me.tumur.portfolio.repository.database.model.settings.AppModel
-import me.tumur.portfolio.utils.constants.DbConstants
+import javax.inject.Inject
 
-@Dao
-abstract class AppDao {
-
-    /** Update */
-    @Transaction
-    open suspend fun update(list: List<AppModel>) {
-        delete()
-        insert(list)
+class AppDao @Inject constructor(
+    private val store: InMemoryDataStore,
+) {
+    suspend fun update(list: List<AppModel>) {
+        store.app.value = list.sortedBy { it.order }
     }
 
-    /** Insert */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(list: List<AppModel>): List<Long>
+    suspend fun insert(list: List<AppModel>): List<Long> {
+        store.app.value = (store.app.value.filterNot { old -> list.any { it.id == old.id } } + list).sortedBy { it.order }
+        return list.indices.map { it.toLong() }
+    }
 
-    /** Delete */
-    @Query(DbConstants.APP_DELETE)
-    abstract suspend fun delete()
+    suspend fun delete() {
+        store.app.value = emptyList()
+    }
 
-    /** Get list items */
-    @Query(DbConstants.APP_GET_LIST_ITEMS)
-    abstract fun getListItems(): Flow<List<AppModel>>
+    fun getListItems(): Flow<List<AppModel>> = store.app.map { items ->
+        items.sortedBy { it.order }
+    }
 }

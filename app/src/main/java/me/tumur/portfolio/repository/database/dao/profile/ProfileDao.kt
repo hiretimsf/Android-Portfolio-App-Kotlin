@@ -1,31 +1,27 @@
 package me.tumur.portfolio.repository.database.dao.profile
 
 import kotlinx.coroutines.flow.Flow
-import androidx.room.*
+import kotlinx.coroutines.flow.map
+import me.tumur.portfolio.repository.database.InMemoryDataStore
 import me.tumur.portfolio.repository.database.model.profile.ProfileModel
-import me.tumur.portfolio.utils.constants.DbConstants
+import javax.inject.Inject
 
-@Dao
-abstract class ProfileDao {
-
-    /** Update */
-    @Transaction
-    open suspend fun update(list: List<ProfileModel>) {
-        delete()
-        insert(list)
+class ProfileDao @Inject constructor(
+    private val store: InMemoryDataStore,
+) {
+    suspend fun update(list: List<ProfileModel>) {
+        store.profiles.value = list.sortedBy { it.order }
     }
 
-    /** Delete */
-    @Query(DbConstants.PROFILE_DELETE)
-    abstract suspend fun delete()
+    suspend fun delete() {
+        store.profiles.value = emptyList()
+    }
 
-    /** Insert */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(list: List<ProfileModel>)
+    suspend fun insert(list: List<ProfileModel>) {
+        store.profiles.value = (store.profiles.value.filterNot { old -> list.any { it.id == old.id } } + list).sortedBy { it.order }
+    }
 
-    /** Get single item */
-    @Query(DbConstants.PROFILE_GET_SINGLE_ITEM)
-    abstract fun getSingleItem(id: String): Flow<ProfileModel>
-
-
+    fun getSingleItem(id: String): Flow<ProfileModel> = store.profiles.map { items ->
+        items.first { it.id == id }
+    }
 }

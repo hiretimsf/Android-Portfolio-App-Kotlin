@@ -9,10 +9,11 @@ import android.graphics.Paint
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.IdRes
+import coil.imageLoader
 import coil.load
+import coil.size.Size
 import coil.transform.RoundedCornersTransformation
 import coil.transform.Transformation
-import coil.size.Size
 import com.google.android.material.button.MaterialButton
 import me.tumur.portfolio.R
 import me.tumur.portfolio.utils.constants.BsConstants
@@ -37,7 +38,7 @@ private class GrayscaleTransformation : Transformation {
 /** Load image from the network or cache with placeholder and error images */
 fun loadImage(imageView: ImageView, url: String?) {
     url?.let {
-        imageView.load(it) {
+        imageView.load(it, imageLoader = imageView.context.imageLoader) {
             crossfade(true)
             placeholder(R.color.colorBorder)
             when (imageView.context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
@@ -55,7 +56,7 @@ fun loadImage(imageView: ImageView, url: String?) {
 /** Load image from the network or cache with placeholder and error images */
 fun setImageDrawable(imageView: ImageView, @IdRes drawable: Int?) {
     drawable?.let {
-        imageView.load(it) {
+        imageView.load(it, imageLoader = imageView.context.imageLoader) {
             crossfade(true)
             placeholder(R.color.colorBorder)
             when (imageView.context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {

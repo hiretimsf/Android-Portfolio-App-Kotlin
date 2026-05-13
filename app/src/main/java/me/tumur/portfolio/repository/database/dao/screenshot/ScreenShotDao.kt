@@ -1,34 +1,35 @@
 package me.tumur.portfolio.repository.database.dao.screenshot
 
-import kotlinx.coroutines.flow.Flow
 import androidx.paging.PagingSource
-import androidx.room.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import me.tumur.portfolio.repository.database.InMemoryDataStore
+import me.tumur.portfolio.repository.database.LocalPagingSource
 import me.tumur.portfolio.repository.database.model.screenshot.ScreenShotModel
-import me.tumur.portfolio.utils.constants.DbConstants
+import javax.inject.Inject
 
-@Dao
-abstract class ScreenShotDao {
-
-    /** Update */
-    @Transaction
-    open suspend fun update(list: List<ScreenShotModel>): List<Long> {
-        delete()
-        return insert(list)
+class ScreenShotDao @Inject constructor(
+    private val store: InMemoryDataStore,
+) {
+    suspend fun update(list: List<ScreenShotModel>): List<Long> {
+        store.screenshots.value = list.sortedBy { it.order }
+        return list.indices.map { it.toLong() }
     }
 
-    /** Insert */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(list: List<ScreenShotModel>): List<Long>
+    suspend fun insert(list: List<ScreenShotModel>): List<Long> {
+        store.screenshots.value = (store.screenshots.value.filterNot { old -> list.any { it.id == old.id } } + list).sortedBy { it.order }
+        return list.indices.map { it.toLong() }
+    }
 
-    /** Delete */
-    @Query(DbConstants.SCREENSHOT_DELETE)
-    abstract suspend fun delete()
+    suspend fun delete() {
+        store.screenshots.value = emptyList()
+    }
 
-    /** Get paged list items */
-    @Query(DbConstants.SCREENSHOT_GET_LIST_ITEMS)
-    abstract fun getPagedItems(id: String): PagingSource<Int, ScreenShotModel>
+    fun getPagedItems(id: String): PagingSource<Int, ScreenShotModel> = LocalPagingSource {
+        store.screenshots.value.filter { it.ownerId == id }.sortedBy { it.order }
+    }
 
-    /** Get list items */
-    @Query(DbConstants.SCREENSHOT_GET_LIST_ITEMS)
-    abstract fun getListItems(id: String): Flow<List<ScreenShotModel>>
+    fun getListItems(id: String): Flow<List<ScreenShotModel>> = store.screenshots.map { items ->
+        items.filter { it.ownerId == id }.sortedBy { it.order }
+    }
 }

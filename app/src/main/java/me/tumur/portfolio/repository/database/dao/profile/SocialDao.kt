@@ -1,29 +1,28 @@
 package me.tumur.portfolio.repository.database.dao.profile
 
 import kotlinx.coroutines.flow.Flow
-import androidx.room.*
+import kotlinx.coroutines.flow.map
+import me.tumur.portfolio.repository.database.InMemoryDataStore
 import me.tumur.portfolio.repository.database.model.profile.SocialModel
-import me.tumur.portfolio.utils.constants.DbConstants
+import javax.inject.Inject
 
-@Dao
-abstract class SocialDao {
-
-    /** Update */
-    @Transaction
-    open suspend fun update(list: List<SocialModel>) {
-        delete()
-        insert(list)
+class SocialDao @Inject constructor(
+    private val store: InMemoryDataStore,
+) {
+    suspend fun update(list: List<SocialModel>) {
+        store.socials.value = list.sortedBy { it.order }
     }
 
-    /** Insert */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(list: List<SocialModel>): List<Long>
+    suspend fun insert(list: List<SocialModel>): List<Long> {
+        store.socials.value = (store.socials.value.filterNot { old -> list.any { it.id == old.id } } + list).sortedBy { it.order }
+        return list.indices.map { it.toLong() }
+    }
 
-    /** Delete */
-    @Query(DbConstants.SOCIAL_DELETE)
-    abstract suspend fun delete()
+    suspend fun delete() {
+        store.socials.value = emptyList()
+    }
 
-    /** Get list items */
-    @Query(DbConstants.SOCIAL_GET_LIST_ITEMS)
-    abstract fun getListItems(id: String): Flow<List<SocialModel>>
+    fun getListItems(id: String): Flow<List<SocialModel>> = store.socials.map { items ->
+        items.filter { it.ownerId == id }.sortedBy { it.order }
+    }
 }

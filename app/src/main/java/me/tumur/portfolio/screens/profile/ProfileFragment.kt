@@ -12,6 +12,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import coil.imageLoader
 import coil.load
 import dagger.hilt.android.AndroidEntryPoint
 import me.tumur.portfolio.R
@@ -146,14 +147,14 @@ class ProfileFragment : Fragment() {
             binding.root.findViewById<android.widget.TextView>(R.id.profile_screen_header_collapsed_name).text = profile?.name
             binding.root.findViewById<android.widget.ImageView>(R.id.profile_screen_header_avatar).apply {
                 contentDescription = profile?.imageDescription
-                load(profile?.image) {
+                load(profile?.image, imageLoader = context.imageLoader) {
                     placeholder(R.drawable.profile)
                     error(R.drawable.profile)
                 }
             }
             binding.root.findViewById<android.widget.ImageView>(R.id.profile_screen_header_collapsed_avatar).apply {
                 contentDescription = profile?.imageDescription
-                load(profile?.image) {
+                load(profile?.image, imageLoader = context.imageLoader) {
                     placeholder(R.drawable.profile)
                     error(R.drawable.profile)
                 }

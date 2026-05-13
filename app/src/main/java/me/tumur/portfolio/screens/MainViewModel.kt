@@ -14,12 +14,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.tumur.portfolio.repository.database.dao.welcome.WelcomeDao
 import me.tumur.portfolio.repository.network.Failed
 import me.tumur.portfolio.repository.network.Success
 import me.tumur.portfolio.repository.repo.Repository
 import me.tumur.portfolio.utils.constants.Constants
-import me.tumur.portfolio.utils.extensions.isNetworkAvailable
 import me.tumur.portfolio.utils.state.*
 import javax.inject.Inject
 
@@ -35,7 +33,6 @@ class MainViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     @param:ApplicationContext private val context: Context,
     private val repo: Repository,
-    private val welcomeDao: WelcomeDao
 ) : ViewModel() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -45,9 +42,6 @@ class MainViewModel @Inject constructor(
     private val isFirstRun by lazy {
         sharedPref.getBoolean(Constants.FIRST, true)
     }
-
-    /** Check network and cache conditions */
-    private val network = (isNetworkAvailable(context))
 
     /** Screen state  */
     private val _screenState = MutableStateFlow<ScreenState>(SplashScreen)
@@ -87,9 +81,8 @@ class MainViewModel @Inject constructor(
         if (isFirstRun) {
             setScreenState(SplashScreen)
             viewModelScope.launch {
-                populateDb()
                 setScreenStateWithDelay(WelcomeScreen)
-                if (network) refreshData() else setShowToast(ToastShow)
+                refreshData()
             }
         } else {
             when (val savedState = getSavedStateHandle()) {
@@ -97,7 +90,7 @@ class MainViewModel @Inject constructor(
                     setScreenState(SplashScreen)
                     viewModelScope.launch {
                         setScreenStateWithDelay(MainScreen)
-                        if (network) refreshData() else setShowToast(ToastShow)
+                        refreshData()
                     }
                 }
                 else -> {
@@ -127,12 +120,6 @@ class MainViewModel @Inject constructor(
     private fun getSavedStateHandle(): String {
         // Gets the current value of the user id from the saved state handle
         return savedStateHandle.get(Constants.FRAGMENT_STATE) ?: Constants.FRAGMENT_EMPTY
-    }
-
-    /** Database population at very first run */
-    private suspend fun populateDb() {
-        /** Fake dao is required to create and populate database from local resource  */
-        withContext(Dispatchers.IO) { welcomeDao.check() }
     }
 
     private suspend fun refreshData() {

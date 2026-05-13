@@ -1,29 +1,29 @@
 package me.tumur.portfolio.repository.database.dao.category
 
 import androidx.paging.PagingSource
-import androidx.room.*
+import me.tumur.portfolio.repository.database.InMemoryDataStore
+import me.tumur.portfolio.repository.database.LocalPagingSource
 import me.tumur.portfolio.repository.database.model.category.CategoryModel
-import me.tumur.portfolio.utils.constants.DbConstants
+import javax.inject.Inject
 
-@Dao
-abstract class CategoryDao {
-
-    /** Update */
-    @Transaction
-    open suspend fun update(list: List<CategoryModel>): List<Long> {
-        delete()
-        return insert(list)
+class CategoryDao @Inject constructor(
+    private val store: InMemoryDataStore,
+) {
+    suspend fun update(list: List<CategoryModel>): List<Long> {
+        store.categories.value = list.sortedBy { it.order }
+        return list.indices.map { it.toLong() }
     }
 
-    /** Insert */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(list: List<CategoryModel>): List<Long>
+    suspend fun insert(list: List<CategoryModel>): List<Long> {
+        store.categories.value = (store.categories.value.filterNot { old -> list.any { it.id == old.id } } + list).sortedBy { it.order }
+        return list.indices.map { it.toLong() }
+    }
 
-    /** Delete */
-    @Query(DbConstants.CATEGORY_DELETE)
-    abstract suspend fun delete()
+    suspend fun delete() {
+        store.categories.value = emptyList()
+    }
 
-    /** Get list items */
-    @Query(DbConstants.CATEGORY_GET_LIST_ITEMS)
-    abstract fun getListItems(type: Int): PagingSource<Int, CategoryModel>
+    fun getListItems(type: Int): PagingSource<Int, CategoryModel> = LocalPagingSource {
+        store.categories.value.filter { it.type == type }.sortedBy { it.order }
+    }
 }
