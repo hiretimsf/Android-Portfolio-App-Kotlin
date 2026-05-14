@@ -52,7 +52,7 @@ class ExperienceFragment : Fragment() {
     private val viewModel: ExperienceViewModel by viewModels()
 
     /**
-     * Databinding
+     * View binding
      */
     private lateinit var binding: FragmentExperienceBinding
 

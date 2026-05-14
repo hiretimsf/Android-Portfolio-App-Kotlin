@@ -4,7 +4,6 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:bind="http://schemas.android.com/apk/res-auto"
         tools:context=".screens.profile.ProfileFragment"
             android:id="@+id/profile_screen"
             android:layout_width="match_parent"
@@ -33,19 +32,12 @@
             <include
                     layout="@layout/screen_profile_about"/>
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
+            <androidx.compose.ui.platform.ComposeView
                     android:id="@+id/screen_profile_fab_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/_20sdp"
                     android:layout_marginEnd="@dimen/_15sdp"
-                    android:contentDescription="@string/cd_more_profile_options"
-                    app:layout_behavior="me.tumur.portfolio.utils.fabButton.ScrollAwareFABBehavior"
-                    app:srcCompat="@drawable/ic_read_more"
-                    app:tint="@null"
-                    app:backgroundTint="?attr/colorPrimary"
-                    app:elevation="@dimen/_5sdp"
-                    app:maxImageSize="@dimen/_16sdp"
                     app:layout_anchor="@+id/screen_profile_about_content"
                     app:layout_anchorGravity="bottom|end"/>
 

@@ -16,7 +16,6 @@ import coil.transform.RoundedCornersTransformation
 import coil.transform.Transformation
 import com.google.android.material.button.MaterialButton
 import me.tumur.portfolio.R
-import me.tumur.portfolio.utils.constants.BsConstants
 import me.tumur.portfolio.utils.constants.Constants
 import java.text.SimpleDateFormat
 import java.util.*
@@ -96,19 +95,6 @@ fun TextView.setDateFromTo(dateFrom: Date?, dateTo: Date?) {
             val result = "$a - $b | $d"
             text = result
         }
-    }
-}
-
-/** Social icon */
-fun ImageView.setSocialIcon(name: String?) {
-    name?.let {
-        setImageResource( when(name){
-            BsConstants.GITHUB -> R.drawable.ic_github
-            BsConstants.LINKEDIN -> R.drawable.ic_linkedin
-            BsConstants.TWITTER -> R.drawable.ic_twitter
-            BsConstants.PDF -> R.drawable.ic_pdf
-            else -> R.drawable.ic_globe
-        })
     }
 }
 

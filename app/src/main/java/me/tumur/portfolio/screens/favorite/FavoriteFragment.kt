@@ -55,7 +55,7 @@ class FavoriteFragment : Fragment() {
     private val viewModel: FavoriteViewModel by viewModels()
 
     /**
-     * Databinding
+     * View binding
      */
     private lateinit var binding: FragmentFavoriteBinding
 

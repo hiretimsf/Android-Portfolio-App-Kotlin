@@ -3,24 +3,20 @@ package me.tumur.portfolio.screens.profile.bottomsheet
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.net.toUri
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import me.tumur.portfolio.R
-import me.tumur.portfolio.databinding.FragmentProfileBottomSheetBinding
-import me.tumur.portfolio.repository.database.model.profile.SocialModel
 import me.tumur.portfolio.screens.profile.ProfileViewModel
-import me.tumur.portfolio.utils.adapters.listItemAdapters.social.SocialAdapter
-import me.tumur.portfolio.utils.adapters.listItemAdapters.social.SocialClickListener
 import me.tumur.portfolio.utils.constants.Constants
 import me.tumur.portfolio.utils.extensions.collectFlow
 import me.tumur.portfolio.utils.extensions.launchCustomTab
@@ -47,9 +43,6 @@ class ProfileBottomSheetFragment: BottomSheetDialogFragment() {
      * */
     private val viewModel: ProfileViewModel by hiltNavGraphViewModels(R.id.profile_screen)
 
-    /** Databinding */
-    private lateinit var binding: FragmentProfileBottomSheetBinding
-
     /** Bottom sheet dialog fragment */
     private lateinit var dlg: BottomSheetDialog
 
@@ -72,38 +65,25 @@ class ProfileBottomSheetFragment: BottomSheetDialogFragment() {
      * @return Return the View for the fragment's UI.
      */
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: android.view.LayoutInflater,
+        container: android.view.ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View {
+        val content = ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val profile by viewModel.profileFlow.collectAsStateWithLifecycle()
+                val socialItems by viewModel.socialFlow.collectAsStateWithLifecycle()
 
-        binding = FragmentProfileBottomSheetBinding.inflate(inflater, container, false)
-
-        /** Social items */
-        val socialAdapter = SocialAdapter(SocialClickListener { viewModel.socialItemOnClick(it) })
-        val layoutManagerSocial = LinearLayoutManager(context)
-        layoutManagerSocial.orientation = LinearLayoutManager.VERTICAL
-        val socialList = binding.root.findViewById<RecyclerView>(R.id.profile_bs_social_list)
-
-        socialList.apply {
-            this.layoutManager = layoutManagerSocial
-            this.hasFixedSize()
-            this.adapter = socialAdapter
+                ProfileBottomSheetContent(
+                    profile = profile,
+                    socialItems = socialItems,
+                    onSocialClick = viewModel::socialItemOnClick,
+                    onContactClick = { viewModel.emailItemOnClick(true) },
+                )
+            }
         }
-
-        binding.clContactMe.setOnClickListener {
-            viewModel.emailItemOnClick(true)
-        }
-
-        /** Observer for social adapter */
-        viewLifecycleOwner.collectFlow(viewModel.profileFlow) { profile ->
-            binding.profileBsAvatar.contentDescription = profile?.imageDescription
-            binding.profileBsAvatar.setImageResource(R.drawable.profile)
-            binding.profileBsName.text = getString(R.string.name)
-            binding.profileBsEmail.text = profile?.email
-        }
-
-        val socialAdapterObserver: suspend (List<SocialModel>) -> Unit = { data ->
-            socialAdapter.submitList(data)
-        }
-        viewLifecycleOwner.collectFlow(viewModel.socialFlow, collector = socialAdapterObserver)
 
         /** Observer for social item on click */
         viewLifecycleOwner.collectFlow(viewModel.socialItemOnClickFlow) { item ->
@@ -134,7 +114,7 @@ class ProfileBottomSheetFragment: BottomSheetDialogFragment() {
             }
         }
 
-        return binding.root
+        return content
 
     }
 

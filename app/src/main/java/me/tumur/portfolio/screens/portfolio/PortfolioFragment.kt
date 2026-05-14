@@ -54,7 +54,7 @@ class PortfolioFragment : Fragment() {
     private val viewModel: PortfolioViewModel by viewModels()
 
     /**
-     * Databinding
+     * View binding
      */
     private lateinit var binding: FragmentPortfolioBinding
 

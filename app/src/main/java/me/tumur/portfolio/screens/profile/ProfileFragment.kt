@@ -3,22 +3,24 @@ package me.tumur.portfolio.screens.profile
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import coil.imageLoader
 import coil.load
 import dagger.hilt.android.AndroidEntryPoint
 import me.tumur.portfolio.R
 import me.tumur.portfolio.databinding.FragmentProfileBinding
 import me.tumur.portfolio.screens.MainViewModel
-import me.tumur.portfolio.utils.adapters.listItemAdapters.about.AboutAdapter
 import me.tumur.portfolio.utils.constants.Constants
 import me.tumur.portfolio.utils.extensions.collectFlow
 import me.tumur.portfolio.utils.extensions.launchCustomTab
@@ -49,7 +51,7 @@ class ProfileFragment : Fragment() {
     private val viewModel: ProfileViewModel by hiltNavGraphViewModels(R.id.profile_screen)
     private val sharedViewModel: MainViewModel by activityViewModels()
 
-    /** Databinding */
+    /** View binding */
     private lateinit var binding: FragmentProfileBinding
 
     /** INITIALIZATION * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -74,21 +76,8 @@ class ProfileFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentProfileBinding.inflate(inflater, container, false)
 
-        /** About items */
-        val aboutAdapter = AboutAdapter()
-        val layoutManagerAbout = LinearLayoutManager(context)
-        layoutManagerAbout.orientation = LinearLayoutManager.VERTICAL
-        val aboutList = binding.root.findViewById<RecyclerView>(R.id.profile_screen_about_content)
-
-        aboutList.apply {
-            this.layoutManager = layoutManagerAbout
-            this.hasFixedSize()
-            this.adapter = aboutAdapter
-        }
-
-        binding.screenProfileFabButton.setOnClickListener {
-            viewModel.setShowProfileBottomsheet(true)
-        }
+        setupAboutContent()
+        setupContactButton()
 
         setupOptionsMenu()
         setupCollapsedProfileHeader()
@@ -97,9 +86,44 @@ class ProfileFragment : Fragment() {
         sharedViewModel.setFragmentStateHolder(Constants.FRAGMENT_PROFILE)
 
         /** Set observers */
-        setObservers(aboutAdapter)
+        setObservers()
 
         return binding.root
+    }
+
+    private fun setupAboutContent() {
+        binding.root.findViewById<ComposeView>(R.id.profile_screen_about_content).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                // Profile body text starts in LocalPortfolioStrings.about and flows through this state.
+                val aboutState by viewModel.aboutScreenFlow.collectAsStateWithLifecycle()
+                ProfileAboutContent(
+                    sections = aboutState.sections,
+                    introductionImages = aboutState.introductionImages,
+                )
+            }
+        }
+    }
+
+    private fun setupContactButton() {
+        val isContactButtonVisible = mutableStateOf(true)
+        binding.root.findViewById<androidx.core.widget.NestedScrollView>(R.id.screen_profile_about_content)
+            .setOnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
+                when {
+                    scrollY > oldScrollY -> isContactButtonVisible.value = false
+                    scrollY < oldScrollY -> isContactButtonVisible.value = true
+                }
+            }
+
+        binding.screenProfileFabButton.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                ProfileContactButton(
+                    visible = isContactButtonVisible.value,
+                    onClick = { viewModel.setShowProfileBottomsheet(true) },
+                )
+            }
+        }
     }
 
     private fun setupOptionsMenu() {
@@ -137,7 +161,7 @@ class ProfileFragment : Fragment() {
             }
     }
 
-    private fun setObservers(aboutAdapter: AboutAdapter){
+    private fun setObservers(){
 
         /** Observer for show profile bottom sheet dialog ------------------------------------------------------------*/
         viewLifecycleOwner.collectFlow(viewModel.profileFlow) { profile ->
@@ -168,10 +192,6 @@ class ProfileFragment : Fragment() {
             }
         }
 
-        /** Observer for about adapter -------------------------------------------------------------------------------*/
-        viewLifecycleOwner.collectFlow(viewModel.aboutScreenFlow) { data ->
-            aboutAdapter.addHeaderAndSubmitList(data.sections, data.introductionImages)
-        }
     }
 
     /** Get a share intent */

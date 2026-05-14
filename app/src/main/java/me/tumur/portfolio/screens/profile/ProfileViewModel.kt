@@ -1,8 +1,8 @@
 package me.tumur.portfolio.screens.profile
 
-import dagger.hilt.android.lifecycle.HiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +14,6 @@ import me.tumur.portfolio.repository.database.dao.profile.SocialDao
 import me.tumur.portfolio.repository.database.model.profile.ProfileModel
 import me.tumur.portfolio.repository.database.model.profile.SocialModel
 import me.tumur.portfolio.repository.network.model.AboutSection
-import me.tumur.portfolio.utils.adapters.listItemAdapters.about.CarouselImage
 import me.tumur.portfolio.utils.constants.DbConstants
 import javax.inject.Inject
 

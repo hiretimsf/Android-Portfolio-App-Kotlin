@@ -3,7 +3,6 @@
 <androidx.core.widget.NestedScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/screen_profile_about_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -11,12 +10,9 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <!-- About texts -->
-    <androidx.recyclerview.widget.RecyclerView
+    <androidx.compose.ui.platform.ComposeView
             android:id="@+id/profile_screen_about_content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false"
-            android:scrollbars="none"
-            tools:listitem="@tools:sample/avatars"/>
+            android:layout_height="wrap_content"/>
 
     </androidx.core.widget.NestedScrollView>

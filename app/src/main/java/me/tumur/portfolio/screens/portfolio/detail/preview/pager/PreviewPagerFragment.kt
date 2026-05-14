@@ -40,7 +40,7 @@ class PreviewPagerFragment : Fragment() {
 
     private val sharedViewModel: PreviewFragmentViewModel by viewModels({ requireParentFragment() })
 
-    /** Databinding */
+    /** View binding */
     private lateinit var binding: PagerItemPreviewScreenBinding
 
     /** Position */

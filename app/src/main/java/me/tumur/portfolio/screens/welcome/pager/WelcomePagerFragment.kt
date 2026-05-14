@@ -37,7 +37,7 @@ class WelcomePagerFragment : Fragment() {
 
     private val sharedViewModel: WelcomeViewModel by viewModels({requireParentFragment()})
 
-    /** Databinding */
+    /** View binding */
     private lateinit var binding: PagerItemWelcomeScreenBinding
 
     /** INITIALIZATION * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

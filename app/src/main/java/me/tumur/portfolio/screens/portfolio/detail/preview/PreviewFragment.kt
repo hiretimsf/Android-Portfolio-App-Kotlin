@@ -39,7 +39,7 @@ class PreviewFragment : Fragment() {
      * */
     private val viewModel by lazy { ViewModelProvider(this).get(PreviewFragmentViewModel::class.java) }
 
-    /** Databinding */
+    /** View binding */
     private lateinit var binding: FragmentPreviewBinding
 
     /** Safe args */
@@ -92,7 +92,7 @@ class PreviewFragment : Fragment() {
     /** FUNCTIONS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
-     * Observe flow-backed properties used by data binding.
+     * Observe flow-backed properties used by the view.
      */
     private fun setObservers() {
         viewLifecycleOwner.collectFlow(viewModel.scrollToItemFlow) {

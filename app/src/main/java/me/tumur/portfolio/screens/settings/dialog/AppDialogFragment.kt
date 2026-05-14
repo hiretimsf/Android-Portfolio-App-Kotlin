@@ -36,7 +36,7 @@ class AppDialogFragment : DialogFragment() {
      * */
     private val viewModel: AppDialogViewModel by viewModels()
 
-    /** Databinding */
+    /** View binding */
     private lateinit var binding: FragmentDialogAppInfoBinding
 
     /** App info dialog fragment */

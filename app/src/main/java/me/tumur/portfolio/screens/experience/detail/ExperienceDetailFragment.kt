@@ -64,7 +64,7 @@ class ExperienceDetailFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMar
     private val viewModel: ExperienceDetailFragmentViewModel by viewModels()
 
     /**
-     * Databinding
+     * View binding
      */
     private lateinit var binding: FragmentExperienceDetailBinding
 

@@ -117,8 +117,7 @@
         <!-- Social -->
         <dialog
                 android:id="@+id/social"
-                android:name="me.tumur.portfolio.screens.profile.bottomsheet.ProfileBottomSheetFragment"
-                tools:layout="@layout/fragment_profile_bottom_sheet">
+                android:name="me.tumur.portfolio.screens.profile.bottomsheet.ProfileBottomSheetFragment">
         </dialog>
     </navigation>
 
