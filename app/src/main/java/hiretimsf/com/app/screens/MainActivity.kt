@@ -14,8 +14,7 @@ import hiretimsf.com.app.utils.state.SplashScreen
 import hiretimsf.com.app.utils.state.ToastShow
 
 /**
- * Single-activity Compose host. App chrome and destinations are rendered through Compose
- * Navigation instead of XML NavHostFragment.
+ * Single-activity Compose host. App chrome and destinations are rendered through Compose Navigation.
  */
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {

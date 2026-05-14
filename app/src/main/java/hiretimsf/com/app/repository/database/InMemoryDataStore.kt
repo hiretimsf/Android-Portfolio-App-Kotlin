@@ -5,7 +5,6 @@ import hiretimsf.com.app.repository.database.model.LocationModel
 import hiretimsf.com.app.repository.database.model.button.ButtonModel
 import hiretimsf.com.app.repository.database.model.category.CategoryModel
 import hiretimsf.com.app.repository.database.model.experience.ExperienceModel
-import hiretimsf.com.app.repository.database.model.favorite.FavoriteModel
 import hiretimsf.com.app.repository.database.model.portfolio.PortfolioModel
 import hiretimsf.com.app.repository.database.model.profile.AboutModel
 import hiretimsf.com.app.repository.database.model.profile.ProfileModel
@@ -35,5 +34,4 @@ class InMemoryDataStore @Inject constructor() {
     val screenshots = MutableStateFlow(all.screenshot.sortedBy { it.order })
     val locations = MutableStateFlow(all.location)
     val resources = MutableStateFlow(all.resource.sortedBy { it.order })
-    val favorites = MutableStateFlow<List<FavoriteModel>>(emptyList())
 }

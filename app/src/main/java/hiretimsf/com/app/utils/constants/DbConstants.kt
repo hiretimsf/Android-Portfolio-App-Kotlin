@@ -18,7 +18,6 @@ object DbConstants {
     const val BUTTON = "button"
     const val CATEGORY = "category"
     const val SCREENSHOT = "screenshot"
-    const val FAVORITE = "favorite"
     const val RESOURCE = "resource"
 
     /** DATABASE POPULATION CONSTANTS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -121,15 +120,6 @@ object DbConstants {
     /** TASK QUERIES ------------------------------------------------------------------------------------------------ */
     const val TASK_DELETE = "DELETE FROM $TASKS"
     const val TASK_GET_LIST_ITEMS = "SELECT * FROM $TASKS WHERE $OWNER_ID=:$ID ORDER BY $ORDERS"
-
-    /** FAVORITE QUERIES -------------------------------------------------------------------------------------------- */
-    const val FAVORITE_DELETE = "DELETE FROM $FAVORITE"
-    const val FAVORITE_DELETE_SINGLE_ITEM = "DELETE FROM $FAVORITE WHERE $ID=:$ID"
-    const val FAVORITE_GET_SINGLE_ITEM = "SELECT * FROM $FAVORITE WHERE $ID=:$ID"
-    const val FAVORITE_GET_LIST_ITEMS = "SELECT * FROM $FAVORITE ORDER BY $DATE"
-    const val FAVORITE_EXIST_SINGLE_ITEM = "SELECT COUNT($ID) FROM $FAVORITE WHERE $ID=:$ID"
-    const val FAVORITE_GET_MAX_ORDER = "SELECT * FROM $FAVORITE ORDER BY $ORDERS DESC LIMIT 1"
-    const val FAVORITE_CHECK = "SELECT COUNT($ID) FROM $FAVORITE"
 
     /** LOCATION QUERIES ------------------------------------------------------------------------------------------------ */
     const val LOCATION_DELETE = "DELETE FROM $LOCATION"

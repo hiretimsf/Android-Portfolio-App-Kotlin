@@ -26,7 +26,6 @@ import hiretimsf.com.app.repository.database.model.button.ButtonModel
 import hiretimsf.com.app.repository.database.model.experience.ExperienceModel
 import hiretimsf.com.app.repository.database.model.resource.ResourceModel
 import hiretimsf.com.app.repository.database.model.task.TaskModel
-import hiretimsf.com.app.utils.state.FavoriteState
 import javax.inject.Inject
 
 @HiltViewModel
@@ -73,11 +72,6 @@ class ExperienceDetailFragmentViewModel @Inject constructor(
         .flatMapLatest { id -> Pager(configResource) { resourceDao.getListItems(id) }.flow }
         .cachedIn(viewModelScope)
 
-    /** Resource state */
-    private val _resourceState = MutableStateFlow<FavoriteState?>(null)
-    val resourceStateFlow: StateFlow<FavoriteState?> = _resourceState.asStateFlow()
-    val resourceState: FavoriteState? get() = _resourceState.value
-
     /** Experience item data */
     val checkResourceTable: StateFlow<Int> = idFlow.filterNotNull()
         .flatMapLatest { id -> resourceDao.check(id) }
@@ -108,10 +102,4 @@ class ExperienceDetailFragmentViewModel @Inject constructor(
         _url.value = url
     }
 
-    /**
-     * Set resource state
-     * */
-    fun setResourceState(state: FavoriteState) {
-        _resourceState.value = state
-    }
 }

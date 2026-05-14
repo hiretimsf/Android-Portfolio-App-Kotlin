@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt.android)
-    alias(libs.plugins.navigation.safeargs)
     alias(libs.plugins.firebase.perf)
     alias(libs.plugins.google.services)
 }
@@ -54,8 +53,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-
-            resValue("string", "google_maps_key", (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "").toString())
             versionNameSuffix = "-debug"
         }
 
@@ -69,7 +66,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            resValue("string", "google_maps_key", (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "").toString())
         }
     }
 
@@ -82,7 +78,6 @@ android {
         buildConfig = true
         compose = true
         resValues = true
-        viewBinding = true
     }
 
     packaging {
@@ -104,26 +99,14 @@ dependencies {
 
     // Google
     implementation(libs.google.material)
-    implementation(libs.google.map)
-    implementation(libs.google.guava)
 
     // AndroidX Foundation
     implementation(libs.androidx.core)
-    implementation(libs.androidx.futures)
     implementation(libs.androidx.vector)
-    implementation(libs.androidx.constraint)
-    implementation(libs.androidx.viewpager2)
-    implementation(libs.androidx.emoji)
-    implementation(libs.androidx.preferences)
-    implementation(libs.androidx.recyclerview)
-    implementation(libs.androidx.swipe.refresh)
 
     // Activity
     implementation(libs.activity.appcompat)
     implementation(libs.activity.compose)
-
-    // Fragment
-    implementation(libs.fragment.ktx)
 
     // Android Architecture components
     implementation(libs.lifecycle.viewmodel)
@@ -135,9 +118,7 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
-    implementation(libs.navigation.fragment)
     implementation(libs.navigation.compose)
-    implementation(libs.navigation.ui)
     implementation(libs.paging.runtime)
     implementation(libs.paging.compose)
 
@@ -148,7 +129,6 @@ dependencies {
 
     // Dependency injection
     implementation(libs.hilt.android)
-    implementation(libs.hilt.navigation.fragment)
     implementation(libs.hilt.navigation.compose)
     kapt(libs.hilt.compiler)
     implementation(libs.splash.screen)
@@ -174,7 +154,6 @@ dependencies {
     androidTestImplementation(libs.androidx.test)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.espresso)
-    testImplementation(libs.fragment.test)
     testImplementation(libs.androidx.arch.test)
     testImplementation(libs.paging.test)
     debugImplementation(libs.compose.ui.tooling)

@@ -1,8 +1,6 @@
 package hiretimsf.com.app.screens.welcome
 
-import android.content.res.ColorStateList
 import android.content.res.Configuration
-import android.view.Gravity
 import android.widget.ImageView
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -18,6 +16,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,8 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -41,7 +40,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.flow.collectLatest
 import hiretimsf.com.app.R
 import hiretimsf.com.app.repository.database.model.welcome.WelcomeModel
@@ -275,36 +273,27 @@ private fun WelcomeButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-    val buttonHeightPadding = dimensionResource(SdpR.dimen._10sdp)
-    val buttonCornerRadius = dimensionResource(SdpR.dimen._4sdp)
-    val density = LocalDensity.current
-    val buttonHeightPaddingPx = with(density) { buttonHeightPadding.roundToPx() }
-    val buttonCornerRadiusPx = with(density) { buttonCornerRadius.roundToPx() }
-    val primaryColor = androidx.core.content.ContextCompat.getColor(context, R.color.colorPrimary)
-    val onPrimaryColor = androidx.core.content.ContextCompat.getColor(context, R.color.colorOnPrimary)
-
-    AndroidView(
+    Button(
+        onClick = onClick,
         modifier = modifier,
-        factory = {
-            MaterialButton(context, null, com.google.android.material.R.attr.materialButtonStyle).apply {
-                gravity = Gravity.CENTER
-                isAllCaps = true
-                textAlignment = android.view.View.TEXT_ALIGNMENT_CENTER
-                setTextAppearance(R.style.TextAppearance_Headline)
-                textSize = 22f
-                setTextColor(onPrimaryColor)
-                backgroundTintList = ColorStateList.valueOf(primaryColor)
-                cornerRadius = buttonCornerRadiusPx
-                setPadding(paddingLeft, buttonHeightPaddingPx, paddingRight, buttonHeightPaddingPx)
-                setOnClickListener { onClick() }
-            }
-        },
-        update = { button ->
-            button.text = text
-            button.setOnClickListener { onClick() }
-        },
-    )
+        shape = RoundedCornerShape(dimensionResource(SdpR.dimen._4sdp)),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = colorResource(R.color.colorPrimary),
+            contentColor = colorResource(R.color.colorOnPrimary),
+        ),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(
+            vertical = dimensionResource(SdpR.dimen._10sdp),
+        ),
+    ) {
+        Text(
+            text = text.uppercase(),
+            fontFamily = portfolioFontFamily(),
+            fontSize = 22.sp,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
 }
 
 @Composable

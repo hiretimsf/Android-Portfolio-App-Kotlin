@@ -8,7 +8,6 @@ sealed class AppRoute(val route: String) {
     data object Portfolio : AppRoute("portfolio")
     data object Experience : AppRoute("experience")
     data object Settings : AppRoute("settings")
-    data object Favorite : AppRoute("favorite")
     data object AppInfo : AppRoute("app-info")
 
     data object PortfolioDetail : AppRoute("portfolio/{id}?title={title}") {
@@ -29,5 +28,4 @@ val topLevelRoutes = setOf(
     AppRoute.Portfolio.route,
     AppRoute.Experience.route,
     AppRoute.Settings.route,
-    AppRoute.Favorite.route,
 )

@@ -8,7 +8,6 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,18 +16,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import hiretimsf.com.app.repository.database.dao.button.ButtonDao
 import hiretimsf.com.app.repository.database.dao.category.CategoryDao
-import hiretimsf.com.app.repository.database.dao.favorite.FavoriteDao
 import hiretimsf.com.app.repository.database.dao.portfolio.PortfolioDao
 import hiretimsf.com.app.repository.database.dao.screenshot.ScreenShotDao
 import hiretimsf.com.app.repository.database.model.button.ButtonModel
 import hiretimsf.com.app.repository.database.model.category.CategoryModel
-import hiretimsf.com.app.repository.database.model.favorite.FavoriteModel
 import hiretimsf.com.app.repository.database.model.portfolio.PortfolioModel
 import hiretimsf.com.app.repository.database.model.screenshot.ScreenShotModel
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,7 +33,6 @@ class PortfolioDetailFragmentViewModel @Inject constructor(
     private val buttonDao: ButtonDao,
     private val categoryDao: CategoryDao,
     private val screenshotDao: ScreenShotDao,
-    private val favoriteDao: FavoriteDao
 ) : ViewModel() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -68,12 +62,6 @@ class PortfolioDetailFragmentViewModel @Inject constructor(
         .flatMapLatest { id -> portfolioDao.getSingleItem(id) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
     val portfolio: PortfolioModel? get() = portfolioFlow.value
-
-    /** Is it favorite? */
-    val favoriteFlow: StateFlow<Int> = idFlow.filterNotNull()
-        .flatMapLatest { id -> favoriteDao.existSingleItem(id) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
-    val favorite: Int get() = favoriteFlow.value
 
     /** Button data */
     private val configButton = PagingConfig(pageSize = 3, enablePlaceholders = true, initialLoadSize = 3)
@@ -124,43 +112,4 @@ class PortfolioDetailFragmentViewModel @Inject constructor(
         _videoUrl.value = url
     }
 
-    /**
-     * Save as favorite
-     * */
-    fun saveToFavorite(item: PortfolioModel) {
-        val favorite = FavoriteModel(
-            id = item.id,
-            ownerId = item.ownerId,
-            title = item.title,
-            subTitle = item.subTitle,
-            logo = item.logo,
-            logoDescription = item.logoDescription,
-            coverImage = item.coverImage,
-            imageDescription = item.imageDescription,
-            text = item.text,
-            info = item.info,
-            dateFrom = item.dateFrom,
-            dateTo = item.dateTo,
-            header = item.header,
-            categoryType = item.categoryType,
-            videoUrl = item.videoUrl,
-            order = item.order,
-            date = Calendar.getInstance().time
-        )
-
-        viewModelScope.launch(Dispatchers.IO) {
-            /** Insert a portfolio item in to favorite table */
-            favoriteDao.insert(favorite)
-        }
-    }
-
-    /**
-     * Remove from favorite
-     * */
-    fun removeFromFavorite(id: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            /** Remove a favorite item */
-            favoriteDao.deleteSingleItem(id)
-        }
-    }
 }

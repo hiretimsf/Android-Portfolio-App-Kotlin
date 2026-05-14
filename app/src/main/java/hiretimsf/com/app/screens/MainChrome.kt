@@ -94,12 +94,7 @@ val bottomDestinations = listOf(
     ),
 )
 
-val drawerDestinations = bottomDestinations + MainChromeDestination(
-    route = AppRoute.Favorite.route,
-    titleRes = R.string.menu_favorite,
-    iconRes = R.drawable.ic_menu_love,
-    animatedIconRes = R.drawable.ic_menu_favorite_animation,
-)
+val drawerDestinations = bottomDestinations
 
 private val questrial = FontFamily(Font(R.font.questrial))
 

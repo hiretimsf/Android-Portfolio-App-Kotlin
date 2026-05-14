@@ -47,8 +47,6 @@ import hiretimsf.com.app.screens.experience.ExperienceComposeScreen
 import hiretimsf.com.app.screens.experience.ExperienceViewModel
 import hiretimsf.com.app.screens.experience.detail.ExperienceDetailComposeScreen
 import hiretimsf.com.app.screens.experience.detail.ExperienceDetailFragmentViewModel
-import hiretimsf.com.app.screens.favorite.FavoriteComposeScreen
-import hiretimsf.com.app.screens.favorite.FavoriteViewModel
 import hiretimsf.com.app.screens.portfolio.PortfolioComposeScreen
 import hiretimsf.com.app.screens.portfolio.PortfolioViewModel
 import hiretimsf.com.app.screens.portfolio.detail.PortfolioDetailComposeScreen
@@ -230,17 +228,6 @@ private fun AppNavHost(
         composable(AppRoute.Settings.route) {
             SettingsRoute(navController = navController)
         }
-        composable(AppRoute.Favorite.route) {
-            val viewModel: FavoriteViewModel = hiltViewModel()
-            val count by viewModel.table.collectAsStateWithLifecycle()
-            FavoriteComposeScreen(
-                items = viewModel.data.collectAsLazyPagingItems(),
-                isEmpty = count == 0,
-                onFavoriteClick = { item ->
-                    navController.navigate(AppRoute.PortfolioDetail.create(item.id, item.title))
-                },
-            )
-        }
         composable(
             route = AppRoute.PortfolioDetail.route,
             arguments = listOf(
@@ -365,7 +352,6 @@ private fun resolveTitle(context: Context, route: String?, arguments: android.os
         AppRoute.Portfolio.route -> context.getString(R.string.menu_portfolio)
         AppRoute.Experience.route -> context.getString(R.string.menu_experience)
         AppRoute.Settings.route -> context.getString(R.string.menu_settings)
-        AppRoute.Favorite.route -> context.getString(R.string.menu_favorite)
         AppRoute.PortfolioDetail.route -> arguments?.getString("title").orEmpty()
         AppRoute.ExperienceDetail.route -> arguments?.getString("company").orEmpty()
         else -> context.getString(R.string.app_name)
@@ -387,7 +373,6 @@ private fun String.toRoute(): String? {
         Constants.FRAGMENT_PORTFOLIO -> AppRoute.Portfolio.route
         Constants.FRAGMENT_EXPERIENCE -> AppRoute.Experience.route
         Constants.FRAGMENT_SETTINGS -> AppRoute.Settings.route
-        Constants.FRAGMENT_FAVORITE -> AppRoute.Favorite.route
         else -> null
     }
 }
@@ -398,7 +383,6 @@ private fun String.toSavedStateHolder(): String? {
         AppRoute.Portfolio.route -> Constants.FRAGMENT_PORTFOLIO
         AppRoute.Experience.route -> Constants.FRAGMENT_EXPERIENCE
         AppRoute.Settings.route -> Constants.FRAGMENT_SETTINGS
-        AppRoute.Favorite.route -> Constants.FRAGMENT_FAVORITE
         else -> null
     }
 }
