@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="welcome_button_next">Next</string>
+    <string name="welcome_button_finish">Finish</string>
+
+    <string name="welcome_page_hello_title">&#x1F44B;Hello</string>
+    <string name="welcome_page_hello_subtitle">I am Tim Baz,</string>
+    <string name="welcome_page_hello_text">born and raised in Mongolia, studied CS in Germany, and moved to the US three and a half years ago.</string>
+    <string name="welcome_page_hello_image_description">Man waves a hand</string>
+
+    <string name="welcome_page_background_title">Background</string>
+    <string name="welcome_page_background_subtitle">Design Engineer,</string>
+    <string name="welcome_page_background_text">specializing in user interfaces, and published two apps on the Google Play Store.</string>
+    <string name="welcome_page_background_image_description">Man texts on the phone</string>
+
+    <string name="welcome_page_passion_title">Passion</string>
+    <string name="welcome_page_passion_subtitle">My portfolio</string>
+    <string name="welcome_page_passion_text">I built this app to show my skills and passion for design and development.</string>
+    <string name="welcome_page_passion_image_description">Man paints a landscape</string>
+</resources>

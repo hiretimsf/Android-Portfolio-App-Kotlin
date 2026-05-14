@@ -111,9 +111,9 @@ private fun WelcomeContent(
 ) {
     val buttonText = stringResource(
         if (pages.isNotEmpty() && currentItem == pages.lastIndex) {
-            R.string.button_finish
+            R.string.welcome_button_finish
         } else {
-            R.string.button_next
+            R.string.welcome_button_next
         },
     )
 
@@ -306,24 +306,7 @@ private fun portfolioFontFamily(): FontFamily {
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 private fun WelcomeComposeScreenPreview() {
-    val pages = listOf(
-        WelcomeModel(
-            id = "1",
-            title = "Hello",
-            subTitle = "I'm Tim,",
-            text = "born and raised in Mongolia, studied CS in Germany, and moved to the US three and a half years ago.",
-            imageDescription = "Man waves a hand",
-            order = 1,
-        ),
-        WelcomeModel(
-            id = "2",
-            title = "Background",
-            subTitle = "Design Engineer,",
-            text = "specializing in user interfaces, and published two apps on the Google Play Store.",
-            imageDescription = "Man texts on the phone",
-            order = 2,
-        ),
-    )
+    val pages = welcomePreviewPages()
 
     WelcomeContent(
         pages = pages,
@@ -341,3 +324,28 @@ private fun WelcomeComposeScreenPreview() {
         },
     )
 }
+
+@Composable
+private fun welcomePreviewPages(): List<WelcomeModel> {
+    return listOf(
+        WelcomeModel(
+            id = WELCOME_PREVIEW_PAGE_ONE_ID,
+            title = stringResource(R.string.welcome_page_hello_title),
+            subTitle = stringResource(R.string.welcome_page_hello_subtitle),
+            text = stringResource(R.string.welcome_page_hello_text),
+            imageDescription = stringResource(R.string.welcome_page_hello_image_description),
+            order = 1,
+        ),
+        WelcomeModel(
+            id = WELCOME_PREVIEW_PAGE_TWO_ID,
+            title = stringResource(R.string.welcome_page_background_title),
+            subTitle = stringResource(R.string.welcome_page_background_subtitle),
+            text = stringResource(R.string.welcome_page_background_text),
+            imageDescription = stringResource(R.string.welcome_page_background_image_description),
+            order = 2,
+        ),
+    )
+}
+
+private const val WELCOME_PREVIEW_PAGE_ONE_ID = "1"
+private const val WELCOME_PREVIEW_PAGE_TWO_ID = "2"

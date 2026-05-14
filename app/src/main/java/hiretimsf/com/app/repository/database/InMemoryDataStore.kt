@@ -1,5 +1,7 @@
 package hiretimsf.com.app.repository.database
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import hiretimsf.com.app.repository.database.model.LocationModel
 import hiretimsf.com.app.repository.database.model.button.ButtonModel
@@ -18,10 +20,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class InMemoryDataStore @Inject constructor() {
+class InMemoryDataStore @Inject constructor(
+    @param:ApplicationContext private val context: Context
+) {
     private val all = LocalPortfolioStrings.all
 
-    val welcome = MutableStateFlow(all.welcome.sortedBy { it.order })
+    val welcome = MutableStateFlow(context.welcomeItems().sortedBy { it.order })
     val profiles = MutableStateFlow(all.profile.sortedBy { it.order })
     val socials = MutableStateFlow(all.social.sortedBy { it.order })
     val about = MutableStateFlow(all.about.sortedBy { it.order })

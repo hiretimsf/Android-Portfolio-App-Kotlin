@@ -20,8 +20,6 @@
 	<string name="menu_remove">Remove</string>
     <string name="menu_delete_all">Delete all</string>
 	<string name="dialog_app_info">App Info</string>
-	<string name="button_next">Next</string>
-	<string name="button_finish">Finish</string>
 	<string name="button_dismiss">Close</string>
 	<string name="cd_logo">App\'s logo</string>
 	<string name="cd_background">Background image</string>

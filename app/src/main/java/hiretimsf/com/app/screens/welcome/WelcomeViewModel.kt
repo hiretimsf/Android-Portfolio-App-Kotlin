@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
-import hiretimsf.com.app.R
 import hiretimsf.com.app.repository.database.dao.welcome.WelcomeDao
 import hiretimsf.com.app.repository.database.model.welcome.WelcomeModel
 import hiretimsf.com.app.utils.constants.Constants
@@ -55,11 +54,6 @@ class WelcomeViewModel @Inject constructor(
     private val _onClicked = MutableStateFlow(false)
     val onClickedFlow: StateFlow<Boolean> = _onClicked.asStateFlow()
 
-    /** Skip and get started button text  */
-    private val _buttonText = MutableStateFlow(context.getString(R.string.button_next))
-    val buttonTextFlow: StateFlow<String> = _buttonText.asStateFlow()
-    val buttonText: String get() = _buttonText.value
-
     /** FUNCTIONS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
@@ -100,10 +94,4 @@ class WelcomeViewModel @Inject constructor(
         _onClicked.value = status
     }
 
-    /**
-     * Set skip and get started button text
-     */
-    fun setButtonText(text: String) {
-        _buttonText.value = text
-    }
 }
