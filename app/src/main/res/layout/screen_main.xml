@@ -16,8 +16,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-            <!-- App bar -->
-            <com.google.android.material.appbar.AppBarLayout
+            <!-- Compose app bar -->
+            <androidx.compose.ui.platform.ComposeView
                     android:id="@+id/main_screen_app_bar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -26,19 +26,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toTopOf="@+id/main_screen_host_fragment"
-                    android:elevation="@dimen/elevation_4dp">
-
-                <com.google.android.material.appbar.MaterialToolbar
-                        android:id="@+id/main_screen_toolbar"
-                        android:layout_width="match_parent"
-                        android:layout_height="?android:actionBarSize"
-                        android:elevation="@dimen/elevation_16dp"
-                        app:titleTextAppearance="@style/ToolbarTitleStyle"
-                        app:subtitleTextAppearance="@style/ToolbarSubTitleStyle"
-                        app:popupTheme="@style/ToolbarPopupMenuStyle"
-                        android:theme="@style/ToolbarStyle"/>
-
-            </com.google.android.material.appbar.AppBarLayout>
+                    android:elevation="@dimen/elevation_4dp"/>
 
             <!-- Navigation host fragment -->
             <androidx.fragment.app.FragmentContainerView
@@ -54,9 +42,8 @@
                     app:defaultNavHost="true"
                     app:navGraph="@navigation/navigation"/>
 
-            <!-- Bottom Menu -->
-            <com.google.android.material.bottomnavigation.BottomNavigationView
-                    style="?attr/bottomNavigationStyle"
+            <!-- Compose bottom menu -->
+            <androidx.compose.ui.platform.ComposeView
                     android:id="@+id/main_screen_bottom_menu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -64,28 +51,15 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/main_screen_host_fragment"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    android:elevation="@dimen/elevation_16dp"
-                    app:menu="@menu/bottom_menu"/>
+                    android:elevation="@dimen/elevation_16dp"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Side bottom_menu -->
-        <com.google.android.material.navigation.NavigationView
+        <!-- Compose drawer menu -->
+        <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/main_screen_side_menu"
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/_280sdp"
                 android:layout_height="match_parent"
                 android:layout_gravity="start"
-                android:background="?android:attr/windowBackground"
-                app:headerLayout="@layout/header_placeholder"
-                app:itemBackground="?android:selectableItemBackground"
-                app:itemIconSize="@dimen/_16sdp"
-                app:itemIconPadding="@dimen/_20sdp"
-                app:itemTextAppearance="@style/SideMenuTextStyle"
-                app:itemTextColor="@color/side_navigation_text_color"
-                app:menu="@menu/side_menu">
-
-            <!-- Drawer header -->
-            <include layout="@layout/header"/>
-
-        </com.google.android.material.navigation.NavigationView>
+                android:background="?android:attr/windowBackground"/>
     </androidx.drawerlayout.widget.DrawerLayout>

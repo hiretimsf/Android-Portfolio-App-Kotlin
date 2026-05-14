@@ -2,21 +2,17 @@ package hiretimsf.com.app.screens.experience
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.paging.compose.collectAsLazyPagingItems
 import dagger.hilt.android.AndroidEntryPoint
-import hiretimsf.com.app.R
-import hiretimsf.com.app.databinding.FragmentExperienceBinding
-import hiretimsf.com.app.repository.database.model.experience.ExperienceModel
 import hiretimsf.com.app.screens.MainViewModel
-import hiretimsf.com.app.utils.adapters.listItemAdapters.experience.ExperienceAdapter
-import hiretimsf.com.app.utils.adapters.listItemAdapters.experience.ExperienceClickListener
 import hiretimsf.com.app.utils.constants.Constants
 import hiretimsf.com.app.utils.extensions.collectFlow
 
@@ -51,13 +47,6 @@ class ExperienceFragment : Fragment() {
      * */
     private val viewModel: ExperienceViewModel by viewModels()
 
-    /**
-     * View binding
-     */
-    private lateinit var binding: FragmentExperienceBinding
-
-    private lateinit var experienceMenu: Menu
-
     /** INITIALIZATION * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
@@ -77,42 +66,28 @@ class ExperienceFragment : Fragment() {
      * @return Return the View for the fragment's UI.
      */
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentExperienceBinding.inflate(inflater, container, false)
-
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         /** Set fragment state in shared view model */
         sharedViewModel.setFragmentStateHolder(Constants.FRAGMENT_EXPERIENCE)
 
-        /** Experience items */
-        val experienceAdapter = ExperienceAdapter(ExperienceClickListener(viewModel::setSelectedItem))
-        val layoutManagerExperience = LinearLayoutManager(context)
-        layoutManagerExperience.orientation = LinearLayoutManager.VERTICAL
-        val portfolioList = binding.experienceScreenList
-
-        portfolioList.apply {
-            this.layoutManager = layoutManagerExperience
-            this.hasFixedSize()
-            this.adapter = experienceAdapter
-        }
-
         /** Set observers */
-        setObservers(experienceAdapter)
+        setObservers()
 
-        return binding.root
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                ExperienceComposeScreen(
+                    items = viewModel.data.collectAsLazyPagingItems(),
+                    onExperienceClick = viewModel::setSelectedItem,
+                )
+            }
+        }
     }
 
     /** FUNCTIONS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /** Set observers */
-    private fun setObservers(experienceAdapter: ExperienceAdapter) {
-
-        /**
-         * Observer for portfolio adapters data
-         * */
-        viewLifecycleOwner.collectFlow(viewModel.data) { data ->
-            experienceAdapter.submitData(viewLifecycleOwner.lifecycle, data)
-        }
-
+    private fun setObservers() {
         /**
          * Click listener for experience item
          * */

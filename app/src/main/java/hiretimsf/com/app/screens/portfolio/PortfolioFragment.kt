@@ -2,20 +2,21 @@ package hiretimsf.com.app.screens.portfolio
 
 import android.os.Bundle
 import android.view.*
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.paging.compose.collectAsLazyPagingItems
 import dagger.hilt.android.AndroidEntryPoint
 import hiretimsf.com.app.R
-import hiretimsf.com.app.databinding.FragmentPortfolioBinding
 import hiretimsf.com.app.screens.MainViewModel
-import hiretimsf.com.app.utils.adapters.listItemAdapters.portfolio.PortfolioAdapter
-import hiretimsf.com.app.utils.adapters.listItemAdapters.portfolio.PortfolioClickListener
 import hiretimsf.com.app.utils.constants.Constants
 import hiretimsf.com.app.utils.extensions.collectFlow
 import hiretimsf.com.app.utils.state.ToastEmpty
@@ -53,16 +54,6 @@ class PortfolioFragment : Fragment() {
      * */
     private val viewModel: PortfolioViewModel by viewModels()
 
-    /**
-     * View binding
-     */
-    private lateinit var binding: FragmentPortfolioBinding
-
-    /**
-     * Pull to refresh layout
-     */
-    private val pullToRefresh by lazy { binding.portfolioScreenRefresh }
-
     /** INITIALIZATION * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
@@ -82,33 +73,32 @@ class PortfolioFragment : Fragment() {
      * @return Return the View for the fragment's UI.
      */
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentPortfolioBinding.inflate(inflater, container, false)
-
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         /** Set fragment state in shared view model */
         sharedViewModel.setFragmentStateHolder(Constants.FRAGMENT_PORTFOLIO)
 
-        /** Portfolio items */
-        val portfolioAdapter = PortfolioAdapter(PortfolioClickListener { viewModel.setSelectedItem(it) })
-        val layoutManagerPortfolio = LinearLayoutManager(context)
-        layoutManagerPortfolio.orientation = LinearLayoutManager.VERTICAL
-        val portfolioList = binding.portfolioScreenList
-
-        portfolioList.apply {
-            this.layoutManager = layoutManagerPortfolio
-            this.hasFixedSize()
-            this.adapter = portfolioAdapter
-        }
-
         setupOptionsMenu()
 
-        /** Set listeners */
-        setPullToRefreshListener()
-
         /** Set observers */
-        setObservers(portfolioAdapter)
+        setObservers()
 
-        return binding.root
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val portfolioItems = viewModel.data.collectAsLazyPagingItems()
+                val isRefreshing by viewModel.isRefreshingFlow.collectAsStateWithLifecycle()
+
+                PortfolioComposeScreen(
+                    items = portfolioItems,
+                    isRefreshing = isRefreshing,
+                    onRefresh = {
+                        viewModel.setRefreshStatus(true)
+                        viewModel.fetch()
+                    },
+                    onPortfolioClick = viewModel::setSelectedItem,
+                )
+            }
+        }
     }
 
     /** FUNCTIONS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -137,14 +127,7 @@ class PortfolioFragment : Fragment() {
     }
 
     /** Set observers */
-    private fun setObservers(portfolioAdapter: PortfolioAdapter) {
-        /**
-         * Observer for portfolio adapters data
-         * */
-        viewLifecycleOwner.collectFlow(viewModel.data) { data ->
-            portfolioAdapter.submitData(viewLifecycleOwner.lifecycle, data)
-        }
-
+    private fun setObservers() {
         /**
          * Click listener for portfolio item
          * */
@@ -155,17 +138,6 @@ class PortfolioFragment : Fragment() {
                 findNavController().navigate(action)
                 viewModel.setSelectedItem(null)
             }
-        }
-
-        /**
-         * Set observer for refresh status
-         * */
-        viewLifecycleOwner.collectFlow(viewModel.isRefreshingFlow) { status ->
-            if (!pullToRefresh.isRefreshing && status) {
-                pullToRefresh.isRefreshing = status
-                viewModel.fetch()
-            } else if (pullToRefresh.isRefreshing && !status)
-                pullToRefresh.isRefreshing = status
         }
 
         /**
@@ -181,16 +153,4 @@ class PortfolioFragment : Fragment() {
             }
         }
     }
-
-
-    /**
-     * Sets up a SwipeRefreshLayout.OnRefreshListener that is invoked when the user
-     * performs a swipe-to-refresh gesture.
-     * */
-    private fun setPullToRefreshListener() {
-        pullToRefresh.setOnRefreshListener {
-            viewModel.fetch()
-        }
-    }
-
 }

@@ -120,6 +120,7 @@ dependencies {
 
     // Activity
     implementation(libs.activity.appcompat)
+    implementation(libs.activity.compose)
 
     // Fragment
     implementation(libs.fragment.ktx)
@@ -135,8 +136,10 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.navigation.fragment)
+    implementation(libs.navigation.compose)
     implementation(libs.navigation.ui)
     implementation(libs.paging.runtime)
+    implementation(libs.paging.compose)
 
     // Firebase components
     implementation(platform(libs.firebase.bom))
@@ -146,6 +149,7 @@ dependencies {
     // Dependency injection
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.fragment)
+    implementation(libs.hilt.navigation.compose)
     kapt(libs.hilt.compiler)
     implementation(libs.splash.screen)
 
