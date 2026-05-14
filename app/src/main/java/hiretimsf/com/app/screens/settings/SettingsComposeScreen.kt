@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -109,11 +110,11 @@ fun SettingsComposeScreen(
             onClick = onRateClick,
         )
 
-        SettingsCategoryTitle(text = "HireTimSF is Made By")
+        SettingsCategoryTitle(text = stringResource(R.string.category_made))
         SettingsPreferenceItem(
             icon = R.drawable.profile,
-            title = "tumur_alex",
-            summary = "You can find me on Twitter",
+            title = stringResource(R.string.title_tumur),
+            summary = stringResource(R.string.summary_tumur),
             iconSize = 25.dp,
             iconTint = null,
             showDivider = false,
@@ -122,8 +123,8 @@ fun SettingsComposeScreen(
 
         SettingsFooterTitle(text = "Thanks for visiting HireTimSF")
         SettingsEmailItem(
-            title = "You can get in touch with me",
-            summary = "✉️ hiretimsf@gmail.com",
+            title = stringResource(R.string.title_email),
+            summary = stringResource(R.string.summary_email),
             onClick = onEmailClick,
         )
     }

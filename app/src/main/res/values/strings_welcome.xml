@@ -4,17 +4,17 @@
     <string name="welcome_button_finish">Finish</string>
 
     <string name="welcome_page_hello_title">&#x1F44B;Hello</string>
-    <string name="welcome_page_hello_subtitle">I am Tim Baz,</string>
-    <string name="welcome_page_hello_text">born and raised in Mongolia, studied CS in Germany, and moved to the US three and a half years ago.</string>
-    <string name="welcome_page_hello_image_description">Man waves a hand</string>
+    <string name="welcome_page_hello_subtitle">I\'m Tim,</string>
+    <string name="welcome_page_hello_text">I am a Design Engineer based in the San Francisco Bay Area.</string>
+    <string name="welcome_page_hello_image_description">Illustration of a person waving</string>
 
     <string name="welcome_page_background_title">Background</string>
-    <string name="welcome_page_background_subtitle">Design Engineer,</string>
-    <string name="welcome_page_background_text">specializing in user interfaces, and published two apps on the Google Play Store.</string>
-    <string name="welcome_page_background_image_description">Man texts on the phone</string>
+    <string name="welcome_page_background_subtitle">Modern web apps,</string>
+    <string name="welcome_page_background_text">I focus on Next.js, React, TypeScript, and Tailwind CSS.</string>
+    <string name="welcome_page_background_image_description">Illustration of a person using a phone</string>
 
     <string name="welcome_page_passion_title">Passion</string>
     <string name="welcome_page_passion_subtitle">My portfolio</string>
-    <string name="welcome_page_passion_text">I built this app to show my skills and passion for design and development.</string>
-    <string name="welcome_page_passion_image_description">Man paints a landscape</string>
+    <string name="welcome_page_passion_text">I built this app to share my work.</string>
+    <string name="welcome_page_passion_image_description">Illustration of a person painting</string>
 </resources>

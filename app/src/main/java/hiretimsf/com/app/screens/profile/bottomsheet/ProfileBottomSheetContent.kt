@@ -221,9 +221,9 @@ private fun bottomSheetFontFamily(): FontFamily = FontFamily(Font(R.font.questri
 
 private fun String.socialIcon(): Int {
     return when (this) {
-        BsConstants.GITHUB -> R.drawable.ic_github
+        BsConstants.GITHUB, BsConstants.GITHUB_DISPLAY -> R.drawable.ic_github
         BsConstants.LINKEDIN -> R.drawable.ic_linkedin
-        BsConstants.TWITTER -> R.drawable.ic_twitter
+        BsConstants.TWITTER, BsConstants.X_TWITTER -> R.drawable.ic_twitter
         BsConstants.PDF -> R.drawable.ic_pdf
         else -> R.drawable.ic_globe
     }
@@ -236,26 +236,26 @@ private fun ProfileBottomSheetContentPreview() {
         profile = ProfileModel(
             id = DbConstants.PERSON_ID,
             greeting = "Hello",
-            name = "Tim Baz",
-            title = "Design Engineer",
+            name = stringResource(R.string.name),
+            title = stringResource(R.string.title),
             image = "",
-            imageDescription = "Profile picture",
-            email = "hiretimsf@gmail.com",
+            imageDescription = stringResource(R.string.profile_image_description),
+            email = stringResource(R.string.contact_email),
             order = 1,
         ),
         socialItems = listOf(
             SocialModel(
                 id = "github",
                 ownerId = DbConstants.PERSON_ID,
-                name = BsConstants.GITHUB,
-                url = "https://github.com",
+                name = stringResource(R.string.profile_social_github_label),
+                url = stringResource(R.string.profile_social_github_url),
                 order = 1,
             ),
             SocialModel(
                 id = "linkedin",
                 ownerId = DbConstants.PERSON_ID,
-                name = BsConstants.LINKEDIN,
-                url = "https://linkedin.com",
+                name = stringResource(R.string.profile_social_linkedin_label),
+                url = stringResource(R.string.profile_social_linkedin_url),
                 order = 2,
             ),
         ),

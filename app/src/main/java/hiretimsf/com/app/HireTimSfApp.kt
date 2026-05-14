@@ -316,8 +316,10 @@ private fun SettingsRoute(navController: NavHostController) {
         onSourceCodeClick = { context.launchCustomTab(Constants.SOURCE_CODE_URL) },
         onPrivacyClick = { context.launchCustomTab(Constants.PRIVACY_URL) },
         onRateClick = { context.openUri("market://details?id=${context.packageName}") },
-        onTwitterClick = { context.launchCustomTab(Constants.TWITTER_URL) },
-        onEmailClick = { context.openUri("${Constants.MAILTO}${Constants.EMAIL}?subject=${Constants.SUBJECT}") },
+        onTwitterClick = { context.launchCustomTab(context.getString(R.string.profile_social_x_url)) },
+        onEmailClick = {
+            context.openUri("${Constants.MAILTO}${context.getString(R.string.contact_email)}?subject=${Constants.SUBJECT}")
+        },
     )
 }
 
@@ -390,7 +392,7 @@ private fun String.toSavedStateHolder(): String? {
 private fun Context.openEmail() {
     val intent = Intent(Intent.ACTION_SENDTO).apply {
         data = Constants.MAILTO.toUri()
-        putExtra(Intent.EXTRA_EMAIL, Constants.EMAIL)
+        putExtra(Intent.EXTRA_EMAIL, getString(R.string.contact_email))
         putExtra(Intent.EXTRA_SUBJECT, Constants.SUBJECT)
     }
     openIntent(intent)

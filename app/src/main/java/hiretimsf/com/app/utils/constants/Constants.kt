@@ -24,13 +24,11 @@ object Constants {
 
     /** EMAIL * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     const val MAILTO = "mailto:"
-    const val EMAIL = "hiretimsf@gmail.com"
     const val SUBJECT = "Oh Hello there"
 
     /** PREFERENCE SCREEN * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     const val SOURCE_CODE_URL = "https://github.com/tumurb/Portfolio"
     const val PRIVACY_URL = "https://tumur.me/terms.html"
-    const val TWITTER_URL = "https://twitter.com/tumur_alex"
 
     /** LIST ITEMS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     const val HEADER = 0

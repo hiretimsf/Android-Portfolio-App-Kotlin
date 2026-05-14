@@ -26,8 +26,8 @@ class InMemoryDataStore @Inject constructor(
     private val all = LocalPortfolioStrings.all
 
     val welcome = MutableStateFlow(context.welcomeItems().sortedBy { it.order })
-    val profiles = MutableStateFlow(all.profile.sortedBy { it.order })
-    val socials = MutableStateFlow(all.social.sortedBy { it.order })
+    val profiles = MutableStateFlow(context.profileItems().sortedBy { it.order })
+    val socials = MutableStateFlow(context.profileSocialItems().sortedBy { it.order })
     val about = MutableStateFlow(all.about.sortedBy { it.order })
     val app = MutableStateFlow(all.app.sortedBy { it.order })
     val portfolio = MutableStateFlow(all.portfolio.sortedBy { it.order })

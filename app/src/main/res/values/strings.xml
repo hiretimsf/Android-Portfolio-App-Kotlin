@@ -2,11 +2,7 @@
 <resources>
 	<string name="app_name">HireTimSF</string>
 	<string name="app_url">https://tumur.me</string>
-	<string name="app_text">Tim Baz | Design Engineer</string>
 	<string name="app_share_message">Please, share my portfolio with the world !!</string>
-	<string name="name">Tim Baz</string>
-	<string name="title">Design Engineer</string>
-	<string name="contact_email">hiretimsf@gmail.com</string>
 	<string name="menu_profile">Profile</string>
 	<string name="menu_portfolio">Portfolio</string>
 	<string name="menu_experience">Experience</string>
@@ -16,8 +12,6 @@
 	<string name="menu_share">Share</string>
 	<string name="menu_rate">Rate</string>
 	<string name="menu_privacy">Privacy</string>
-	<string name="menu_save">Save</string>
-	<string name="menu_remove">Remove</string>
     <string name="menu_delete_all">Delete all</string>
 	<string name="dialog_app_info">App Info</string>
 	<string name="button_dismiss">Close</string>
@@ -33,7 +27,6 @@
     <string name="cd_previous_photo">Show previous photo</string>
     <string name="cd_next_photo">Show next photo</string>
     <string name="cd_external_link">External link</string>
-	<string name="copy_right">You can get in touch with me \n ✉️ hiretimsf@gmail.com</string>
     <string name="preference_key_theme">theme</string>
     <string name="preference_key_theme_option">theme_option</string>
 	<string name="preference_key_app">app</string>
@@ -43,7 +36,6 @@
 	<string name="preference_key_rate">rate</string>
 	<string name="preference_key_made">made</string>
 	<string name="preference_key_tumur">tumur</string>
-	<string name="summary_tumur">You can find me on Twitter</string>
 	<string name="preference_key_footer">footer</string>
 	<string name="preference_key_email">email</string>
     <string name="category_theme_options">Display Options</string>
@@ -54,10 +46,6 @@
 	<string name="summary_external_link">External link</string>
 	<string name="title_privacy">Protecting Your Privacy</string>
 	<string name="title_rate">Rate This App</string>
-	<string name="category_made">HireTimSF is Made By</string>
-	<string name="title_tumur">tumur_alex</string>
-	<string name="title_email">You can get in touch with me</string>
-	<string name="summary_email">✉️ hiretimsf@gmail.com</string>
 	<string name="title_source_code">Source code</string>
 	<string name="summary_source_code">Licensed under the Apache License</string>
 	<string name="category_footer">Thanks for visiting HireTimSF</string>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="name">Tim Baz</string>
+    <string name="title">Design Engineer</string>
+    <string name="contact_email">hiretimsf@gmail.com</string>
+    <string name="profile_greeting">Nice to meet you</string>
+    <string name="profile_image_url">https://tumur.me/img/profile.jpg</string>
+    <string name="profile_image_description">Profile picture of Tim Baz</string>
+    <string name="copy_right">You can get in touch with me \n ✉️ hiretimsf@gmail.com</string>
+    <string name="category_made">HireTimSF is Made By</string>
+    <string name="title_tumur">@hiretimsf</string>
+    <string name="summary_tumur">You can find me on X</string>
+    <string name="title_email">You can get in touch with me</string>
+    <string name="summary_email">✉️ hiretimsf@gmail.com</string>
+
+    <string name="profile_social_x_label">X (Twitter)</string>
+    <string name="profile_social_x_url">https://x.com/hiretimsf</string>
+    <string name="profile_social_github_label">GitHub</string>
+    <string name="profile_social_github_url">https://github.com/hiretimsf</string>
+    <string name="profile_social_linkedin_label">LinkedIn</string>
+    <string name="profile_social_linkedin_url">https://www.linkedin.com/in/hiretimsf/</string>
+    <string name="profile_social_facebook_label">Facebook</string>
+    <string name="profile_social_facebook_url">https://www.facebook.com/hiretimsf/</string>
+    <string name="profile_social_strava_label">Strava</string>
+    <string name="profile_social_strava_url">https://www.strava.com/athletes/128944314</string>
+</resources>
