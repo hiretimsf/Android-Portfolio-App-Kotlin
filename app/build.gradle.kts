@@ -7,7 +7,6 @@ plugins {
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.navigation.safeargs)
     alias(libs.plugins.firebase.perf)
-    alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.google.services)
 }
 
@@ -30,7 +29,7 @@ val appVersionPatch = libs.versions.versionPatch.get().toInt()
 val appVersionBuild = libs.versions.versionBuild.get().toInt()
 
 android {
-    namespace = libs.versions.appId.get()
+    namespace = libs.versions.appNamespace.get()
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
@@ -142,7 +141,6 @@ dependencies {
     // Firebase components
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.core)
-    implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.monitoring)
 
     // Dependency injection
@@ -170,6 +168,7 @@ dependencies {
     // Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test)
+    androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.espresso)
     testImplementation(libs.fragment.test)
     testImplementation(libs.androidx.arch.test)

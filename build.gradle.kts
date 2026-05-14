@@ -9,7 +9,6 @@ plugins {
     alias(libs.plugins.hilt.android) apply false
     alias(libs.plugins.navigation.safeargs) apply false
     alias(libs.plugins.firebase.perf) apply false
-    alias(libs.plugins.firebase.crashlytics) apply false
 }
 
 tasks.register<Delete>("clean") {

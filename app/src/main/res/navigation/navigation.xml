@@ -7,7 +7,7 @@
 
     <!-- Welcome screen -->
     <fragment android:id="@+id/welcome_screen"
-              android:name="me.tumur.portfolio.screens.welcome.WelcomeFragment"
+              android:name="hiretimsf.com.app.screens.welcome.WelcomeFragment"
               tools:layout="@layout/fragment_welcome">
 
         <action android:id="@+id/action_to_profile_screen"
@@ -31,7 +31,7 @@
 
     <!-- Experience screen -->
     <fragment android:id="@+id/experience_screen"
-              android:name="me.tumur.portfolio.screens.experience.ExperienceFragment"
+              android:name="hiretimsf.com.app.screens.experience.ExperienceFragment"
               android:label="@string/menu_experience"
               tools:layout="@layout/fragment_experience">
 
@@ -57,7 +57,7 @@
 
     <!-- Experience detail screen -->
     <fragment android:id="@+id/experience_detail_screen"
-              android:name="me.tumur.portfolio.screens.experience.detail.ExperienceDetailFragment"
+              android:name="hiretimsf.com.app.screens.experience.detail.ExperienceDetailFragment"
               android:label="{company}"
               tools:layout="@layout/fragment_experience_detail">
 
@@ -75,13 +75,13 @@
 
     <!-- Settings screen -->
     <fragment android:id="@+id/settings_screen"
-              android:name="me.tumur.portfolio.screens.settings.SettingsFragment"
+              android:name="hiretimsf.com.app.screens.settings.SettingsFragment"
               android:label="@string/menu_settings">
     </fragment>
 
     <!-- App info dialog -->
     <dialog android:id="@+id/app_info_dialog"
-            android:name="me.tumur.portfolio.screens.settings.dialog.AppDialogFragment"
+            android:name="hiretimsf.com.app.screens.settings.dialog.AppDialogFragment"
             android:label="@string/dialog_app_info"/>
 
     <!-- Global action to app info dialog -->
@@ -98,7 +98,7 @@
         <!-- Profile -->
         <fragment
                 android:id="@+id/profile"
-                android:name="me.tumur.portfolio.screens.profile.ProfileFragment"
+                android:name="hiretimsf.com.app.screens.profile.ProfileFragment"
                 android:label="@string/menu_profile"
                 tools:layout="@layout/fragment_profile">
 
@@ -117,13 +117,13 @@
         <!-- Social -->
         <dialog
                 android:id="@+id/social"
-                android:name="me.tumur.portfolio.screens.profile.bottomsheet.ProfileBottomSheetFragment">
+                android:name="hiretimsf.com.app.screens.profile.bottomsheet.ProfileBottomSheetFragment">
         </dialog>
     </navigation>
 
     <!-- Portfolio screen -->
     <fragment android:id="@+id/portfolio_screen"
-              android:name="me.tumur.portfolio.screens.portfolio.PortfolioFragment"
+              android:name="hiretimsf.com.app.screens.portfolio.PortfolioFragment"
               android:label="@string/menu_portfolio"
               tools:layout="@layout/fragment_portfolio">
 
@@ -149,7 +149,7 @@
 
     <!-- Portfolio detail screen -->
     <fragment android:id="@+id/portfolio_detail_screen"
-              android:name="me.tumur.portfolio.screens.portfolio.detail.PortfolioDetailFragment"
+              android:name="hiretimsf.com.app.screens.portfolio.detail.PortfolioDetailFragment"
               android:label="{title}"
               tools:layout="@layout/fragment_portfolio_detail">
 
@@ -187,7 +187,7 @@
     <!-- Preview -->
     <fragment
             android:id="@+id/portfolio_detail_screen_preview"
-            android:name="me.tumur.portfolio.screens.portfolio.detail.preview.PreviewFragment"
+            android:name="hiretimsf.com.app.screens.portfolio.detail.preview.PreviewFragment"
             android:label="@string/preview"
             tools:layout="@layout/fragment_preview">
         <argument
@@ -203,7 +203,7 @@
 
     <!-- Favorite screen -->
     <fragment android:id="@+id/favorite_screen"
-              android:name="me.tumur.portfolio.screens.favorite.FavoriteFragment"
+              android:name="hiretimsf.com.app.screens.favorite.FavoriteFragment"
               android:label="@string/menu_favorite"
               tools:layout="@layout/fragment_favorite">
 

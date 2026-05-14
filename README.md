@@ -8,7 +8,7 @@ I've published two Kotlin Android apps and up to date with the latest technologi
 <i>Ps: This is a result of what I've learned during my learning of Kotlin, Android Jetpack, Material Design components, and Firebase, Google Cloud Functions. I tried to implement as many as possible best practices from the Android community and I'm very thankful to everyone who shared their valuable knowledge and experience through social media and blog posts.</i>
 <br/>
 <div style="display:flex;" >
-<a target="_blank" href="https://play.google.com/store/apps/details?id=me.tumur.portfolio">
+<a target="_blank" href="https://play.google.com/store/apps/details?id=hiretimsf.com.app">
     <img alt="Get it on Google Play"
         height="80"
         src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" />
@@ -70,7 +70,7 @@ I've published two Kotlin Android apps and up to date with the latest technologi
 |[Kotlin Coroutines](https://bit.ly/2wTru3E)|[Cloud Functions](https://bit.ly/2TfAkTE)|[Shape Shifter](https://bit.ly/2IuQzrQ)|[Ktlint](http://bit.ly/2Z9rGJB)|
 |[Retrofit](https://bit.ly/2pSxHbb)|[Hosting](https://bit.ly/2H5qbSW)|[Adobe Photoshop](https://adobe.ly/1Z5LVOp)|[Detekt](http://bit.ly/31T7r0l)|
 |[OkHttp](https://bit.ly/2fVF6OA)|[Cloud Storage](https://bit.ly/2EuLtb6)|[Adobe Illustrator](https://adobe.ly/1G6wY8i)|[Versions](http://bit.ly/31P7Xwj)|
-|[Glide](https://bit.ly/1RIHiKz)|[Crashlytics](https://bit.ly/2GIM9fq)|[Adobe After Effects](https://adobe.ly/1B8kNrh)|[SafeArgs](http://bit.ly/2KSkf04)|
+|[Glide](https://bit.ly/1RIHiKz)||[Adobe After Effects](https://adobe.ly/1B8kNrh)|[SafeArgs](http://bit.ly/2KSkf04)|
 |[Timber](https://bit.ly/1zQNWqd)|[Performance Monitoring](https://bit.ly/2Es0b2s)|||
 ||[Test Lab](https://bit.ly/2C1h3Mb)|||
 |[ThreenTenABP](https://bit.ly/2GIykxt)|[App Indexing](https://bit.ly/2Tcy9jP)|||
@@ -87,7 +87,7 @@ I've published two Kotlin Android apps and up to date with the latest technologi
 
 ## 📦 DOWNLOAD APK
 You can download the apk from: 
-1. [Google Playstore](https://play.google.com/store/apps/details?id=me.tumur.portfolio)
+1. [Google Playstore](https://play.google.com/store/apps/details?id=hiretimsf.com.app)
 
 ## 📝 REQUIREMENTS
 * JDK Version 1.7 & above
@@ -102,17 +102,16 @@ Firebase Cloud Storage used as a backend server and Firebase Cloud Hosting and G
 You can find the code <a href="https://github.com/tumurb/Personal-Portoflio-API-Version-2.0">here</a>.
 
 ## 🔥 FIREBASE SETUP
-This project uses Firebases Analytics and Crashlytics, Cloud Firestore, Remote Config, etc. You will need to generate the configuration file (`google-services.json`) and copy it to your `/app` dir. See links below
+This project uses Firebase Analytics, Cloud Firestore, Remote Config, etc. You will need to generate the configuration file (`google-services.json`) and copy it to your `/app` dir. See links below
 
 1. [Setup Firebase setup](https://firebase.google.com/docs/android/setup)
-2. [Setup Firebase Crashlytics](https://firebase.google.com/docs/crashlytics/get-started/)
-3. [Setup Firebase Cloud Firestore](https://firebase.google.com/docs/firestore/quickstart/)
-4. [Setup Firebase Storage](https://firebase.google.com/docs/storage/android/start)
-5. [Setup Firebase Cloud Functions](https://firebase.google.com/docs/functions/get-started)
-6. [Setup Firebase Hosting](https://firebase.google.com/docs/hosting/quickstart)
-7. [Setup Firebase Peformance Monitoring](https://firebase.google.com/docs/perf-mon/get-started-android)
-8. [Setup Firebase Test Lab ](https://firebase.google.com/docs/test-lab/)
-9. [Setup Firebase App Indexing ](https://firebase.google.com/docs/app-indexing/android/app)
+2. [Setup Firebase Cloud Firestore](https://firebase.google.com/docs/firestore/quickstart/)
+3. [Setup Firebase Storage](https://firebase.google.com/docs/storage/android/start)
+4. [Setup Firebase Cloud Functions](https://firebase.google.com/docs/functions/get-started)
+5. [Setup Firebase Hosting](https://firebase.google.com/docs/hosting/quickstart)
+6. [Setup Firebase Peformance Monitoring](https://firebase.google.com/docs/perf-mon/get-started-android)
+7. [Setup Firebase Test Lab ](https://firebase.google.com/docs/test-lab/)
+8. [Setup Firebase App Indexing ](https://firebase.google.com/docs/app-indexing/android/app)
 
 
 ## ⚙️ PROJECT SETUP

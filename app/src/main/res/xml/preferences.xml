@@ -90,7 +90,7 @@
                 app:layout="@layout/preference_item_email">
             <intent
                     android:action="android.intent.action.VIEW"
-                    android:data="mailto:tumur.alex@gmail.com?subject=Oh Hello there,">
+                    android:data="mailto:hiretimsf@gmail.com?subject=Oh Hello there,">
             </intent>
         </Preference>
 

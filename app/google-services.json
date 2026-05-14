@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:852832723346:android:c8b206b00866c4fa",
         "android_client_info": {
-          "package_name": "me.tumur.portfolio"
+          "package_name": "hiretimsf.com.app"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "852832723346-ddic85s6rk4gb9b9e7t6c85ig7733n0s.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "me.tumur.portfolio",
+            "package_name": "hiretimsf.com.app",
             "certificate_hash": "d7ad4634a38255ed8eda9e62be06a518d53f28ea"
           }
         },
