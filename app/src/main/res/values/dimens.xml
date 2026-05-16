@@ -1,19 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<dimen name="dimen_0dp">0dp</dimen>
-	<dimen name="dimen_1dp">1dp</dimen>
 	<dimen name="dimen_2dp">2dp</dimen>
-	<dimen name="dimen_5sp">5sp</dimen>
-	<dimen name="dimen_10sp">10sp</dimen>
 	<dimen name="dimen_12sp">12sp</dimen>
-	<dimen name="dimen_14sp">14sp</dimen>
-	<dimen name="dimen_15sp">15sp</dimen>
 	<dimen name="dimen_16sp">16sp</dimen>
-	<dimen name="dimen_18sp">18sp</dimen>
-	<dimen name="dimen_20sp">20sp</dimen>
-	<dimen name="dimen_22sp">22sp</dimen>
-	<dimen name="dimen_24sp">24sp</dimen>
 	<dimen name="dimen_26sp">26sp</dimen>
 	<dimen name="elevation_16dp">16dp</dimen>
-	<dimen name="elevation_4dp">4dp</dimen>
 </resources>

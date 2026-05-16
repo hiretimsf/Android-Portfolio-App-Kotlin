@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.google.services) apply false
     alias(libs.plugins.hilt.android) apply false
     alias(libs.plugins.firebase.perf) apply false
+    alias(libs.plugins.firebase.crashlytics) apply false
 }
 
 tasks.register<Delete>("clean") {

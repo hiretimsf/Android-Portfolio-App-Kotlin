@@ -6,8 +6,11 @@
     <color name="colorPrimary">#0061BF</color>
     <color name="colorPrimaryDark">#014384</color>
     <color name="colorOnPrimary">@android:color/white</color>
+    <color name="colorChromeBackground">@color/colorPrimary</color>
+    <color name="colorOnChrome">@color/colorOnPrimary</color>
 
     <color name="colorSurface">@android:color/white</color>
+    <color name="colorElevatedSurface">@android:color/white</color>
 
     <!-- Title -->
     <color name="colorOnPrimarySurface">#1A2025</color>
@@ -23,6 +26,8 @@
     <!-- Header list item -->
     <color name="colorHeaderBackground">#E2E2E2</color>
     <color name="colorHeaderTitle">#5F6368</color>
+    <color name="colorSelectedItemBackground">#E8F1FF</color>
+    <color name="colorSelectedItemContent">@color/colorPrimary</color>
 
     <!-- Border -->
     <color name="colorBorder">#E2E2E2</color>
@@ -30,13 +35,6 @@
     <color name="colorControlHighlight">#3C4043</color>
     <color name="colorControlActivated">#5F6368</color>
     <color name="colorTransparent">#34000000</color>
-
-    <!-- * * * * * * * * * * * BUTTON * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-    <color name="colorButton">#699E3F</color>
-    <color name="colorButtonActive">#265F27</color>
-
-    <!-- * * * * * * * * * * * WELCOME SCREEN * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-
 
     <!-- * * * * * * * * * * * SVG VECTORS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  -->
     <color name="colorLogoChest">#0061BF</color>
@@ -46,8 +44,6 @@
     <color name="colorLogoGreyLight">#E9E9E9</color>
     <color name="colorLogoGreyDark">#A8A8A8</color>
     <color name="colorLogoDark">#5F6368</color>
-    <color name="colorLogoFace">#EAD8C5</color>
-    <color name="colorLogoNeck">#EAC3A2</color>
     <color name="colorLogoBody">#F9AA8F</color>
     <color name="colorLogoBodyFace">#FBBEA0</color>
     <color name="colorLogoOrange">#f47d2c</color>

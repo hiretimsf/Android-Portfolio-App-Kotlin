@@ -2,16 +2,14 @@ package hiretimsf.com.app.screens.portfolio
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import hiretimsf.com.app.repository.database.dao.portfolio.PortfolioDao
@@ -27,7 +25,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PortfolioViewModel @Inject constructor(
-    private val dao: PortfolioDao,
     private val repo: Repository
 ) : ViewModel() {
 
@@ -40,19 +37,43 @@ class PortfolioViewModel @Inject constructor(
 
     /** Pull to refresh status  */
     private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshingFlow: StateFlow<Boolean> = _isRefreshing.asStateFlow()
-    val isRefreshing: Boolean get() = _isRefreshing.value
+
+    private val _query = MutableStateFlow("")
+    val queryFlow: StateFlow<String> = _query.asStateFlow()
 
     /** Show toast message from activity  */
     private val _showToast = MutableStateFlow<ToastState>(ToastEmpty)
     val showToastFlow: StateFlow<ToastState> = _showToast.asStateFlow()
 
-    /** Portfolio pager data */
-    private val config = PagingConfig(pageSize = 10, enablePlaceholders = true, initialLoadSize = 5)
+    private val _errorMessage = MutableStateFlow<String?>(null)
 
-    val data: Flow<PagingData<PortfolioModel>> = Pager(config) {
-        dao.getListItems(DbConstants.PERSON_ID)
-    }.flow.cachedIn(viewModelScope)
+    val state: StateFlow<PortfolioScreenState> = combine(
+        repo.observePortfolio(DbConstants.PERSON_ID),
+        _isRefreshing,
+        _query,
+        _errorMessage,
+    ) { items, isRefreshing, query, errorMessage ->
+        val trimmedQuery = query.trim()
+        val filteredItems = if (trimmedQuery.isBlank()) {
+            items
+        } else {
+            items.filter { item ->
+                item.title.contains(trimmedQuery, ignoreCase = true) ||
+                    item.subTitle.contains(trimmedQuery, ignoreCase = true) ||
+                    item.text.contains(trimmedQuery, ignoreCase = true) ||
+                    item.info.contains(trimmedQuery, ignoreCase = true) ||
+                    item.header.contains(trimmedQuery, ignoreCase = true)
+            }
+        }
+
+        PortfolioScreenState(
+            items = filteredItems,
+            isRefreshing = isRefreshing,
+            query = query,
+            errorMessage = errorMessage,
+            showNoInternet = errorMessage != null && items.isEmpty(),
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PortfolioScreenState())
 
     /** FUNCTIONS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -67,13 +88,19 @@ class PortfolioViewModel @Inject constructor(
     fun fetch() = viewModelScope.launch {
         when (withContext(Dispatchers.IO) { repo.fetchAll() }) {
             is Failed -> {
+                _errorMessage.value = "Unable to refresh projects. Showing saved projects when available."
                 setShowToast(ToastShow)
                 setRefreshStatus(false)
             }
             is Success -> {
+                _errorMessage.value = null
                 setRefreshStatus(false)
             }
         }
+    }
+
+    fun setQuery(query: String) {
+        _query.value = query
     }
 
     /** Set show toast message */
@@ -86,3 +113,11 @@ class PortfolioViewModel @Inject constructor(
         _isRefreshing.value = status
     }
 }
+
+data class PortfolioScreenState(
+    val items: List<PortfolioModel> = emptyList(),
+    val isRefreshing: Boolean = false,
+    val query: String = "",
+    val errorMessage: String? = null,
+    val showNoInternet: Boolean = false,
+)

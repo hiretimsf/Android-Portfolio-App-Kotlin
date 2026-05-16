@@ -14,6 +14,13 @@ class CategoryDao @Inject constructor(
         return list.indices.map { it.toLong() }
     }
 
+    suspend fun updateForTypes(types: Set<Int>, list: List<CategoryModel>): List<Long> {
+        store.categories.value = (
+            store.categories.value.filterNot { it.type in types } + list
+        ).sortedBy { it.order }
+        return list.indices.map { it.toLong() }
+    }
+
     suspend fun insert(list: List<CategoryModel>): List<Long> {
         store.categories.value = (store.categories.value.filterNot { old -> list.any { it.id == old.id } } + list).sortedBy { it.order }
         return list.indices.map { it.toLong() }

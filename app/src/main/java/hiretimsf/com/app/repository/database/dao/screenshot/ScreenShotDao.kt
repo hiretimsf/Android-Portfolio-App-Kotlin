@@ -16,6 +16,13 @@ class ScreenShotDao @Inject constructor(
         return list.indices.map { it.toLong() }
     }
 
+    suspend fun updateForOwners(ownerIds: Set<String>, list: List<ScreenShotModel>): List<Long> {
+        store.screenshots.value = (
+            store.screenshots.value.filterNot { it.ownerId in ownerIds } + list
+        ).sortedBy { it.order }
+        return list.indices.map { it.toLong() }
+    }
+
     suspend fun insert(list: List<ScreenShotModel>): List<Long> {
         store.screenshots.value = (store.screenshots.value.filterNot { old -> list.any { it.id == old.id } } + list).sortedBy { it.order }
         return list.indices.map { it.toLong() }

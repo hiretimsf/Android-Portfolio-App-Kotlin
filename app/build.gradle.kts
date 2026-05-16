@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.firebase.perf)
+    alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.google.services)
 }
 
@@ -53,7 +54,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            versionNameSuffix = "-debug"
         }
 
         release {
@@ -121,11 +121,15 @@ dependencies {
     implementation(libs.navigation.compose)
     implementation(libs.paging.runtime)
     implementation(libs.paging.compose)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    kapt(libs.room.compiler)
 
     // Firebase components
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.core)
     implementation(libs.firebase.monitoring)
+    implementation(libs.firebase.crashlytics)
 
     // Dependency injection
     implementation(libs.hilt.android)
@@ -142,6 +146,7 @@ dependencies {
     implementation(libs.okhttp.core)
     implementation(libs.okhttp.logging)
     implementation(libs.coil.core)
+    implementation(libs.coil.compose)
     implementation(libs.custom.activity.on.crash)
 
     // Utilities

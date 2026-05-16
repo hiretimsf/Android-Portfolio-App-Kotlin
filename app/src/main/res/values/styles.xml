@@ -72,27 +72,6 @@
         <item name="android:textSize">@dimen/dimen_16sp</item>
     </style>
 
-    <!-- * * * * * * * * * * * TOOLBAR * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-
-    <!-- Toolbar style - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
-    <style name="ToolbarStyle" parent="ThemeOverlay.MaterialComponents.ActionBar">
-        <item name="android:textColorPrimary">?attr/colorOnPrimary</item>
-        <item name="android:textColorSecondary">?attr/colorOnPrimary</item>
-        <item name="android:background">?attr/colorPrimary</item>
-    </style>
-
-    <!-- Toolbar Title style - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-    <style name="ToolbarTitleStyle" parent="TextAppearance.Headline">
-        <item name="android:textSize">@dimen/dimen_18sp</item>
-        <item name="android:letterSpacing">0.1</item>
-        <item name="fontFamily">@font/questrial</item>
-    </style>
-
-    <!-- Toolbar Sub Title style - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-    <style name="ToolbarSubTitleStyle" parent="ToolbarTitleStyle">
-        <item name="android:textSize">@dimen/dimen_16sp</item>
-    </style>
-
     <!-- Popup Menu style - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
     <style name="ToolbarPopupMenuStyle" parent="Widget.AppCompat.Light.PopupMenu">
         <item name="android:textColor">?attr/colorOnSurface</item>
@@ -122,12 +101,6 @@
         <item name="android:ellipsize">end</item>
     </style>
 
-    <!-- Side Menu text style (active) - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - -->
-    <style name="SideMenuTextStyle" parent="BottomMenuActiveTextStyle">
-        <item name="android:textSize">@dimen/dimen_15sp</item>
-        <item name="android:textAlignment">textStart</item>
-    </style>
-
     <!-- * * * * * * * * * * * BOTTOM SHEET * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 
     <!-- BottomSheetDialog - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
@@ -140,11 +113,6 @@
     <style name="AppModalStyle"
            parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/rounded_dialog</item>
-    </style>
-
-    <style name="ShapeAppearance.Portfolio.Circle" parent="">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">50%</item>
     </style>
 
 </resources>

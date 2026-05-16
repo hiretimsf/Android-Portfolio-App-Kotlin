@@ -12,8 +12,9 @@ object Constants {
     const val FRAGMENT_STATE = "FragmentState"
     const val FRAGMENT_PROFILE = "FragmentProfile"
     const val FRAGMENT_PORTFOLIO = "FragmentPortfolio"
-    const val FRAGMENT_EXPERIENCE = "FragmentExperience"
+    const val FRAGMENT_BLOG = "FragmentBlog"
     const val FRAGMENT_SETTINGS = "FragmentSettings"
+    const val FRAGMENT_CONTACT = "FragmentContact"
     const val FRAGMENT_EMPTY = "FragmentEmpty"
 
     /** Shared Preference ------------------------------------------------------------------------------------------ */
@@ -27,8 +28,8 @@ object Constants {
     const val SUBJECT = "Oh Hello there"
 
     /** PREFERENCE SCREEN * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-    const val SOURCE_CODE_URL = "https://github.com/tumurb/Portfolio"
-    const val PRIVACY_URL = "https://tumur.me/terms.html"
+    const val SOURCE_CODE_URL = "https://github.com/hiretimsf/Android-Portfolio-App-Kotlin"
+    const val PRIVACY_URL = "https://hiretimsf.com/privacy"
 
     /** LIST ITEMS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     const val HEADER = 0

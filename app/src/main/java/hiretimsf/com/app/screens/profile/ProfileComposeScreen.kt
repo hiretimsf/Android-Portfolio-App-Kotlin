@@ -4,6 +4,8 @@ import android.widget.ImageView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -30,6 +32,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
@@ -74,13 +78,16 @@ fun ProfileComposeScreen(
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             state = listState,
-            contentPadding = PaddingValues(bottom = 96.dp),
+            contentPadding = PaddingValues(bottom = 72.dp),
             modifier = Modifier
                 .fillMaxSize()
                 .background(colorResource(R.color.colorSurface)),
         ) {
             item {
-                ProfileHeader(profile = profile)
+                ProfileHeader(
+                    profile = profile,
+                    onEmailClick = onEmailClick,
+                )
             }
             item {
                 ProfileAboutContent(
@@ -123,13 +130,18 @@ fun ProfileComposeScreen(
 @Composable
 private fun ProfileHeader(
     profile: ProfileModel?,
+    onEmailClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val profileTextGap = dimensionResource(SdpR.dimen._5sdp)
+    val emailTopGap = dimensionResource(SdpR.dimen._9sdp)
+    val secondaryHeaderTextColor = colorResource(R.color.colorOnChrome).copy(alpha = 0.78f)
+
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(dimensionResource(SdpR.dimen._240sdp))
-            .background(colorResource(R.color.colorPrimary)),
+            .height(dimensionResource(SdpR.dimen._220sdp))
+            .background(colorResource(R.color.colorChromeBackground)),
     ) {
         Image(
             painter = painterResource(R.drawable.ic_header_bg),
@@ -145,17 +157,22 @@ private fun ProfileHeader(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = dimensionResource(SdpR.dimen._10sdp)),
+                modifier = Modifier.padding(bottom = dimensionResource(SdpR.dimen._7sdp)),
             ) {
                 Image(
                     painter = painterResource(R.drawable.ic_hand_waving),
                     contentDescription = null,
+                    colorFilter = if (isSystemInDarkTheme()) {
+                        ColorFilter.tint(Color.White)
+                    } else {
+                        null
+                    },
                     modifier = Modifier.size(dimensionResource(SdpR.dimen._17sdp)),
                 )
                 Spacer(Modifier.width(dimensionResource(SdpR.dimen._2sdp)))
                 androidx.compose.material3.Text(
                     text = profile?.greeting.orEmpty(),
-                    color = colorResource(R.color.colorOnPrimary),
+                    color = colorResource(R.color.colorOnChrome),
                     fontFamily = profileHeaderFontFamily,
                     fontSize = 22.sp,
                     maxLines = 1,
@@ -166,23 +183,36 @@ private fun ProfileHeader(
             ProfileAvatar(profile = profile, modifier = Modifier.size(dimensionResource(SdpR.dimen._80sdp)))
             androidx.compose.material3.Text(
                 text = stringResource(R.string.name),
-                color = colorResource(R.color.colorOnPrimary),
+                color = colorResource(R.color.colorOnChrome),
                 fontFamily = profileHeaderFontFamily,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = dimensionResource(SdpR.dimen._10sdp)),
+                modifier = Modifier.padding(top = dimensionResource(SdpR.dimen._7sdp)),
             )
             androidx.compose.material3.Text(
                 text = stringResource(R.string.title),
-                color = colorResource(R.color.colorOnPrimary),
+                color = secondaryHeaderTextColor,
                 fontFamily = profileHeaderFontFamily,
                 fontSize = 18.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = profileTextGap),
+            )
+            androidx.compose.material3.Text(
+                text = stringResource(R.string.contact_email),
+                color = secondaryHeaderTextColor,
+                fontFamily = profileHeaderFontFamily,
+                fontSize = 16.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(top = emailTopGap)
+                    .clickable(onClick = onEmailClick),
             )
         }
     }
@@ -196,7 +226,7 @@ private fun ProfileAvatar(
     AndroidView(
         modifier = modifier
             .clip(CircleShape)
-            .border(1.dp, colorResource(R.color.colorOnPrimary), CircleShape),
+            .border(1.dp, colorResource(R.color.colorOnChrome), CircleShape),
         factory = { context ->
             ImageView(context).apply {
                 scaleType = ImageView.ScaleType.CENTER_CROP
@@ -204,9 +234,14 @@ private fun ProfileAvatar(
         },
         update = { imageView ->
             imageView.contentDescription = profile?.imageDescription ?: imageView.context.getString(R.string.cd_avatar)
-            imageView.load(profile?.image, imageLoader = imageView.context.imageLoader) {
-                placeholder(R.drawable.profile)
-                error(R.drawable.profile)
+            val image = profile?.image
+            if (image.isNullOrBlank()) {
+                imageView.setImageResource(R.drawable.profile)
+            } else {
+                imageView.load(image, imageLoader = imageView.context.imageLoader) {
+                    placeholder(R.drawable.profile)
+                    error(R.drawable.profile)
+                }
             }
         },
     )

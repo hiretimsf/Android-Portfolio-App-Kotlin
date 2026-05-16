@@ -4,6 +4,7 @@ import android.widget.ImageView
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,6 +41,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import coil.imageLoader
@@ -54,10 +56,14 @@ fun ProfileAboutContent(
     sections: List<AboutSection>,
     introductionImages: List<CarouselImage>,
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 22.dp, bottom = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp),
+    ) {
         sections.forEachIndexed { index, section ->
-            AboutSectionHeader(title = section.title)
-            AboutSectionBody(text = section.content)
+            AboutTextSection(section = section)
             if (index == 0 && introductionImages.isNotEmpty()) {
                 AboutPhotoCarousel(images = introductionImages)
             }
@@ -66,23 +72,32 @@ fun ProfileAboutContent(
 }
 
 @Composable
-private fun AboutSectionHeader(title: String) {
-    Text(
-        text = title.uppercase(),
-        color = colorResource(R.color.colorHeaderTitle),
-        fontFamily = profileFontFamily(),
-        fontWeight = FontWeight.Bold,
-        fontSize = 18.sp,
-        maxLines = 1,
+private fun AboutTextSection(
+    section: AboutSection,
+    modifier: Modifier = Modifier,
+) {
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(colorResource(R.color.colorHeaderBackground))
-            .padding(
-                start = dimensionResource(SdpR.dimen._10sdp),
-                top = dimensionResource(SdpR.dimen._10sdp),
-                end = dimensionResource(SdpR.dimen._10sdp),
-                bottom = dimensionResource(SdpR.dimen._5sdp),
-            ),
+            .padding(horizontal = 18.dp)
+            .then(modifier),
+    ) {
+        AboutSectionHeader(title = section.title)
+        AboutSectionBody(text = section.content)
+    }
+}
+
+@Composable
+private fun AboutSectionHeader(title: String) {
+    Text(
+        text = title,
+        color = colorResource(R.color.colorOnPrimarySurface),
+        fontFamily = profileFontFamily(),
+        fontWeight = FontWeight.Bold,
+        fontSize = 22.sp,
+        lineHeight = 26.sp,
+        maxLines = 2,
+        modifier = Modifier.fillMaxWidth(),
     )
 }
 
@@ -99,17 +114,12 @@ private fun AboutSectionBody(text: String) {
         style = TextStyle(
             color = colorResource(R.color.colorOnSurface),
             fontFamily = profileFontFamily(),
-            fontSize = 18.sp,
-            lineHeight = 30.sp,
+            fontSize = 17.sp,
+            lineHeight = 28.sp,
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(
-                start = dimensionResource(SdpR.dimen._10sdp),
-                top = dimensionResource(SdpR.dimen._10sdp),
-                end = dimensionResource(SdpR.dimen._10sdp),
-                bottom = dimensionResource(SdpR.dimen._10sdp),
-            ),
+            .padding(top = 10.dp),
     )
 }
 
@@ -123,11 +133,11 @@ private fun AboutPhotoCarousel(images: List<CarouselImage>) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(dimensionResource(SdpR.dimen._300sdp))
-            .padding(dimensionResource(SdpR.dimen._10sdp)),
+            .height(dimensionResource(SdpR.dimen._320sdp))
+            .padding(horizontal = 18.dp),
     ) {
         Card(
-            shape = RoundedCornerShape(dimensionResource(SdpR.dimen._5sdp)),
+            shape = RoundedCornerShape(8.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.dimen_2dp)),
             modifier = Modifier.fillMaxSize(),
         ) {
@@ -148,7 +158,7 @@ private fun AboutPhotoCarousel(images: List<CarouselImage>) {
             enabled = currentPage > 0,
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .padding(start = dimensionResource(SdpR.dimen._8sdp)),
+                .padding(start = 10.dp),
         ) {
             scope.launch {
                 pagerState.animateScrollToPage((currentPage - 1).coerceAtLeast(0))
@@ -161,7 +171,7 @@ private fun AboutPhotoCarousel(images: List<CarouselImage>) {
             enabled = currentPage < images.lastIndex,
             modifier = Modifier
                 .align(Alignment.CenterEnd)
-                .padding(end = dimensionResource(SdpR.dimen._8sdp)),
+                .padding(end = 10.dp),
         ) {
             scope.launch {
                 pagerState.animateScrollToPage((currentPage + 1).coerceAtMost(images.lastIndex))
@@ -175,11 +185,11 @@ private fun AboutPhotoCarousel(images: List<CarouselImage>) {
             fontSize = 14.sp,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = dimensionResource(SdpR.dimen._8sdp))
-                .background(colorResource(R.color.colorTransparent), RoundedCornerShape(dimensionResource(SdpR.dimen._10sdp)))
+                .padding(bottom = 10.dp)
+                .background(colorResource(R.color.colorTransparent), RoundedCornerShape(50))
                 .padding(
-                    horizontal = dimensionResource(SdpR.dimen._8sdp),
-                    vertical = dimensionResource(SdpR.dimen._4sdp),
+                    horizontal = 12.dp,
+                    vertical = 6.dp,
                 ),
         )
     }
@@ -197,7 +207,7 @@ private fun CarouselButton(
         onClick = onClick,
         enabled = enabled,
         modifier = modifier
-            .size(dimensionResource(SdpR.dimen._34sdp))
+            .size(44.dp)
             .alpha(if (enabled) 1f else 0.35f)
             .background(colorResource(R.color.colorTransparent), CircleShape),
     ) {
@@ -205,7 +215,7 @@ private fun CarouselButton(
             painter = painterResource(icon),
             contentDescription = contentDescription,
             colorFilter = ColorFilter.tint(colorResource(R.color.colorOnPrimary)),
-            modifier = Modifier.size(dimensionResource(SdpR.dimen._18sdp)),
+            modifier = Modifier.size(22.dp),
         )
     }
 }

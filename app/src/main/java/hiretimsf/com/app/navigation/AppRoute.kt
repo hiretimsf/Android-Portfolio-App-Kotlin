@@ -6,8 +6,9 @@ sealed class AppRoute(val route: String) {
     data object Welcome : AppRoute("welcome")
     data object Profile : AppRoute("profile")
     data object Portfolio : AppRoute("portfolio")
-    data object Experience : AppRoute("experience")
+    data object Blog : AppRoute("blog")
     data object Settings : AppRoute("settings")
+    data object Contact : AppRoute("contact")
     data object AppInfo : AppRoute("app-info")
 
     data object PortfolioDetail : AppRoute("portfolio/{id}?title={title}") {
@@ -16,9 +17,9 @@ sealed class AppRoute(val route: String) {
         }
     }
 
-    data object ExperienceDetail : AppRoute("experience/{id}?company={company}") {
-        fun create(id: String, company: String): String {
-            return "experience/${Uri.encode(id)}?company=${Uri.encode(company)}"
+    data object BlogDetail : AppRoute("blog/{id}?title={title}") {
+        fun create(id: String, title: String): String {
+            return "blog/${Uri.encode(id)}?title=${Uri.encode(title)}"
         }
     }
 }
@@ -26,6 +27,7 @@ sealed class AppRoute(val route: String) {
 val topLevelRoutes = setOf(
     AppRoute.Profile.route,
     AppRoute.Portfolio.route,
-    AppRoute.Experience.route,
+    AppRoute.Blog.route,
     AppRoute.Settings.route,
+    AppRoute.Contact.route,
 )

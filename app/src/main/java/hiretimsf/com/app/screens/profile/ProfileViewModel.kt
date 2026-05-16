@@ -7,20 +7,25 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import hiretimsf.com.app.repository.database.LocalPortfolioStrings
 import hiretimsf.com.app.repository.database.dao.profile.ProfileDao
 import hiretimsf.com.app.repository.database.dao.profile.SocialDao
 import hiretimsf.com.app.repository.database.model.profile.ProfileModel
 import hiretimsf.com.app.repository.database.model.profile.SocialModel
 import hiretimsf.com.app.repository.network.model.AboutSection
+import hiretimsf.com.app.repository.repo.Repository
 import hiretimsf.com.app.utils.constants.DbConstants
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val profileDao: ProfileDao,
     private val socialDao: SocialDao,
+    private val repo: Repository,
 ) : ViewModel() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -30,20 +35,24 @@ class ProfileViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
     val profile: ProfileModel? get() = profileFlow.value
 
-    private val _aboutScreenFlow = MutableStateFlow(AboutScreenState())
-    val aboutScreenFlow: StateFlow<AboutScreenState> = _aboutScreenFlow.asStateFlow()
+    val aboutScreenFlow: StateFlow<AboutScreenState> = repo.observeAbout()
+        .map { about ->
+            AboutScreenState(
+                sections = about.sections,
+                introductionImages = about.photos.map { photo ->
+                    CarouselImage(
+                        url = photo.url,
+                        description = photo.alt,
+                    )
+                },
+            )
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AboutScreenState())
 
     init {
-        val about = LocalPortfolioStrings.about.data
-        _aboutScreenFlow.value = AboutScreenState(
-            sections = about.sections,
-            introductionImages = about.photos.map { photo ->
-                CarouselImage(
-                    url = photo.url,
-                    description = photo.alt,
-                )
-            },
-        )
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) { repo.fetchAbout() }
+        }
     }
 
     /** Social*/

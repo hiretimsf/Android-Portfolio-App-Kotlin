@@ -10,6 +10,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import es.dmoral.toasty.Toasty
 import hiretimsf.com.app.HireTimSfApp
+import hiretimsf.com.app.utils.theme.PortfolioComposeTheme
 import hiretimsf.com.app.utils.state.SplashScreen
 import hiretimsf.com.app.utils.state.ToastShow
 
@@ -34,7 +35,9 @@ class MainActivity : AppCompatActivity() {
                 viewModel.setShowToast(hiretimsf.com.app.utils.state.ToastEmpty)
             }
 
-            HireTimSfApp(viewModel)
+            PortfolioComposeTheme {
+                HireTimSfApp(viewModel)
+            }
         }
     }
 }

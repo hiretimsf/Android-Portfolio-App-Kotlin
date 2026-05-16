@@ -15,14 +15,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,16 +32,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.itemKey
 import hiretimsf.com.app.R
 import hiretimsf.com.app.repository.database.model.button.ButtonModel
 import hiretimsf.com.app.repository.database.model.category.CategoryModel
 import hiretimsf.com.app.repository.database.model.portfolio.PortfolioModel
 import hiretimsf.com.app.repository.database.model.screenshot.ScreenShotModel
+import hiretimsf.com.app.screens.shared.components.PrimaryGradientButton
 import hiretimsf.com.app.utils.adapters.bindingAdapters.loadImage
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -56,9 +49,9 @@ private val portfolioDetailFontFamily = FontFamily(Font(R.font.questrial))
 @Composable
 fun PortfolioDetailComposeScreen(
     portfolio: PortfolioModel?,
-    buttons: LazyPagingItems<ButtonModel>,
-    categories: LazyPagingItems<CategoryModel>,
-    screenshots: LazyPagingItems<ScreenShotModel>,
+    buttons: List<ButtonModel>,
+    categories: List<CategoryModel>,
+    screenshots: List<ScreenShotModel>,
     onButtonClick: (String) -> Unit,
     onVideoClick: (String) -> Unit,
     onScreenshotClick: (ScreenShotModel) -> Unit,
@@ -79,6 +72,7 @@ fun PortfolioDetailComposeScreen(
                 url = portfolio.coverImage,
                 contentDescription = portfolio.imageDescription,
                 modifier = Modifier
+                    .padding(top = 16.dp)
                     .fillMaxWidth()
                     .height(220.dp)
                     .clickable(enabled = portfolio.videoUrl != null) {
@@ -89,29 +83,34 @@ fun PortfolioDetailComposeScreen(
         item {
             Column(Modifier.padding(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    RemoteDetailImage(
-                        url = portfolio.logo,
-                        contentDescription = portfolio.logoDescription,
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(CircleShape),
-                    )
-                    Spacer(Modifier.width(10.dp))
+                    if (portfolio.logo.isNotBlank()) {
+                        RemoteDetailImage(
+                            url = portfolio.logo,
+                            contentDescription = portfolio.logoDescription,
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(CircleShape),
+                        )
+                        Spacer(Modifier.width(10.dp))
+                    }
                     Column(Modifier.weight(1f)) {
                         Text(
                             text = portfolio.subTitle,
                             color = colorResource(R.color.colorOnPrimarySurface),
                             fontFamily = portfolioDetailFontFamily,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            maxLines = 1,
+                            fontSize = 24.sp,
+                            lineHeight = 28.sp,
+                            maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                         )
                         Text(
                             text = formatDateRange(portfolio.dateFrom, portfolio.dateTo),
                             color = colorResource(R.color.colorHeaderTitle),
                             fontFamily = portfolioDetailFontFamily,
-                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp,
+                            modifier = Modifier.padding(top = 10.dp),
                         )
                     }
                 }
@@ -139,68 +138,54 @@ fun PortfolioDetailComposeScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                repeat(categories.itemCount) { index ->
-                    categories[index]?.let { category ->
-                        AssistChip(
-                            onClick = {},
-                            label = { Text(category.title, fontFamily = portfolioDetailFontFamily) },
+                categories.forEach { category ->
+                    AssistChip(
+                        onClick = {},
+                        label = { Text(category.title, fontFamily = portfolioDetailFontFamily) },
+                    )
+                }
+            }
+        }
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                buttons.forEach { button ->
+                    if (button.title != "Portfolio") {
+                        ProjectActionButton(
+                            button = button,
+                            onClick = { onButtonClick(button.url) },
                         )
                     }
                 }
             }
         }
-        item {
-            FlowRow(
-                modifier = Modifier.padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                repeat(buttons.itemCount) { index ->
-                    buttons[index]?.let { button ->
-                        if (button.type == "outline") {
-                            OutlinedButton(onClick = { onButtonClick(button.url) }) {
-                                Text(button.title, fontFamily = portfolioDetailFontFamily)
-                            }
-                        } else {
-                            Button(
-                                onClick = { onButtonClick(button.url) },
-                                colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.colorPrimary)),
-                            ) {
-                                Text(button.title, fontFamily = portfolioDetailFontFamily)
-                            }
-                        }
-                    }
-                }
-            }
+    }
+}
+
+@Composable
+private fun ProjectActionButton(
+    button: ButtonModel,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val title = if (button.title == "Website") "Live Demo" else button.title
+    if (button.type == "outline") {
+        OutlinedButton(
+            onClick = onClick,
+            modifier = modifier.fillMaxWidth(),
+        ) {
+            Text(title, fontFamily = portfolioDetailFontFamily)
         }
-        item {
-            LazyRow(
-                modifier = Modifier.padding(bottom = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp),
-            ) {
-                items(
-                    count = screenshots.itemCount,
-                    key = screenshots.itemKey { it.id },
-                ) { index ->
-                    screenshots[index]?.let { screenshot ->
-                        Card(
-                            modifier = Modifier
-                                .width(130.dp)
-                                .height(220.dp)
-                                .clickable { onScreenshotClick(screenshot) },
-                            shape = RoundedCornerShape(5.dp),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                        ) {
-                            RemoteDetailImage(
-                                url = screenshot.url,
-                                contentDescription = screenshot.imageDescription,
-                                modifier = Modifier.fillMaxSize(),
-                            )
-                        }
-                    }
-                }
-            }
+    } else {
+        PrimaryGradientButton(
+            onClick = onClick,
+            modifier = modifier.fillMaxWidth(),
+        ) {
+            Text(title, fontFamily = portfolioDetailFontFamily)
         }
     }
 }
@@ -231,10 +216,5 @@ private fun formatDateRange(dateFrom: Date?, dateTo: Date?): String {
     if (dateFrom.compareTo(dateTo) == 0) return outputFormat.format(dateFrom)
     val startText = outputFormat.format(dateFrom)
     val endText = outputFormat.format(dateTo)
-    val start = Calendar.getInstance().apply { time = dateFrom }
-    val end = Calendar.getInstance().apply { time = dateTo }
-    val diff = (end.get(Calendar.YEAR) - start.get(Calendar.YEAR)) * 12L +
-        (end.get(Calendar.MONTH) - start.get(Calendar.MONTH))
-    val duration = if (diff / 12 > 0) "${diff / 12}.${diff % 12} year(s)" else "${diff % 12} month(s)"
-    return "$startText - $endText | $duration"
+    return if (startText == endText) startText else "$startText - $endText"
 }

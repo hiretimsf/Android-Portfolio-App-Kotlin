@@ -14,6 +14,13 @@ class ButtonDao @Inject constructor(
         return list.indices.map { it.toLong() }
     }
 
+    suspend fun updateForOwners(ownerIds: Set<String>, list: List<ButtonModel>): List<Long> {
+        store.buttons.value = (
+            store.buttons.value.filterNot { it.ownerId in ownerIds } + list
+        ).sortedBy { it.order }
+        return list.indices.map { it.toLong() }
+    }
+
     suspend fun insert(list: List<ButtonModel>): List<Long> {
         store.buttons.value = (store.buttons.value.filterNot { old -> list.any { it.id == old.id } } + list).sortedBy { it.order }
         return list.indices.map { it.toLong() }

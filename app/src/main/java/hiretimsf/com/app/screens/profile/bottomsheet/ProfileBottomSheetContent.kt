@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,9 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -52,7 +49,6 @@ fun ProfileBottomSheetContent(
             .fillMaxWidth()
             .background(colorResource(R.color.colorSurface)),
     ) {
-        BottomSheetIndicator()
         ProfileSummary(profile = profile)
         BottomSheetDivider(top = SdpR.dimen._10sdp, bottom = SdpR.dimen._5sdp)
         socialItems.forEach { item ->
@@ -62,27 +58,6 @@ fun ProfileBottomSheetContent(
             )
         }
         ContactRow(onClick = onContactClick)
-    }
-}
-
-@Composable
-private fun BottomSheetIndicator() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                top = dimensionResource(SdpR.dimen._10sdp),
-                bottom = dimensionResource(SdpR.dimen._10sdp),
-            ),
-        contentAlignment = Alignment.Center,
-    ) {
-        Spacer(
-            modifier = Modifier
-                .width(dimensionResource(SdpR.dimen._30sdp))
-                .height(dimensionResource(SdpR.dimen._3sdp))
-                .clip(RoundedCornerShape(dimensionResource(SdpR.dimen._3sdp)))
-                .background(colorResource(R.color.colorPageIndicatorBackground)),
-        )
     }
 }
 
@@ -102,7 +77,7 @@ private fun ProfileSummary(profile: ProfileModel?) {
                 .clip(CircleShape)
                 .border(
                     width = dimensionResource(SdpR.dimen._1sdp),
-                    color = colorResource(R.color.colorOnPrimary),
+                    color = colorResource(R.color.colorPrimary),
                     shape = CircleShape,
                 ),
         )

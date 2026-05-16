@@ -41,18 +41,6 @@ internal fun Context.profileSocialItems(): List<SocialModel> {
             url = getString(R.string.profile_social_linkedin_url),
             order = 3,
         ),
-        profileSocialItem(
-            id = PROFILE_SOCIAL_FACEBOOK_ID,
-            name = getString(R.string.profile_social_facebook_label),
-            url = getString(R.string.profile_social_facebook_url),
-            order = 4,
-        ),
-        profileSocialItem(
-            id = PROFILE_SOCIAL_STRAVA_ID,
-            name = getString(R.string.profile_social_strava_label),
-            url = getString(R.string.profile_social_strava_url),
-            order = 5,
-        ),
     )
 }
 
@@ -74,5 +62,3 @@ private fun profileSocialItem(
 private const val PROFILE_SOCIAL_X_ID = "profile_social_x"
 private const val PROFILE_SOCIAL_GITHUB_ID = "profile_social_github"
 private const val PROFILE_SOCIAL_LINKEDIN_ID = "profile_social_linkedin"
-private const val PROFILE_SOCIAL_FACEBOOK_ID = "profile_social_facebook"
-private const val PROFILE_SOCIAL_STRAVA_ID = "profile_social_strava"

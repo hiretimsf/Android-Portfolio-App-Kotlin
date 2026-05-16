@@ -17,8 +17,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,6 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
 import hiretimsf.com.app.R
 import hiretimsf.com.app.repository.database.model.welcome.WelcomeModel
+import hiretimsf.com.app.screens.shared.components.PrimaryGradientButton
 import hiretimsf.com.app.utils.adapters.bindingAdapters.setPagerIcon
 import com.intuit.sdp.R as SdpR
 
@@ -273,14 +272,10 @@ private fun WelcomeButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Button(
+    PrimaryGradientButton(
         onClick = onClick,
         modifier = modifier,
         shape = RoundedCornerShape(dimensionResource(SdpR.dimen._4sdp)),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = colorResource(R.color.colorPrimary),
-            contentColor = colorResource(R.color.colorOnPrimary),
-        ),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(
             vertical = dimensionResource(SdpR.dimen._10sdp),
         ),

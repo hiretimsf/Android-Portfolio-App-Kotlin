@@ -9,15 +9,22 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import hiretimsf.com.app.repository.database.model.portfolio.PortfolioModel
 import hiretimsf.com.app.repository.network.Failed
+import hiretimsf.com.app.repository.network.model.AboutSection
 import hiretimsf.com.app.repository.network.Success
 import hiretimsf.com.app.repository.repo.Repository
+import hiretimsf.com.app.screens.blog.BlogPost
 import hiretimsf.com.app.utils.constants.Constants
+import hiretimsf.com.app.utils.constants.DbConstants
 import hiretimsf.com.app.utils.state.*
 import javax.inject.Inject
 
@@ -70,6 +77,31 @@ class MainViewModel @Inject constructor(
     private val _showToast = MutableStateFlow<ToastState>(ToastEmpty)
     val showToastFlow: StateFlow<ToastState> = _showToast.asStateFlow()
     val showToast: ToastState get() = _showToast.value
+
+    private val _searchQuery = MutableStateFlow("")
+    val searchQueryFlow: StateFlow<String> = _searchQuery.asStateFlow()
+
+    val searchState: StateFlow<GlobalSearchState> = combine(
+        _searchQuery,
+        repo.observePortfolio(DbConstants.PERSON_ID),
+        repo.observeBlogPosts(),
+        repo.observeAbout(),
+    ) { query, projects, blogPosts, about ->
+        val trimmedQuery = query.trim()
+        GlobalSearchState(
+            query = query,
+            results = if (trimmedQuery.isBlank()) {
+                emptyList()
+            } else {
+                buildSearchResults(
+                    query = trimmedQuery,
+                    projects = projects,
+                    blogPosts = blogPosts,
+                    aboutSections = about.sections,
+                )
+            },
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), GlobalSearchState())
 
     /** INITIALIZATION  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -127,11 +159,20 @@ class MainViewModel @Inject constructor(
             is Failed -> setShowToast(ToastShow)
             is Success -> Unit
         }
+        withContext(Dispatchers.IO) {
+            repo.fetchAbout()
+            repo.fetchBlogPosts()
+        }
     }
 
     /** Set navigation state */
     fun setNavigationState(state: NavigationState){
         _navigation.value = state
+    }
+
+    fun finishWelcome() {
+        _screenState.value = MainScreen
+        _navigation.value = ShowNavigation
     }
 
     /** Set saved state handle for screen state */
@@ -173,4 +214,99 @@ class MainViewModel @Inject constructor(
     fun setShowToast(state: ToastState) {
         _showToast.value = state
     }
+
+    fun setSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
+
+    fun clearSearchQuery() {
+        _searchQuery.value = ""
+    }
+}
+
+data class GlobalSearchState(
+    val query: String = "",
+    val results: List<GlobalSearchResult> = emptyList(),
+)
+
+data class GlobalSearchResult(
+    val id: String,
+    val title: String,
+    val subtitle: String,
+    val type: GlobalSearchResultType,
+)
+
+enum class GlobalSearchResultType(val label: String) {
+    Project("Project"),
+    BlogPost("Blog"),
+    About("About"),
+}
+
+private fun buildSearchResults(
+    query: String,
+    projects: List<PortfolioModel>,
+    blogPosts: List<BlogPost>,
+    aboutSections: List<AboutSection>,
+): List<GlobalSearchResult> {
+    val projectResults = projects
+        .filter { project ->
+            listOf(project.title, project.subTitle, project.text, project.info, project.header)
+                .any { it.contains(query, ignoreCase = true) }
+        }
+        .map { project ->
+            GlobalSearchResult(
+                id = project.id,
+                title = project.title,
+                subtitle = project.text.searchSnippet(query),
+                type = GlobalSearchResultType.Project,
+            )
+        }
+
+    val blogResults = blogPosts
+        .filter { post ->
+            listOf(
+                post.title,
+                post.excerpt,
+                post.category,
+                post.readTime,
+                post.content,
+                post.sections.joinToString(" ") { "${it.title} ${it.content}" },
+            ).any { it.contains(query, ignoreCase = true) }
+        }
+        .map { post ->
+            GlobalSearchResult(
+                id = post.slug,
+                title = post.title,
+                subtitle = post.excerpt.searchSnippet(query),
+                type = GlobalSearchResultType.BlogPost,
+            )
+        }
+
+    val aboutResults = aboutSections
+        .filter { section ->
+            section.title.contains(query, ignoreCase = true) ||
+                section.content.contains(query, ignoreCase = true)
+        }
+        .mapIndexed { index, section ->
+            GlobalSearchResult(
+                id = "about-$index",
+                title = section.title,
+                subtitle = section.content.searchSnippet(query),
+                type = GlobalSearchResultType.About,
+            )
+        }
+
+    return projectResults + blogResults + aboutResults
+}
+
+private fun String.searchSnippet(query: String, maxLength: Int = 120): String {
+    val cleanedText = replace('\n', ' ').replace(Regex("\\s+"), " ").trim()
+    if (cleanedText.length <= maxLength) return cleanedText
+
+    val matchIndex = cleanedText.indexOf(query, ignoreCase = true)
+    val start = if (matchIndex == -1) 0 else (matchIndex - 32).coerceAtLeast(0)
+    val end = (start + maxLength).coerceAtMost(cleanedText.length)
+    val prefix = if (start > 0) "... " else ""
+    val suffix = if (end < cleanedText.length) " ..." else ""
+    return prefix + cleanedText.substring(start, end).trim() + suffix
 }

@@ -29,6 +29,10 @@ class PortfolioDao @Inject constructor(
         store.portfolio.value.filter { it.ownerId == id }.sortedBy { it.order }
     }
 
+    fun observeListItems(id: String): Flow<List<PortfolioModel>> = store.portfolio.map { items ->
+        items.filter { it.ownerId == id }.sortedBy { it.order }
+    }
+
     fun getSingleItem(id: String): Flow<PortfolioModel> = store.portfolio.map { items ->
         items.first { it.id == id }
     }

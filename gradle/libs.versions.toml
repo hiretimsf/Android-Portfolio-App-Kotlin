@@ -16,9 +16,11 @@ browser = "1.10.0"
 lifecycle = "2.10.0"
 composeBom = "2025.12.00"
 paging = "3.5.0"
+room = "2.8.4"
 navigation = "2.9.8"
 firebaseBom = "34.13.0"
 firebasePerfPlugin = "2.0.2"
+firebaseCrashlyticsPlugin = "3.0.6"
 hilt = "2.59.2"
 androidxHilt = "1.3.0"
 splashScreen = "1.2.0"
@@ -39,7 +41,7 @@ targetSdk = "37"
 compileSdk = "37"
 versionMajor = "1"
 versionMinor = "5"
-versionPatch = "0"
+versionPatch = "2"
 versionBuild = "0"
 
 [libraries]
@@ -68,9 +70,13 @@ navigation-compose = { module = "androidx.navigation:navigation-compose", versio
 paging-runtime = { module = "androidx.paging:paging-runtime-ktx", version.ref = "paging" }
 paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
 paging-test = { module = "androidx.paging:paging-testing", version.ref = "paging" }
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-core = { module = "com.google.firebase:firebase-analytics" }
 firebase-monitoring = { module = "com.google.firebase:firebase-perf" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "androidxHilt" }
@@ -83,6 +89,7 @@ kotlinx-serialization-converter = { module = "com.squareup.retrofit2:converter-k
 okhttp-core = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 okhttp-logging = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 coil-core = { module = "io.coil-kt:coil", version.ref = "coil" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 custom-activity-on-crash = { module = "cat.ereza:customactivityoncrash", version.ref = "customActivityOnCrash" }
 sdp = { module = "com.intuit.sdp:sdp-android", version.ref = "sdp" }
 toasty = { module = "com.github.GrenderG:Toasty", version.ref = "toasty" }
@@ -97,5 +104,6 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 firebase-perf = { id = "com.google.firebase.firebase-perf", version.ref = "firebasePerfPlugin" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlyticsPlugin" }
 versions = { id = "com.github.ben-manes.versions", version.ref = "gradleVersionsPlugin" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintGradle" }

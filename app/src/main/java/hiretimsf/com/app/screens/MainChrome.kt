@@ -27,6 +27,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -81,10 +83,10 @@ val bottomDestinations = listOf(
         animatedIconRes = R.drawable.ic_menu_portfolio_avd,
     ),
     MainChromeDestination(
-        route = AppRoute.Experience.route,
-        titleRes = R.string.menu_experience,
-        iconRes = R.drawable.ic_menu_experience,
-        animatedIconRes = R.drawable.ic_menu_experience_avd,
+        route = AppRoute.Blog.route,
+        titleRes = R.string.menu_blog,
+        iconRes = R.drawable.ic_menu_blog,
+        animatedIconRes = R.drawable.ic_menu_blog_avd,
     ),
     MainChromeDestination(
         route = AppRoute.Settings.route,
@@ -94,7 +96,12 @@ val bottomDestinations = listOf(
     ),
 )
 
-val drawerDestinations = bottomDestinations
+val drawerDestinations = bottomDestinations + MainChromeDestination(
+    route = AppRoute.Contact.route,
+    titleRes = R.string.menu_contact,
+    iconRes = R.drawable.ic_email,
+    animatedIconRes = R.drawable.ic_email,
+)
 
 private val questrial = FontFamily(Font(R.font.questrial))
 
@@ -102,13 +109,15 @@ private val questrial = FontFamily(Font(R.font.questrial))
 fun MainTopAppBar(
     state: MainChromeState,
     onNavigationClick: () -> Unit,
+    onContactClick: () -> Unit,
+    onSearchClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
             .shadow(dimensionResource(R.dimen.elevation_16dp))
-            .background(colorResource(R.color.colorPrimary)),
+            .background(colorResource(R.color.colorChromeBackground)),
     ) {
         Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
         Row(
@@ -131,7 +140,7 @@ fun MainTopAppBar(
             }
             Text(
                 text = state.title,
-                color = colorResource(R.color.colorOnPrimary),
+                color = colorResource(R.color.colorOnChrome),
                 fontFamily = questrial,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
@@ -139,8 +148,28 @@ fun MainTopAppBar(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .weight(1f)
-                    .padding(end = 16.dp),
+                    .padding(end = 4.dp),
             )
+            IconButton(
+                onClick = onSearchClick,
+                modifier = Modifier.size(56.dp),
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_search),
+                    contentDescription = stringResource(R.string.cd_search),
+                    modifier = Modifier.size(24.dp),
+                )
+            }
+            IconButton(
+                onClick = onContactClick,
+                modifier = Modifier.size(56.dp),
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_email_top),
+                    contentDescription = stringResource(R.string.cd_contact),
+                    modifier = Modifier.size(24.dp),
+                )
+            }
         }
     }
 }
@@ -195,6 +224,7 @@ fun MainDrawerContent(
     ) {
         Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
         DrawerHeader()
+        Spacer(Modifier.height(12.dp))
         drawerDestinations.forEach { destination ->
             DrawerDestinationRow(
                 destination = destination,
@@ -210,50 +240,54 @@ private fun DrawerHeader(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(120.dp)
-            .background(colorResource(R.color.colorPrimary)),
+            .height(176.dp)
+            .background(colorResource(R.color.colorChromeBackground)),
     ) {
         Image(
             painter = painterResource(R.drawable.ic_header_bg),
             contentDescription = stringResource(R.string.cd_background),
             modifier = Modifier
                 .fillMaxSize()
-                .alpha(0.1f),
+                .alpha(0.12f),
             contentScale = ContentScale.Crop,
         )
-        Column(
-            modifier = Modifier.align(Alignment.Center),
-            horizontalAlignment = Alignment.CenterHorizontally,
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 22.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Image(
                 painter = painterResource(R.drawable.profile),
                 contentDescription = stringResource(R.string.cd_avatar),
                 modifier = Modifier
-                    .size(60.dp)
+                    .size(72.dp)
                     .clip(CircleShape)
-                    .border(1.dp, colorResource(R.color.colorBorder), CircleShape),
+                    .border(2.dp, colorResource(R.color.colorOnChrome), CircleShape),
                 contentScale = ContentScale.Crop,
             )
-            Text(
-                text = stringResource(R.string.name),
-                color = colorResource(R.color.colorOnPrimary),
-                fontFamily = questrial,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 4.dp),
-            )
-            Text(
-                text = stringResource(R.string.title),
-                color = colorResource(R.color.colorOnPrimary),
-                fontFamily = questrial,
-                fontSize = 14.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center,
-            )
+            Spacer(Modifier.width(14.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.name),
+                    color = colorResource(R.color.colorOnChrome),
+                    fontFamily = questrial,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 22.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = stringResource(R.string.title),
+                    color = colorResource(R.color.colorOnChrome),
+                    fontFamily = questrial,
+                    fontSize = 17.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = 6.dp),
+                )
+            }
         }
     }
 }
@@ -268,24 +302,40 @@ private fun DrawerDestinationRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(48.dp)
+            .padding(horizontal = 12.dp, vertical = 4.dp)
+            .height(58.dp)
+            .background(
+                color = if (selected) colorResource(R.color.colorSelectedItemBackground) else Color.Transparent,
+                shape = RoundedCornerShape(8.dp),
+            )
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        Box(
+            modifier = Modifier
+                .width(4.dp)
+                .height(30.dp)
+                .background(
+                    color = if (selected) colorResource(R.color.colorSelectedItemContent) else Color.Transparent,
+                    shape = RoundedCornerShape(50),
+                ),
+        )
+        Spacer(Modifier.width(14.dp))
         AnimatedDrawableIcon(
             iconRes = destination.iconRes,
             animatedIconRes = destination.animatedIconRes,
             selected = selected,
             onClick = onClick,
-            modifier = Modifier.size(16.dp),
+            modifier = Modifier.size(24.dp),
         )
-        Spacer(Modifier.width(20.dp))
+        Spacer(Modifier.width(16.dp))
         Text(
             text = stringResource(destination.titleRes),
-            color = colorResource(R.color.colorOnSurface),
+            color = if (selected) colorResource(R.color.colorSelectedItemContent) else colorResource(R.color.colorOnPrimarySurface),
             fontFamily = questrial,
-            fontSize = 15.sp,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
@@ -313,7 +363,7 @@ private fun NavigationBarItemContent(
         Spacer(Modifier.height(2.dp))
         Text(
             text = stringResource(destination.titleRes),
-            color = colorResource(R.color.colorOnSurface),
+            color = colorResource(if (selected) R.color.colorSelectedItemContent else R.color.colorOnSurface),
             fontFamily = questrial,
             fontSize = 12.sp,
             maxLines = 1,
@@ -328,8 +378,8 @@ private fun AnimatedDrawableIcon(
     @DrawableRes iconRes: Int,
     @DrawableRes animatedIconRes: Int,
     selected: Boolean,
-    onClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     AndroidView(
@@ -367,6 +417,8 @@ private fun MainTopAppBarPreview() {
     MainTopAppBar(
         state = MainChromeState(title = "Profile"),
         onNavigationClick = {},
+        onContactClick = {},
+        onSearchClick = {},
     )
 }
 

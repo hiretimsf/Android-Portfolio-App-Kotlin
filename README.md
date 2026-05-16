@@ -1,6 +1,6 @@
 # HireTimSF Android Portfolio
 
-HireTimSF is a Kotlin Android portfolio app for Tim Baz, a Design Engineer based in the San Francisco Bay Area. The app presents profile details, portfolio projects, experience, contact links, and app settings in a modern Jetpack Compose interface.
+HireTimSF is a Kotlin Android portfolio app for Tim Baz, a Design Engineer based in the San Francisco Bay Area. The app presents profile details, portfolio projects, blog placeholders, contact links, and app settings in a modern Jetpack Compose interface.
 
 [Visit hiretimsf.com](https://hiretimsf.com)
 
@@ -16,7 +16,7 @@ HireTimSF is a Kotlin Android portfolio app for Tim Baz, a Design Engineer based
 
 ## Features
 
-- Jetpack Compose UI for profile, portfolio, experience, settings, drawer, top bar, and bottom navigation.
+- Jetpack Compose UI for profile, portfolio, blog, settings, drawer, top bar, and bottom navigation.
 - Compose Navigation with a single-activity app shell.
 - Edge-to-edge layout support with Compose app chrome.
 - Animated vector icons in navigation surfaces.

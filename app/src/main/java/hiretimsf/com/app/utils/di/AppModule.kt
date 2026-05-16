@@ -6,6 +6,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import androidx.room.Room
+import hiretimsf.com.app.repository.cache.CacheDao
+import hiretimsf.com.app.repository.cache.PortfolioCacheDatabase
 import hiretimsf.com.app.repository.network.RestApi
 import hiretimsf.com.app.repository.repo.Repository
 import hiretimsf.com.app.repository.repo.RepositoryImp
@@ -32,7 +35,9 @@ object Http {
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    private val networkJson = Json {
+    @Provides
+    @Singleton
+    fun provideJson(): Json = Json {
         ignoreUnknownKeys = true
         isLenient = true
     }
@@ -47,14 +52,27 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRestApi(properties: Properties, okHttpClient: OkHttpClient): RestApi {
+    fun provideRestApi(properties: Properties, okHttpClient: OkHttpClient, json: Json): RestApi {
         return Retrofit.Builder()
             .baseUrl(properties.getProperty(Http.URL))
             .client(okHttpClient)
-            .addConverterFactory(networkJson.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(RestApi::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun provideCacheDatabase(@ApplicationContext context: Context): PortfolioCacheDatabase {
+        return Room.databaseBuilder(
+            context,
+            PortfolioCacheDatabase::class.java,
+            "portfolio-cache.db",
+        ).build()
+    }
+
+    @Provides
+    fun provideCacheDao(database: PortfolioCacheDatabase): CacheDao = database.cacheDao()
 
     @Provides
     @Singleton

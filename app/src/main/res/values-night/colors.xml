@@ -3,11 +3,14 @@
 
     <!-- * * * * * * * * * * * BASE COLOR * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 
-    <color name="colorPrimary">#1F1F1F</color>
+    <color name="colorPrimary">#6EA8FE</color>
     <color name="colorPrimaryDark">#000000</color>
-    <color name="colorOnPrimary">#E2E2E2</color>
+    <color name="colorOnPrimary">#07111F</color>
+    <color name="colorChromeBackground">#1F1F1F</color>
+    <color name="colorOnChrome">#E2E2E2</color>
 
     <color name="colorSurface">#121212</color>
+    <color name="colorElevatedSurface">#1B1B1B</color>
 
     <!-- Title -->
     <color name="colorOnPrimarySurface">#E1E1E1</color>
@@ -17,23 +20,21 @@
 
     <!-- * * * * * * * * * * * CUSTOM COLOR * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
     <!-- Welcome screen page indicator -->
-    <color name="colorPageIndicatorBackground">#1F1F1F</color>
+    <color name="colorPageIndicatorBackground">#2D2F31</color>
     <color name="colorPageIndicatorActive">#E2E2E2</color>
 
     <!-- Header list item -->
-    <color name="colorHeaderBackground">#1F1F1F</color>
-    <color name="colorHeaderTitle">#E1E1E1</color>
+    <color name="colorHeaderBackground">#202124</color>
+    <color name="colorHeaderTitle">#D0D4DA</color>
+    <color name="colorSelectedItemBackground">#3A2416</color>
+    <color name="colorSelectedItemContent">#F59E0B</color>
 
     <!-- Border -->
-    <color name="colorBorder">#1F1F1F</color>
-    <color name="colorControlNormal">#1F1F1F</color>
-    <color name="colorControlHighlight">#3C4043</color>
-    <color name="colorControlActivated">#5F6368</color>
-    <color name="colorTransparent">#34000000</color>
-
-    <!-- * * * * * * * * * * * BUTTON * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-    <color name="colorButton">#3C4043</color>
-    <color name="colorButtonActive">#5F6368</color>
+    <color name="colorBorder">#2D2F31</color>
+    <color name="colorControlNormal">#A4A4A4</color>
+    <color name="colorControlHighlight">#2A3D55</color>
+    <color name="colorControlActivated">#6EA8FE</color>
+    <color name="colorTransparent">#33FFFFFF</color>
 
     <!-- * * * * * * * * * * * SVG VECTORS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  -->
     <color name="colorLogoChest">#1F1F1F</color>
@@ -43,8 +44,6 @@
     <color name="colorLogoGreyLight">#404040</color>
     <color name="colorLogoGreyDark">#A8A8A8</color>
     <color name="colorLogoDark">#5F6368</color>
-    <color name="colorLogoFace">#FFFFFF</color>
-    <color name="colorLogoNeck">#E1E1E1</color>
     <color name="colorLogoBody">#E1E1E1</color>
     <color name="colorLogoBodyFace">#FFFFFF</color>
     <color name="colorLogoOrange">#2F2F2F</color>

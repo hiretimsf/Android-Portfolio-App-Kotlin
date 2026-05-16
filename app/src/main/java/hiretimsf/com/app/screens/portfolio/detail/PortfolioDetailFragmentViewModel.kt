@@ -2,13 +2,8 @@ package hiretimsf.com.app.screens.portfolio.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -16,23 +11,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
-import hiretimsf.com.app.repository.database.dao.button.ButtonDao
-import hiretimsf.com.app.repository.database.dao.category.CategoryDao
-import hiretimsf.com.app.repository.database.dao.portfolio.PortfolioDao
-import hiretimsf.com.app.repository.database.dao.screenshot.ScreenShotDao
 import hiretimsf.com.app.repository.database.model.button.ButtonModel
 import hiretimsf.com.app.repository.database.model.category.CategoryModel
 import hiretimsf.com.app.repository.database.model.portfolio.PortfolioModel
 import hiretimsf.com.app.repository.database.model.screenshot.ScreenShotModel
+import hiretimsf.com.app.repository.repo.Repository
 import javax.inject.Inject
 
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
 class PortfolioDetailFragmentViewModel @Inject constructor(
-    private val portfolioDao: PortfolioDao,
-    private val buttonDao: ButtonDao,
-    private val categoryDao: CategoryDao,
-    private val screenshotDao: ScreenShotDao,
+    private val repo: Repository,
 ) : ViewModel() {
 
     /** VARIABLES * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -59,28 +48,22 @@ class PortfolioDetailFragmentViewModel @Inject constructor(
 
     /** Portfolio item data */
     val portfolioFlow: StateFlow<PortfolioModel?> = idFlow.filterNotNull()
-        .flatMapLatest { id -> portfolioDao.getSingleItem(id) }
+        .flatMapLatest { id -> repo.observePortfolioItem(id) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
     val portfolio: PortfolioModel? get() = portfolioFlow.value
 
-    /** Button data */
-    private val configButton = PagingConfig(pageSize = 3, enablePlaceholders = true, initialLoadSize = 3)
-
-    val button: Flow<PagingData<ButtonModel>> = idFlow.filterNotNull()
-        .flatMapLatest { id -> Pager(configButton) { buttonDao.getListItems(id) }.flow }
-        .cachedIn(viewModelScope)
+    val buttons: StateFlow<List<ButtonModel>> = idFlow.filterNotNull()
+        .flatMapLatest { id -> repo.observePortfolioButtons(id) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     /** Category data */
-    val category: Flow<PagingData<CategoryModel>> = portfolioFlow.filterNotNull()
-        .flatMapLatest { portfolio -> Pager(configButton) { categoryDao.getListItems(portfolio.categoryType) }.flow }
-        .cachedIn(viewModelScope)
+    val categories: StateFlow<List<CategoryModel>> = portfolioFlow.filterNotNull()
+        .flatMapLatest { portfolio -> repo.observePortfolioCategories(portfolio.categoryType) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    /** Screenshot data */
-    private val configScreenShot = PagingConfig(pageSize = 5, enablePlaceholders = true, initialLoadSize = 5)
-
-    val screenshot: Flow<PagingData<ScreenShotModel>> = idFlow.filterNotNull()
-        .flatMapLatest { id -> Pager(configScreenShot) { screenshotDao.getPagedItems(id) }.flow }
-        .cachedIn(viewModelScope)
+    val screenshots: StateFlow<List<ScreenShotModel>> = idFlow.filterNotNull()
+        .flatMapLatest { id -> repo.observePortfolioScreenshots(id) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     /** FUNCTIONS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
