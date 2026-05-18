@@ -42,7 +42,7 @@ import kotlinx.coroutines.flow.collectLatest
 import hiretimsf.com.app.R
 import hiretimsf.com.app.repository.database.model.welcome.WelcomeModel
 import hiretimsf.com.app.screens.shared.components.PrimaryGradientButton
-import hiretimsf.com.app.utils.adapters.bindingAdapters.setPagerIcon
+import hiretimsf.com.app.utils.images.showWelcomePagerIcon
 import com.intuit.sdp.R as SdpR
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -230,7 +230,11 @@ private fun WelcomeIcon(
         },
         update = { imageView ->
             imageView.contentDescription = model.imageDescription
-            setPagerIcon(imageView, model.order, currentItem, page)
+            imageView.showWelcomePagerIcon(
+                pageOrder = model.order,
+                selectedPage = currentItem,
+                page = page,
+            )
         },
     )
 }

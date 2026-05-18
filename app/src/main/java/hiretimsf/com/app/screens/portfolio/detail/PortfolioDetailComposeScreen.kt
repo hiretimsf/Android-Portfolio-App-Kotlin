@@ -38,7 +38,7 @@ import hiretimsf.com.app.repository.database.model.category.CategoryModel
 import hiretimsf.com.app.repository.database.model.portfolio.PortfolioModel
 import hiretimsf.com.app.repository.database.model.screenshot.ScreenShotModel
 import hiretimsf.com.app.screens.shared.components.PrimaryGradientButton
-import hiretimsf.com.app.utils.adapters.bindingAdapters.loadImage
+import hiretimsf.com.app.utils.images.loadRemoteImage
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -205,7 +205,7 @@ private fun RemoteDetailImage(
         },
         update = { imageView ->
             imageView.contentDescription = contentDescription
-            loadImage(imageView, url)
+            imageView.loadRemoteImage(url)
         },
     )
 }
