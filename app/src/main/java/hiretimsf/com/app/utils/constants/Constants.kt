@@ -30,6 +30,8 @@ object Constants {
     /** PREFERENCE SCREEN * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     const val SOURCE_CODE_URL = "https://github.com/hiretimsf/Android-Portfolio-App-Kotlin"
     const val PRIVACY_URL = "https://hiretimsf.com/privacy"
+    const val DATA_DELETION_URL = "https://hiretimsf.com/data-deletion"
+    const val DATA_DELETION_SUBJECT = "HireTimSF Data Deletion Request"
 
     /** LIST ITEMS * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     const val HEADER = 0

@@ -41,7 +41,7 @@ targetSdk = "37"
 compileSdk = "37"
 versionMajor = "1"
 versionMinor = "5"
-versionPatch = "2"
+versionPatch = "3"
 versionBuild = "0"
 
 [libraries]

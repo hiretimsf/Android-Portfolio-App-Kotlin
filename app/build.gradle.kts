@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.legacy.kapt)
@@ -27,6 +29,16 @@ val appVersionMajor = libs.versions.versionMajor.get().toInt()
 val appVersionMinor = libs.versions.versionMinor.get().toInt()
 val appVersionPatch = libs.versions.versionPatch.get().toInt()
 val appVersionBuild = libs.versions.versionBuild.get().toInt()
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists()) {
+        keystorePropertiesFile.inputStream().use { load(it) }
+    }
+}
+
+fun keystoreProperty(name: String): String =
+    keystoreProperties.getProperty(name)
+        ?: error("Missing $name in keystore.properties")
 
 android {
     namespace = libs.versions.appNamespace.get()
@@ -41,6 +53,15 @@ android {
         versionCode = getVersionCode(appVersionMajor, appVersionMinor, appVersionPatch, appVersionBuild)
         versionName = getVersionName(appVersionMajor, appVersionMinor, appVersionPatch)
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = rootProject.file(keystoreProperty("storeFile"))
+            storePassword = keystoreProperty("storePassword")
+            keyAlias = keystoreProperty("keyAlias")
+            keyPassword = keystoreProperty("keyPassword")
+        }
     }
 
     buildTypes {
@@ -60,8 +81,12 @@ android {
             buildConfigField("boolean", "LOGS", "false")
             buildConfigField("boolean", "DEV_ENVIRONMENT", "false")
 
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",

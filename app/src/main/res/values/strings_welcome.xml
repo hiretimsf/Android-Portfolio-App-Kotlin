@@ -10,7 +10,7 @@
 
     <string name="welcome_page_background_title">Background</string>
     <string name="welcome_page_background_subtitle">Modern web apps,</string>
-    <string name="welcome_page_background_text">I focus on Next.js, React, TypeScript, and Tailwind CSS.</string>
+    <string name="welcome_page_background_text">I build web and Android apps using Next.js, React, TypeScript, Tailwind CSS, Kotlin, and Jetpack Compose.</string>
     <string name="welcome_page_background_image_description">Illustration of a person using a phone</string>
 
     <string name="welcome_page_passion_title">Passion</string>

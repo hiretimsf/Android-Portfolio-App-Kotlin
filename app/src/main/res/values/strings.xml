@@ -29,6 +29,17 @@
 	<string name="summary_app_version">1.5.2</string>
 	<string name="summary_external_link">External link</string>
 	<string name="title_privacy">Protecting Your Privacy</string>
+    <string name="title_data_deletion">Data Deletion</string>
+    <string name="summary_data_deletion">Request app data deletion</string>
+    <string name="data_deletion_title">Data Deletion</string>
+    <string name="data_deletion_intro">Use this identifier when requesting deletion of analytics, crash, and performance data that can be associated with this app install.</string>
+    <string name="data_deletion_identifier_label">Deletion identifier</string>
+    <string name="data_deletion_identifier_help">This ID is randomly generated on this device. It is not your name or email.</string>
+    <string name="data_deletion_email_button">Email deletion request</string>
+    <string name="data_deletion_open_instructions">Open deletion instructions</string>
+    <string name="data_deletion_copy_id">Copy ID</string>
+    <string name="data_deletion_id_copied">Deletion ID copied</string>
+    <string name="data_deletion_email_body">Hello Tim,\n\nPlease delete app-related data for the HireTimSF Portfolio Android app that can be associated with this deletion identifier:\n\n%1$s\n\nApproximate date range of app use:\n\nAdditional details:</string>
 	<string name="title_rate">Rate This App</string>
 	<string name="title_source_code">Source code</string>
 	<string name="summary_source_code">Licensed under the Apache License</string>

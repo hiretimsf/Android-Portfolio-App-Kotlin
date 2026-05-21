@@ -13,6 +13,7 @@ import coil.util.DebugLogger
 import dagger.hilt.android.HiltAndroidApp
 import hiretimsf.com.app.screens.MainActivity
 import hiretimsf.com.app.utils.constants.Constants
+import hiretimsf.com.app.utils.privacy.DataDeletionIdentifier
 import hiretimsf.com.app.utils.theme.ThemeHelper
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
@@ -33,6 +34,8 @@ class App : Application(), ImageLoaderFactory {
         CaocConfig.Builder.create()
             .restartActivity(MainActivity::class.java)
             .apply()
+
+        DataDeletionIdentifier.applyToFirebase(this)
 
         /**
          * THEME SETTINGS

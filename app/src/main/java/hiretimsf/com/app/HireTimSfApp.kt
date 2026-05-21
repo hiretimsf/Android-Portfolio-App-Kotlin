@@ -59,12 +59,14 @@ import hiretimsf.com.app.screens.portfolio.detail.PortfolioDetailFragmentViewMod
 import hiretimsf.com.app.screens.profile.ProfileComposeScreen
 import hiretimsf.com.app.screens.profile.ProfileViewModel
 import hiretimsf.com.app.screens.search.GlobalSearchDialog
+import hiretimsf.com.app.screens.settings.DataDeletionComposeScreen
 import hiretimsf.com.app.screens.settings.SettingsComposeScreen
 import hiretimsf.com.app.screens.settings.components.ThemeOption
 import hiretimsf.com.app.screens.welcome.WelcomeComposeScreen
 import hiretimsf.com.app.screens.welcome.WelcomeViewModel
 import hiretimsf.com.app.utils.constants.Constants
 import hiretimsf.com.app.utils.extensions.launchCustomTab
+import hiretimsf.com.app.utils.privacy.DataDeletionIdentifier
 import hiretimsf.com.app.utils.state.HideNavigation
 import hiretimsf.com.app.utils.state.ShowNavigation
 import hiretimsf.com.app.utils.state.SplashScreen
@@ -279,6 +281,14 @@ private fun AppNavHost(
         composable(AppRoute.Settings.route) {
             SettingsRoute(navController = navController)
         }
+        composable(AppRoute.DataDeletion.route) {
+            val deletionId = remember { DataDeletionIdentifier.get(context) }
+            DataDeletionComposeScreen(
+                deletionId = deletionId,
+                onEmailClick = { context.openDataDeletionEmail(deletionId) },
+                onInstructionsClick = { context.launchCustomTab(Constants.DATA_DELETION_URL) },
+            )
+        }
         composable(AppRoute.Contact.route) {
             val viewModel: ProfileViewModel = hiltViewModel()
             val profile by viewModel.profileFlow.collectAsStateWithLifecycle()
@@ -382,6 +392,7 @@ private fun SettingsRoute(navController: NavHostController) {
         onAppVersionClick = { navController.navigate(AppRoute.AppInfo.route) },
         onSourceCodeClick = { context.launchCustomTab(Constants.SOURCE_CODE_URL) },
         onPrivacyClick = { context.launchCustomTab(Constants.PRIVACY_URL) },
+        onDataDeletionClick = { navController.navigate(AppRoute.DataDeletion.route) },
         onRateClick = { context.openPlayStoreListing() },
         onTwitterClick = { context.launchCustomTab(twitterUrl) },
     )
@@ -430,6 +441,7 @@ private fun resolveTitle(context: Context, route: String?, arguments: android.os
         AppRoute.Blog.route -> context.getString(R.string.menu_blog)
         AppRoute.Settings.route -> context.getString(R.string.menu_settings)
         AppRoute.Contact.route -> context.getString(R.string.menu_contact)
+        AppRoute.DataDeletion.route -> context.getString(R.string.data_deletion_title)
         AppRoute.PortfolioDetail.route -> context.getString(R.string.title_back)
         AppRoute.BlogDetail.route -> context.getString(R.string.title_back)
         else -> context.getString(R.string.app_name)
@@ -472,6 +484,16 @@ private fun Context.openEmail() {
         data = Constants.MAILTO.toUri()
         putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.contact_email)))
         putExtra(Intent.EXTRA_SUBJECT, Constants.SUBJECT)
+    }
+    openIntent(intent)
+}
+
+private fun Context.openDataDeletionEmail(deletionId: String) {
+    val intent = Intent(Intent.ACTION_SENDTO).apply {
+        data = Constants.MAILTO.toUri()
+        putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.contact_email)))
+        putExtra(Intent.EXTRA_SUBJECT, Constants.DATA_DELETION_SUBJECT)
+        putExtra(Intent.EXTRA_TEXT, getString(R.string.data_deletion_email_body, deletionId))
     }
     openIntent(intent)
 }

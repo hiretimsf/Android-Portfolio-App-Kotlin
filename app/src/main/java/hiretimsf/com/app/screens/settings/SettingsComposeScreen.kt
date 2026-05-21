@@ -33,6 +33,7 @@ fun SettingsComposeScreen(
     onAppVersionClick: () -> Unit,
     onSourceCodeClick: () -> Unit,
     onPrivacyClick: () -> Unit,
+    onDataDeletionClick: () -> Unit,
     onRateClick: () -> Unit,
     onTwitterClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -78,6 +79,13 @@ fun SettingsComposeScreen(
                 title = stringResource(R.string.title_privacy),
                 summary = stringResource(R.string.summary_external_link),
                 onClick = onPrivacyClick,
+                showDivider = true,
+            )
+            SettingsPreferenceItem(
+                icon = R.drawable.ic_privacy,
+                title = stringResource(R.string.title_data_deletion),
+                summary = stringResource(R.string.summary_data_deletion),
+                onClick = onDataDeletionClick,
                 showDivider = true,
             )
             SettingsPreferenceItem(
@@ -131,6 +139,7 @@ private fun SettingsComposeScreenPreview() {
         onAppVersionClick = {},
         onSourceCodeClick = {},
         onPrivacyClick = {},
+        onDataDeletionClick = {},
         onRateClick = {},
         onTwitterClick = {},
     )

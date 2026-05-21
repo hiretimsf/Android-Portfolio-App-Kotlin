@@ -9,6 +9,7 @@ sealed class AppRoute(val route: String) {
     data object Blog : AppRoute("blog")
     data object Settings : AppRoute("settings")
     data object Contact : AppRoute("contact")
+    data object DataDeletion : AppRoute("data-deletion")
     data object AppInfo : AppRoute("app-info")
 
     data object PortfolioDetail : AppRoute("portfolio/{id}?title={title}") {
