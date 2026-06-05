@@ -2,7 +2,7 @@ package hiretimsf.com.app.screens.blog.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -24,14 +24,14 @@ fun BlogPill(
 ) {
     Text(
         text = text,
-        color = colorResource(R.color.colorHeaderTitle),
+        color = colorResource(R.color.colorPrimary),
         fontFamily = blogPillFontFamily,
         fontWeight = FontWeight.Bold,
         fontSize = 12.sp,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         modifier = modifier
-            .background(colorResource(R.color.colorHeaderBackground), RoundedCornerShape(6.dp))
-            .padding(horizontal = 10.dp, vertical = 5.dp),
+            .background(colorResource(R.color.colorPrimary).copy(alpha = 0.12f), CircleShape)
+            .padding(horizontal = 10.dp, vertical = 6.dp),
     )
 }

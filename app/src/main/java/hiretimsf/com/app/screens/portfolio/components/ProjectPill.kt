@@ -1,7 +1,7 @@
 package hiretimsf.com.app.screens.portfolio.components
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,18 +24,18 @@ fun ProjectPill(
 ) {
     Surface(
         modifier = modifier,
-        shape = RoundedCornerShape(50),
-        color = colorResource(R.color.colorHeaderBackground),
+        shape = CircleShape,
+        color = colorResource(R.color.colorPrimary).copy(alpha = 0.12f),
     ) {
         Text(
             text = text,
-            color = colorResource(R.color.colorHeaderTitle),
+            color = colorResource(R.color.colorPrimary),
             fontFamily = projectPillFontFamily,
-            fontSize = 14.sp,
+            fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
         )
     }
 }

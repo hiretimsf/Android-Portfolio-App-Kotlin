@@ -1,6 +1,7 @@
 package hiretimsf.com.app.screens.blog.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -60,21 +61,15 @@ fun BlogPostCard(
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 16.dp, top = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 BlogPill(
                     text = post.category,
                     modifier = Modifier.weight(1f, fill = false),
                 )
-                Spacer(Modifier.weight(1f))
-                Text(
-                    text = post.date,
-                    color = colorResource(R.color.colorHeaderTitle),
-                    fontFamily = blogCardFontFamily,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 13.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                BlogMetaText(text = post.date)
+                BlogMetaText(text = "|", alpha = 0.7f)
+                BlogMetaText(text = post.readTime)
             }
             Text(
                 text = post.title,
@@ -120,4 +115,20 @@ fun BlogPostCard(
             }
         }
     }
+}
+
+@Composable
+private fun BlogMetaText(
+    text: String,
+    alpha: Float = 1f,
+) {
+    Text(
+        text = text,
+        color = colorResource(R.color.colorOnSurface).copy(alpha = alpha),
+        fontFamily = blogCardFontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 13.sp,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+    )
 }

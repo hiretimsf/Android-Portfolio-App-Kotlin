@@ -349,6 +349,7 @@ private fun AppNavHost(
             val state by viewModel.state.collectAsStateWithLifecycle()
             BlogDetailComposeScreen(
                 state = state,
+                onLinkClick = context::launchCustomTab,
             )
         }
         dialog(AppRoute.AppInfo.route) {

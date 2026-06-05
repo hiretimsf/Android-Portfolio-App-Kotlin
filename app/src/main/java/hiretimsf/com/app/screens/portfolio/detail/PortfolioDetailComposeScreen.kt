@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +36,7 @@ import hiretimsf.com.app.repository.database.model.button.ButtonModel
 import hiretimsf.com.app.repository.database.model.category.CategoryModel
 import hiretimsf.com.app.repository.database.model.portfolio.PortfolioModel
 import hiretimsf.com.app.repository.database.model.screenshot.ScreenShotModel
+import hiretimsf.com.app.screens.portfolio.components.ProjectPill
 import hiretimsf.com.app.screens.shared.components.PrimaryGradientButton
 import hiretimsf.com.app.utils.images.loadRemoteImage
 import java.text.SimpleDateFormat
@@ -139,10 +139,7 @@ fun PortfolioDetailComposeScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 categories.forEach { category ->
-                    AssistChip(
-                        onClick = {},
-                        label = { Text(category.title, fontFamily = portfolioDetailFontFamily) },
-                    )
+                    ProjectPill(text = category.title)
                 }
             }
         }

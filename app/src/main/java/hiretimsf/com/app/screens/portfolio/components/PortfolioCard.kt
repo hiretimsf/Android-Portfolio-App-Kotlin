@@ -66,18 +66,18 @@ fun PortfolioCard(
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     ProjectPill(
                         text = item.header.ifBlank { "Project" },
                         modifier = Modifier.weight(1f, fill = false),
                     )
-                    Spacer(Modifier.weight(1f))
                     Text(
                         text = formatDateRange(item.dateFrom, item.dateTo),
-                        color = colorResource(R.color.colorHeaderTitle),
+                        color = colorResource(R.color.colorOnSurface),
                         fontFamily = portfolioCardFontFamily,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
+                        fontSize = 13.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
